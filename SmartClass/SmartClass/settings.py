@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'student',
     'teacher',
+    'adminsc',
 ]
 
 AUTH_USER_MODEL = 'teacher.MyUser'

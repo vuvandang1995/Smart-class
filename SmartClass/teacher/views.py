@@ -31,16 +31,19 @@ class EmailThread(threading.Thread):
         self.email.send()
 
 
-def home(request):
-    user = request.user
-    if user.is_authenticated:
-        return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
-    else:
-        return HttpResponseRedirect('/')
+#
+
+# def home(request):
+#     user = request.user
+#     if user.is_authenticated:
+#         return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
+#     else:
+#         return HttpResponseRedirect('/')
 
 
 def user_login(request):
     user = request.user
+
     if user.is_authenticated:
         return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
     else:
@@ -82,7 +85,7 @@ def user_login(request):
                         elif user.position == 1:
                             return HttpResponseRedirect('/home')
                         else:
-                            return HttpResponseRedirect('/home')
+                            return HttpResponseRedirect('/adminsc/home')
                     else:
                         return render(request, 'teacher/login.html', {'error': 'Your account is blocked!'})
                 else:
