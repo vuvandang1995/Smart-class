@@ -10,14 +10,14 @@ from django.utils.safestring import mark_safe
 import json
 from django.contrib.auth.models import User
 import threading
-from teacher.forms import UserForm, authenticate, UserResetForm, get_user_email, ResetForm
+from teacher.forms import UserForm, authenticate, UserResetForm, get_email, ResetForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from .tokens import account_activation_token
 from django.core.mail import EmailMessage
-from teacher.models import GiaoVien, HocSinh
+from teacher.models import MyUser
 
 from django.contrib import messages
 
@@ -30,16 +30,20 @@ class EmailThread(threading.Thread):
     def run(self):
         self.email.send()
 
-def home(request):
-    user = request.user
-    if user.is_authenticated:
-        return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
-    else:
-        return HttpResponseRedirect('/')
+
+#
+
+# def home(request):
+#     user = request.user
+#     if user.is_authenticated:
+#         return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
+#     else:
+#         return HttpResponseRedirect('/')
 
 
 def user_login(request):
     user = request.user
+
     if user.is_authenticated:
         return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
     else:
@@ -50,7 +54,7 @@ def user_login(request):
                 if form.is_valid():
                     to_email = form.cleaned_data['uemail']
                     current_site = get_current_site(request)
-                    user = get_user_email(to_email)
+                    user = get_email(to_email)
                     mail_subject = 'Reset password your account.'
                     message = render_to_string('teacher/resetpwd.html', {
                         'user': user,
@@ -74,13 +78,18 @@ def user_login(request):
                 password = request.POST['agentpass']
                 user = authenticate(username=username, password=password)
                 if user:
-                    if user.is_active and user.is_adminkvm:
+                    if user.is_active:
                         login(request, user)
-                        return HttpResponseRedirect('/home')
+                        if user.position == 0:
+                            return HttpResponseRedirect('/home')
+                        elif user.position == 1:
+                            return HttpResponseRedirect('/home')
+                        else:
+                            return HttpResponseRedirect('/adminsc/home')
                     else:
-                        return render(request, 'teacher/login.html',{'error':'Your account is blocked!'})
+                        return render(request, 'teacher/login.html', {'error': 'Your account is blocked!'})
                 else:
-                    return render(request, 'teacher/login.html',{'error':'Invalid username or password '})
+                    return render(request, 'teacher/login.html', {'error': 'Invalid username or password '})
             elif 'firstname' and 'email' and 'password2' in request.POST:
                 user_form = UserForm(request.POST)
                 if user_form.is_valid():
@@ -113,6 +122,7 @@ def resetpwd(request, uidb64, token):
         return render(request, 'teacher/formresetpass.html', {})
     else:
         return HttpResponse('Link is invalid!')
+
 
 def user_logout(request):
     logout(request)

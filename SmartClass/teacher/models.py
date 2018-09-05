@@ -5,8 +5,16 @@ from django.contrib.auth.models import (
 from django.utils import timezone
 
 
-class GiaoVienManager(BaseUserManager):
-    def create_user(self, email, username, fullname, password):
+def get_truong(name):
+    try:
+        truong = Truong.objects.get(ten=name)
+    except:
+        return None
+    return truong
+
+
+class MyUserManager(BaseUserManager):
+    def create_student(self, email, username, fullname, password):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -18,100 +26,68 @@ class GiaoVienManager(BaseUserManager):
             email=self.normalize_email(email),
             username=username,
             fullname=fullname,
+            # truong_id=get_truong(truong),
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, fullname, password):
+    def create_teacher(self, email, username, fullname, password):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
         """
-        user = self.create_user(
+        user = self.create_student(
             email,
             password=password,
             username=username,
             fullname=fullname,
+            # truong=truong,
         )
-        user.is_admin = True
+        user.position = 1
         user.save(using=self._db)
         return user
 
-
-
-
-class GiaoVien(AbstractBaseUser):
-    email = models.EmailField(
-        verbose_name='email address',
-        max_length=255,
-        unique=True,
-    )
-    fullname = models.CharField(max_length=100)
-    username = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
-
-    objects = GiaoVienManager()
-
-    class Meta:
-        managed = True
-        db_table = 'giao_vien'
-
-    def __str__(self):
-        return self.email
-
-    def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
-        return True
-
-    def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
-        return True
-
-    @property
-    def is_staff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
-        return self.is_admin
-
-
-class HocSinhManager(BaseUserManager):
-    def create_user(self, username, fullname, password):
+    def create_admin(self, email, username, fullname, password):
         """
-        Creates and saves a User with the given email, date of
+        Creates and saves a superuser with the given email, date of
         birth and password.
         """
-
-        user = self.model(
+        user = self.create_student(
+            email,
+            password=password,
             username=username,
             fullname=fullname,
+            # truong=truong,
         )
-
-        user.set_password(password)
+        user.position = 2
         user.save(using=self._db)
         return user
 
 
-class HocSinh(AbstractBaseUser):
+class MyUser(AbstractBaseUser):
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
         unique=True,
-        null=True,
     )
     fullname = models.CharField(max_length=100)
-    username = models.CharField(max_length=100)
+    username = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
+    position = models.IntegerField(default=0)
+    # 0 : student
+    # 1 : teacher
+    # 2 : admin
+    truong_id = models.ForeignKey('Truong', models.CASCADE, db_column='truong_id', null=True)
 
-    objects = HocSinhManager()
+    objects = MyUserManager()
+
+    USERNAME_FIELD = 'username'
 
     class Meta:
         managed = True
-        db_table = 'hoc_sinh'
+        db_table = 'my_user'
 
     def __str__(self):
         return self.email
@@ -153,8 +129,7 @@ class Lop(models.Model):
 
 class ChiTietLop(models.Model):
     lop_id = models.ForeignKey('Lop', models.CASCADE, db_column='lop_id')
-    giao_vien_id = models.ForeignKey('GiaoVien', models.CASCADE, null=True, db_column='giao_vien_id')
-    hoc_sinh_id = models.ForeignKey('HocSinh', models.CASCADE, null=True, db_column="hoc_sinh_id")
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
 
     class Meta:
         managed = True
@@ -172,7 +147,7 @@ class Mon(models.Model):
 
 
 class GiaoVienMon(models.Model):
-    giao_vien_id = models.ForeignKey('GiaoVien', models.CASCADE, db_column='giao_vien_id')
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
     mon_id = models.ForeignKey('Mon', models.CASCADE, db_column='mon_id')
 
     class Meta:
@@ -182,7 +157,7 @@ class GiaoVienMon(models.Model):
 
 class De(models.Model):
     ten = models.CharField(max_length=255)
-    giao_vien_id = models.ForeignKey('GiaoVien', models.CASCADE, db_column='giao_vien_id')
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
     mon = models.ForeignKey('Mon', models.CASCADE, db_column='mon_id')
     ngay_tao = models.DateField(default=timezone.now)
     loai_de = models.IntegerField()
@@ -203,7 +178,7 @@ class ChiTietDe(models.Model):
 
 
 class CauHoi(models.Model):
-    giao_vien_id = models.ForeignKey('GiaoVien', models.CASCADE, db_column='giao_vien_id')
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
     mon_id = models.ForeignKey('Mon', models.CASCADE, db_column='mon_id')
     ngay_tao = models.DateField(default=timezone.now)
     noi_dung = models.TextField()
@@ -227,7 +202,7 @@ class DapAn(models.Model):
 class BaiLamHocSinh(models.Model):
     de_id = models.ForeignKey('De', models.CASCADE, db_column='de_id')
     cau_hoi_id = models.ForeignKey('CauHoi', models.CASCADE, db_column='cau_hoi_id')
-    hoc_sinh_id = models.ForeignKey('HocSinh', models.CASCADE, db_column='hoc_sinh_id')
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
     dap_an = models.CharField(max_length=255)
 
     class Meta:
@@ -237,7 +212,7 @@ class BaiLamHocSinh(models.Model):
 
 class DiemSo(models.Model):
     de_id = models.ForeignKey('De', models.CASCADE, db_column='de_id')
-    hoc_sinh_id = models.ForeignKey('HocSinh', models.CASCADE, db_column='hoc_sinh_id')
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
     dap_an = models.CharField(max_length=255)
     ngay_lam = models.DateField(default=timezone.now)
 
@@ -248,7 +223,7 @@ class DiemSo(models.Model):
 
 class Nhom(models.Model):
     ten_nhom = models.CharField(max_length=255)
-    giao_vien_id = models.ForeignKey('GiaoVien', models.CASCADE, db_column='giao_vien_id')
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
 
     class Meta:
         managed = True
@@ -257,7 +232,7 @@ class Nhom(models.Model):
 
 class ChiTietNhom(models.Model):
     nhom_id = models.ForeignKey('Nhom', models.CASCADE, db_column='nhom_id')
-    hoc_sinh_id = models.ForeignKey('HocSinh', models.CASCADE, db_column='hoc_sinh_id')
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
 
     class Meta:
         managed = True
