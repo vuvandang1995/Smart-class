@@ -80,6 +80,7 @@ class MyUser(AbstractBaseUser):
     # 1 : teacher
     # 2 : admin
     truong_id = models.ForeignKey('Truong', models.CASCADE, db_column='truong_id', null=True)
+    gioi_tinh = models.IntegerField(null=True)
 
     objects = MyUserManager()
 
