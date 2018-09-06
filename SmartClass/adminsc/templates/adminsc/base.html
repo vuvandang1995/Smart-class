@@ -51,6 +51,7 @@
       }
     </style>
     <link rel="stylesheet" href="{% static 'css/admin-tpl/style.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     {% block js%}
     {% endblock%}
   </head>
@@ -78,7 +79,7 @@
           <div class="sidebar-logo">
             <div class="peers ai-c fxw-nw">
               <div class="peer peer-greed">
-                <a class="sidebar-link td-n" href="#">
+                <a class="sidebar-link td-n" href="{% url 'adminsc:home' %}">
                   <div class="peers ai-c fxw-nw">
                     <div class="peer">
                       <div class="logo">
@@ -128,7 +129,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class='sidebar-link' href="#">
+              <a class='sidebar-link' href="{% url 'adminsc:manage_teacher' %}">
                 <span class="icon-holder">
                   <i class="c-light-blue-500 ti-view-list-alt"></i>
                 </span>
@@ -355,14 +356,15 @@
         </div>
 
         <!-- ### $App Screen Content ### -->
-          {% block content%}
-          {% endblock%}
+          {% block content %}
+          {% endblock %}
       </div>
     </div>
-
+    <script src="{% static 'js/jquery/jquery-3.3.1.js' %}"></script>
     <script src="{% static 'js/admin-tpl/vendor.js' %}"></script>
     <script src="{% static 'js/admin-tpl/bundle.js' %}"></script>
     <script src="{% static 'js/admin-tpl/script.js' %}"></script>
-
+  {% block endjs%}
+  {% endblock %}
   </body>
 </html>
