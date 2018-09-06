@@ -14,7 +14,7 @@ def get_truong(name):
 
 
 class MyUserManager(BaseUserManager):
-    def create_student(self, email, username, fullname, password):
+    def create_student(self, email, username, fullname, password, gioi_tinh):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -26,6 +26,7 @@ class MyUserManager(BaseUserManager):
             email=self.normalize_email(email),
             username=username,
             fullname=fullname,
+            gioi_tinh=gioi_tinh,
             # truong_id=get_truong(truong),
         )
 
@@ -33,7 +34,7 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_teacher(self, email, username, fullname, password):
+    def create_teacher(self, email, username, fullname, password, gioi_tinh):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
@@ -43,6 +44,7 @@ class MyUserManager(BaseUserManager):
             password=password,
             username=username,
             fullname=fullname,
+            gioi_tinh=gioi_tinh,
             # truong=truong,
         )
         user.position = 1
