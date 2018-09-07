@@ -21,7 +21,7 @@ $(document).ready(function(){
         },
 //        'dom': 'Rlfrtip',
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        "displayLength": 25,
+        "displayLength": 10,
     });
 
     $("#new_teacher").on('show.bs.modal', function(event){
@@ -38,7 +38,7 @@ $(document).ready(function(){
             $('body #list_mon').empty();
             $('body .list_mon'+gvid).each(function(){
                 var mon = $(this).text();
-                var element = '<div class="checkbox checkbox-circle checkbox-info peers ai-c"><input type="checkbox" class="check_mon peer" name="'+mon+'" value="'+mon+'" checked ><label class="peers peer-greed js-sb ai-c"><span class="peer peer-greed">'+mon+'</span></label></div>';
+                var element = '<div><input type="checkbox" style="transform: scale(1.3)" class="check_mon" name="'+mon+'" value="'+mon+'" checked > '+mon+'</div>';
                 $('#list_mon').append(element);
             });
 
@@ -161,7 +161,7 @@ $(document).ready(function(){
             onChooseEvent: function() {
                 var ten = $("#search_mon").getSelectedItemData().ten;
                 var lop = $("#search_mon").getSelectedItemData().lop;
-                var element = '<div class="checkbox checkbox-circle checkbox-info peers ai-c"><input type="checkbox" class="check_mon peer" name="'+ten+" - "+lop+'" value="'+ten+" - "+lop+'" checked ><label class="peers peer-greed js-sb ai-c"><span class="peer peer-greed">'+ten+" - "+lop+'</span></label></div>';
+                var element = '<div><input type="checkbox" style="transform: scale(1.3)" class="check_mon" name="'+ten+" - "+lop+'" value="'+ten+" - "+lop+'" checked > '+ten+" - "+lop+'</div>';
                 var list_old = $("#list_mon").text();
                 if (list_old.includes(ten+" - "+lop) == false){
                     $('#list_mon').append(element);
@@ -174,6 +174,41 @@ $(document).ready(function(){
     $("#search_mon").easyAutocomplete(options_mon);
 
     $('body #list_mon').on('change', '.check_mon', function() {
+        $(this).parent().remove();
+    });
+
+    var options_lop = {
+        url: "lop_data",
+
+        getValue: function(element){
+            return element.ten;
+         },
+//        template: {
+//            type: "description",
+//            fields: {
+//                description: "username"
+//            }
+//        },
+
+        list: {
+            match: {
+                enabled: true
+            },
+            onChooseEvent: function() {
+                var ten = $("#search_lop").getSelectedItemData().ten;
+                var element = '<div><input type="checkbox" style="transform: scale(1.3)" class="check_lop" name="'+ten+'" value="'+ten+'" checked > '+ten+'</div>';
+                var list_old = $("#list_lop").text();
+                if (list_old.includes(ten) == false){
+                    $('#list_lop').append(element);
+                }
+                $("#search_lop").val("");
+            }
+        },
+        theme: "square"
+    };
+    $("#search_lop").easyAutocomplete(options_lop);
+
+    $('body #list_lop').on('change', '.check_lop', function() {
         $(this).parent().remove();
     });
 

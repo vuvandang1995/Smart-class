@@ -36,7 +36,7 @@ def home(request):
     user = request.user
     if user.is_authenticated:
         content = {'username': mark_safe(json.dumps(user.username)),}
-        return render(request, 'adminsc/index.html', content)
+        return render(request, 'adminsc/base.html', content)
     else:
         return HttpResponseRedirect('/')
 
@@ -98,23 +98,26 @@ def manage_teacher_data(request):
             mon = GiaoVienMon.objects.filter(myuser_id=teacher)
             ls_mon = ''
             for m in mon:
-                ls_mon += '<p hidden class="list_mon{0}">{1} - {2}</p>'.format(teacher.id, m.mon_id.ten, m.mon_id.lop)
+                ls_mon += '<p class="list_mon{0}">{1} - {2}</p>'.format(teacher.id, m.mon_id.ten, m.mon_id.lop)
+            lop = ChiTietLop.objects.filter(myuser_id=teacher)
+            ls_lop = ''
+            for l in lop:
+                ls_lop += '<p class="list_lop{0}">{1}</p>'.format(teacher.id, l.lop_id.ten)
             options = '''
-                <div class="btn-group mr-2" role="group" aria-label="First group">
-                    <button type="button" class="btn cur-p btn-success" data-toggle="modal" data-target="#new_teacher" data-title="edit" id="edit_{0}">
-                        <i class="fas fa-users-cog" data-toggle="tooltip" title="Chỉnh sửa"></i>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#new_teacher" data-title="edit" id="edit_{0}">
+                        <i class="fa fa-cog" data-toggle="tooltip" title="Chỉnh sửa"></i>
                     </button> 
-                    <button type="button" class="btn cur-p btn-warning" data-title="block" id="block_{0}">
-                        <i class="fas fa-user-lock" data-toggle="tooltip" title="Khóa"></i></i>
+                    <button type="button" class="btn btn-warning" data-title="block" id="block_{0}">
+                        <i class="fa fa-lock" data-toggle="tooltip" title="Khóa"></i></i>
                     </button> 
-                    <button type="button" class="btn cur-p btn-danger" data-title="del" id="del_{0}">
-                        <i class="fas fa-trash-alt" data-toggle="tooltip" title="Xóa"></i>
+                    <button type="button" class="btn btn-danger" data-title="del" id="del_{0}">
+                        <i class="fa fa-trash" data-toggle="tooltip" title="Xóa"></i>
                     </button> 
                 </div>
                 <p hidden id="email_{0}">{1}</p>
-                {2}
-            '''.format(teacher.id, teacher.email, ls_mon,)
-            data.append([fullname, username, gioi_tinh, last_login, options])
+            '''.format(teacher.id, teacher.email)
+            data.append([fullname, ls_mon, ls_lop, username, gioi_tinh, options])
         big_data = {"data": data}
         json_data = json.loads(json.dumps(big_data))
         return JsonResponse(json_data)
@@ -127,6 +130,15 @@ def mon_data(request):
         for mon in Mon.objects.all():
             ls_mon.append({"ten": mon.ten, "lop": mon.lop})
         return JsonResponse(ls_mon, safe=False)
+
+
+def lop_data(request):
+    user = request.user
+    if user.is_authenticated:
+        ls_lop = []
+        for l in Lop.objects.all():
+            ls_lop.append({"ten": l.ten})
+        return JsonResponse(ls_lop, safe=False)
 
 
 def user_logout(request):
