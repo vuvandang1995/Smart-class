@@ -21,77 +21,93 @@ $(document).ready(function(){
         },
 //        'dom': 'Rlfrtip',
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        "displayLength": 25,
+        "displayLength": 10,
     });
 
     $("#new_teacher").on('show.bs.modal', function(event){
         var button = $(event.relatedTarget);
         var title = button.data('title');
+        console.log = title;
         if (title === 'edit'){
-            $('#title').html("Chỉnh sửa dịch vụ")
-            var svname = button.data('name');
-            var svid = button.attr('id');
-            $("input[name=svname]").val(svname);
+            $('#teacher_title').html("Chỉnh sửa giáo viên")
+            var gvid = button.attr('id').split('_')[1];
 
-            var description = $("#description_topic"+svid).html();
-            $("input[name=description]").val(description);
+            var fullname = $("#full_"+gvid).text();
+            $("#new_teacher input[name=fullname]").val(fullname);
 
-            var leader = $("#leader_topic"+svid).children('p').text();
-            $("input[name=search]").val(leader);
-
-            var leader_username = $("#leader_topic"+svid).children('input').val();
-            $("input[name=username_leader]").val(leader_username);
-
-            var gpsv = $("input[name=gpsv"+svid+"]").val();
-            $("#mySelect").val(gpsv);
-
-            var downtime = $('body #downtime'+svid).html();
-            var ngay = parseInt(downtime/1440);
-            var gio = parseInt((downtime - ngay*1440)/60);
-            var phut = parseInt(downtime - ngay*1440 - gio*60);
-            $("input[name=ngay]").val(ngay);
-            $("input[name=gio]").val(gio);
-            $("input[name=phut]").val(phut);
-
-            $('body #list_agent').empty();
-            $('body .listagent'+svid).each(function(){
-                var username = $(this).children('input').val();
-                var fullname = $(this).text();
-                var element = '<li><input style="transform: scale(1.3)" type="checkbox" class="check_agent" name="'+username+'" value="'+username+'" checked >'+fullname+'</li>';
-                $('#list_agent').append(element);
+            $('body #list_mon').empty();
+            $('body .list_mon'+gvid).each(function(){
+                var mon = $(this).text();
+                var element = '<div><input type="checkbox" style="transform: scale(1.3)" class="check_mon" name="'+mon+'" value="'+mon+'" checked > '+mon+'</div>';
+                $('#list_mon').append(element);
             });
 
-            $("#search_agent").val("");
-            $("input[name=svid]").val(svid);
-            $("#nameerr").html("");
-            $("#deserr").html("");
-            $("#leadererr").html("");
-            $("#gpsverr").html("");
-            $("#downtimeerr").html("");
+            var gioi_tinh = $("#gioi_"+ gvid).text();
+            if(gioi_tinh === 'Nam'){
+                $('#new_teacher input[name=nam]').prop('checked', true);
+                $('#new_teacher input[name=nu]').prop('checked', false);
+            }else{
+                $('#new_teacher input[name=nam]').prop('checked', false);
+                $('#new_teacher input[name=nu]').prop('checked', true);
+            }
+
+            var username = $("#user_"+gvid).text();
+            $("#new_teacher input[name=username]").val(username);
+
+            var email = $("#email_"+gvid).text();
+            $("#new_teacher input[name=email]").val(email);
+
+            $("#new_teacher input[name=username]").hide();
+            $("#new_teacher label[name=username]").hide();
+
+            $("#new_teacher input[name=password]").hide();
+            $("#new_teacher label[name=password]").hide();
+
+            $("#new_teacher  input[name=password2]").hide();
+            $("#new_teacher label[name=password2]").hide();
+
+            $("#new_teacher  input[name=kieu]").val("edit");
+
+            $("#create_new_teacher").html("Chỉnh sửa");
 
         }else{
             $('#teacher_title').html("Thêm mới giáo viên")
-            $("input[name=svid]").val(0);
-            $("input[name=fullname]").val("");
-            $("input[name=username]").val("");
-            $("input[name=gioi_tinh]").val("");
-            $("input[name=search_agent]").val("");
-            $("input[name=username_leader]").val("");
-            $('body #list_agent').empty();
-            $("input[name=ngay]").val("");
-            $("input[name=gio]").val("");
-            $("input[name=phut]").val("");
-            $("#nameerr").html("");
-            $("#deserr").html("");
-            $("#leadererr").html("");
-            $("#gpsverr").html("");
-            $("#downtimeerr").html("");
+            $("#new_teacher input[name=gvid]").val(0);
+            $("#new_teacher input[name=fullname]").val("");
+            $("#new_teacher input[name=search_mon]").val("");
+            $("#new_teacher input[name=gioi_tinh]").val("");
+            $('#new_teacher input[name=nam]').prop('checked', true);
+            $('#new_teacher input[name=nu]').prop('checked', false);
+            $("#new_teacher input[name=username]").val("");
+            $("#new_teacher input[name=password]").val("");
+            $("#new_teacher input[name=password2]").val("");
+            $("#new_teacher input[name=email]").val("");
+
+            $('#list_mon').empty();
+
+            $("#new_teacher input[name=username]").show();
+            $("#new_teacher label[name=username]").show();
+
+            $("#new_teacher input[name=password]").show();
+            $("#new_teacher label[name=password]").show();
+
+            $("#new_teacher input[name=password2]").show();
+            $("#new_teacher label[name=password2]").show();
+
+            $("#new_teacher  input[name=kieu]").val("new");
+            $("#create_new_teacher").html("Thêm mới");
         }
     });
 
     $('#create_new_teacher').click( function(){
+        var kieu = $("#new_teacher  input[name=kieu]").val();
         var token = $("#new_teacher input[name=csrfmiddlewaretoken]").val();
         var fullname = $("#new_teacher input[name=fullname]").val();
+        if ($('#new_teacher input[name=nam]').is(':checked')){
+            var gioi_tinh = 1;
+        }else{
+            var gioi_tinh = 0;
+        }
         var username = $("#new_teacher input[name=username]").val();
         var email = $("#new_teacher input[name=email]").val();
         var password = $("#new_teacher input[name=password]").val();
@@ -106,23 +122,21 @@ $(document).ready(function(){
             $.ajax({
                 type:'POST',
                 url:location.href,
-                data: {'csrfmiddlewaretoken':token, 'fullname': fullname,'list_mon': JSON.stringify(list_mon),
-                 'username': username, 'email': email, 'password': password},
+                data: {'csrfmiddlewaretoken':token, 'kieu':kieu, 'fullname': fullname, 'gioi_tinh': gioi_tinh,
+                'list_mon': JSON.stringify(list_mon),'username': username, 'email': email, 'password': password},
                 success: function(){
+                    $("#new_teacher").modal("hide");
                     $('#list_teacher').DataTable().ajax.reload(null,false);
-                    $("#close_new_teacher").click();
                 }
             });
         }
     });
 
     $(".gioi_tinh").change(function() {
-        if($('#new_teacher input[name=nam]').checked){
-            console.log("nam click");
+        if(this.checked && this.name === 'nam'){
             $('#new_teacher input[name=nu]').prop('checked', false);
         }
-        if($('#new_teacher input[name=nu]').checked){
-            console.log("nu click");
+        else if(this.checked && this.name === 'nu'){
             $('#new_teacher input[name=nam]').prop('checked', false);
         }
     });
@@ -147,9 +161,9 @@ $(document).ready(function(){
             onChooseEvent: function() {
                 var ten = $("#search_mon").getSelectedItemData().ten;
                 var lop = $("#search_mon").getSelectedItemData().lop;
-                var element = '<div class="checkbox checkbox-circle checkbox-info peers ai-c"><input type="checkbox" class="check_mon peer" name="'+ten+" - "+lop+'" value="'+ten+" - "+lop+'" checked ><label class="peers peer-greed js-sb ai-c"><span class="peer peer-greed">'+ten+" - "+lop+'</span></label></div>';
+                var element = '<div><input type="checkbox" style="transform: scale(1.3)" class="check_mon" name="'+ten+" - "+lop+'" value="'+ten+" - "+lop+'" checked > '+ten+" - "+lop+'</div>';
                 var list_old = $("#list_mon").text();
-                if (list_old.includes(ten) == false){
+                if (list_old.includes(ten+" - "+lop) == false){
                     $('#list_mon').append(element);
                 }
                 $("#search_mon").val("");
@@ -160,7 +174,42 @@ $(document).ready(function(){
     $("#search_mon").easyAutocomplete(options_mon);
 
     $('body #list_mon').on('change', '.check_mon', function() {
-        $(this).parent().parent().remove();
+        $(this).parent().remove();
+    });
+
+    var options_lop = {
+        url: "lop_data",
+
+        getValue: function(element){
+            return element.ten;
+         },
+//        template: {
+//            type: "description",
+//            fields: {
+//                description: "username"
+//            }
+//        },
+
+        list: {
+            match: {
+                enabled: true
+            },
+            onChooseEvent: function() {
+                var ten = $("#search_lop").getSelectedItemData().ten;
+                var element = '<div><input type="checkbox" style="transform: scale(1.3)" class="check_lop" name="'+ten+'" value="'+ten+'" checked > '+ten+'</div>';
+                var list_old = $("#list_lop").text();
+                if (list_old.includes(ten) == false){
+                    $('#list_lop').append(element);
+                }
+                $("#search_lop").val("");
+            }
+        },
+        theme: "square"
+    };
+    $("#search_lop").easyAutocomplete(options_lop);
+
+    $('body #list_lop').on('change', '.check_lop', function() {
+        $(this).parent().remove();
     });
 
 });
