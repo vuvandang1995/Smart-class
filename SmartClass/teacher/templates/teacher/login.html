@@ -21,9 +21,7 @@
       <!-- /.login-logo -->
       <div class="login-box-body">
         <ul class="nav nav-tabs">
-          <li class="active"><a data-toggle="tab" href="#home">Học sinh</a></li>
-          <li><a data-toggle="tab" href="#menu1">Giáo viên</a></li>
-          <li><a data-toggle="tab" href="#menu2">Đăng ký</a></li>
+          <li class="active"><a data-toggle="tab" href="#home">Đăng nhập</a></li>
         </ul>
 
         <div class="tab-content">
@@ -44,7 +42,7 @@
                   <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                 </div>
 
-                <button type="submit" class="btn btn-primary" value="OK" id="login" >Học sinh đăng nhập</button>
+                <button type="submit" class="btn btn-primary" value="OK" id="login" >Đăng nhập</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#id03">Quên mật khẩu ?</button>
                 <br>
                 <br>
@@ -52,72 +50,6 @@
                 <font color="red" size="4">{{ error }}</font>
             </form>
 
-          </div>
-          <div id="menu1" class="tab-pane fade">
-            <br>
-            <form method="POST">
-              {% csrf_token %}
-              <div class="form-group has-feedback">
-                <label for="uname"><b>Tên đăng nhập</b></label>
-                <input class="form-control" type="text" placeholder="Nhập tên đăng nhập" name="agentname" required>
-                <div class="invalid-msg"></div>
-                <span class="glyphicon glyphicon-user form-control-feedback"></span>
-              </div>
-              <div class="form-group has-feedback">
-                <label for="psw"><b>Mật khẩu</b></label>
-                <input  class="form-control" type="password" placeholder="Nhập mật khẩu" name="agentpass" required>
-                <div class="invalid-msg1"></div>
-                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-              </div>
-
-                <button type="submit" class="btn btn-primary" value="OK" id="login">Giáo viên đăng nhập</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal" data-toggle="modal" data-target="#id04">Quên mật khẩu ?</button>
-                <br>
-                <br>
-                <font color="red" size="4">{{ mess }}</font>
-                <font color="red" size="4">{{error}}</font>
-            </form>
-          </div>
-          <div id="menu2" class="tab-pane fade">
-            <br>
-            <form method="POST">
-              {% csrf_token %}
-              <div class="form-group has-feedback">
-                <label for="fullname"><b>Họ và tên</b></label>
-                <input class="form-control inputText" type="text" placeholder="Nhập họ tên" name="fullname" required>
-                <div class="invalid-msg"></div>
-                <span class="glyphicon glyphicon-font form-control-feedback"></span>
-              </div>
-              <div class="form-group has-feedback">
-                <label for="username"><b>Tên đăng nhập</b></label>
-                <input class="form-control inputText" type="text" placeholder="Nhập tên đăng nhập" name="username" id="username_" required>
-                <div class="invalid-msg"></div>
-                <span class="glyphicon glyphicon-user form-control-feedback"></span>
-              </div>
-              <div class="form-group has-feedback">
-                <label for="email"><b>Email</b></label></br>
-                <input class="form-control inputText" type="text" placeholder="Nhập email" name="email" id="email_" required>
-                <div class="invalid-msg"></div>
-                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-              </div>
-              <div class="form-group has-feedback">
-                <label for="psw"><b>Mật khẩu</b></label>
-                <input class="form-control inputText" type="password" placeholder="Nhập mật khẩu" name="password" id="p1" required>
-                <div class="invalid-msg"></div>
-                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-              </div>
-              <div class="form-group has-feedback">
-                <label for="psw-repeat"><b>Nhắc lại mật khẩu</b></label>
-                <input class="form-control inputText" type="password" placeholder="Nhập lại mật khẩu" name="password2" id="p2" required>
-                <div class="invalid-msg"></div>
-                <span class="glyphicon glyphicon-repeat form-control-feedback"></span>
-              </div>
-                <button type="submit" class="btn btn-primary" value="OK" id="register">Đăng ký</button>
-                <br>
-                <br>
-                <font color="red" size="4">{{ mess }}</font>
-                <font color="red" size="4">{{ error }}</font>
-          </form>
           </div>
         </div>
       </div>

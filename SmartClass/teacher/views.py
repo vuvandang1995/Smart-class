@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
-from django.contrib.auth import login
 from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
+from django.contrib import auth
 import uuid
 import random
 
@@ -71,15 +71,15 @@ def user_login(request):
                     for field in form:
                         error += field.errors
                     return render(request, 'teacher/login.html', {'error': error})
-            elif 'agentname' and 'agentpass' in request.POST:
-                username = request.POST['agentname']
-                password = request.POST['agentpass']
+            elif 'username' and 'password' in request.POST:
+                username = request.POST['username']
+                password = request.POST['password']
                 user = authenticate(username=username, password=password)
                 if user:
                     if user.is_active:
                         login(request, user)
                         if user.position == 0:
-                            return HttpResponseRedirect('/home')
+                            return HttpResponseRedirect('/student')
                         elif user.position == 1:
                             return HttpResponseRedirect('/home')
                         else:
