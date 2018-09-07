@@ -33,7 +33,7 @@ class EmailThread(threading.Thread):
 
 def home(request):
     user = request.user
-    if user.is_authenticated:
+    if user.is_authenticated and user.position == 1:
         return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
     else:
         return HttpResponseRedirect('/')
@@ -43,7 +43,12 @@ def user_login(request):
     user = request.user
 
     if user.is_authenticated:
-        return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
+        if user.position == 0:
+            return redirect("/student")
+        elif user.position == 1:
+            return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
+        else:
+            return redirect("/adminsc")
     else:
         if request.method == 'POST':
             # post form để User yêu cầu reset mật khẩu, gửi link về mail
@@ -129,4 +134,7 @@ def user_logout(request):
 
 def user_profile(request):
     user = request.user
-    return render(request, 'teacher/profile.html', {'username': mark_safe(json.dumps(user.username))})
+    if user.is_authenticated and user.position == 1:
+        return render(request, 'teacher/profile.html', {'username': mark_safe(json.dumps(user.username))})
+    else:
+        return HttpResponseRedirect('/')
