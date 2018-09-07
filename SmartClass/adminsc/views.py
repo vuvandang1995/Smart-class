@@ -34,7 +34,7 @@ class EmailThread(threading.Thread):
 
 def home(request):
     user = request.user
-    if user.is_authenticated:
+    if user.is_authenticated and user.position == 2:
         content = {'username': mark_safe(json.dumps(user.username)),}
         return render(request, 'adminsc/base.html', content)
     else:
@@ -45,7 +45,7 @@ def manage_teacher(request):
     user = request.user
     content = {'username': mark_safe(json.dumps(user.username)),}
 
-    if user.is_authenticated:
+    if user.is_authenticated and user.position == 2:
         if request.method == 'POST':
             list_mon = request.POST['list_mon']
             list_mon = json.loads(list_mon)
