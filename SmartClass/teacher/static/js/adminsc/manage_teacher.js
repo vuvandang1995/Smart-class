@@ -42,6 +42,13 @@ $(document).ready(function(){
                 $('#list_mon').append(element);
             });
 
+            $('body #list_lop').empty();
+            $('body .list_lop'+gvid).each(function(){
+                var lop = $(this).text();
+                var element = '<div><input type="checkbox" style="transform: scale(1.3)" class="check_lop" name="'+lop+'" value="'+lop+'" checked > '+lop+'</div>';
+                $('#list_lop').append(element);
+            });
+
             var gioi_tinh = $("#gioi_"+ gvid).text();
             if(gioi_tinh === 'Nam'){
                 $('#new_teacher input[name=nam]').prop('checked', true);
@@ -53,18 +60,14 @@ $(document).ready(function(){
 
             var username = $("#user_"+gvid).text();
             $("#new_teacher input[name=username]").val(username);
+            $("#new_teacher input[name=username]").prop("readonly", true);
 
             var email = $("#email_"+gvid).text();
             $("#new_teacher input[name=email]").val(email);
 
-            $("#new_teacher input[name=username]").hide();
-            $("#new_teacher label[name=username]").hide();
-
-            $("#new_teacher input[name=password]").hide();
-            $("#new_teacher label[name=password]").hide();
-
-            $("#new_teacher  input[name=password2]").hide();
-            $("#new_teacher label[name=password2]").hide();
+            $(".passwd").each(function() {
+                $(this).hide();
+            });
 
             $("#new_teacher  input[name=kieu]").val("edit");
 
@@ -75,6 +78,7 @@ $(document).ready(function(){
             $("#new_teacher input[name=gvid]").val(0);
             $("#new_teacher input[name=fullname]").val("");
             $("#new_teacher input[name=search_mon]").val("");
+            $("#new_teacher input[name=search_lop]").val("");
             $("#new_teacher input[name=gioi_tinh]").val("");
             $('#new_teacher input[name=nam]').prop('checked', true);
             $('#new_teacher input[name=nu]').prop('checked', false);
@@ -84,15 +88,13 @@ $(document).ready(function(){
             $("#new_teacher input[name=email]").val("");
 
             $('#list_mon').empty();
+            $('#list_lop').empty();
 
-            $("#new_teacher input[name=username]").show();
-            $("#new_teacher label[name=username]").show();
+            $("#new_teacher input[name=username]").prop("readonly", false);
 
-            $("#new_teacher input[name=password]").show();
-            $("#new_teacher label[name=password]").show();
-
-            $("#new_teacher input[name=password2]").show();
-            $("#new_teacher label[name=password2]").show();
+            $(".passwd").each(function() {
+                $(this).show();
+            });
 
             $("#new_teacher  input[name=kieu]").val("new");
             $("#create_new_teacher").html("Thêm mới");
@@ -113,17 +115,20 @@ $(document).ready(function(){
         var password = $("#new_teacher input[name=password]").val();
         var password2 = $("#new_teacher input[name=password2]").val();
         var list_mon = [];
-        $('#new_teacher input:checkbox').each(function() {
-            if ($(this).is(":checked") && (this.name != 'nam') && (this.name != 'nu') ){
-                list_mon.push(this.name);
-            }
+        $('#new_teacher .check_mon').each(function() {
+            list_mon.push(this.name);
+        });
+        var list_lop = [];
+        $('#new_teacher .check_lop').each(function() {
+            list_lop.push(this.name);
         });
         if(password === password2){
             $.ajax({
                 type:'POST',
                 url:location.href,
                 data: {'csrfmiddlewaretoken':token, 'kieu':kieu, 'fullname': fullname, 'gioi_tinh': gioi_tinh,
-                'list_mon': JSON.stringify(list_mon),'username': username, 'email': email, 'password': password},
+                'list_mon': JSON.stringify(list_mon),'list_lop': JSON.stringify(list_lop),'username': username,
+                'email': email, 'password': password},
                 success: function(){
                     $("#new_teacher").modal("hide");
                     $('#list_teacher').DataTable().ajax.reload(null,false);
@@ -210,6 +215,36 @@ $(document).ready(function(){
 
     $('body #list_lop').on('change', '.check_lop', function() {
         $(this).parent().remove();
+    });
+
+    $("#list_teacher").on('click', '.btn-danger', function(){
+        var id = $(this).attr('id').split('_')[1];
+        var token = $("input[name=csrfmiddlewaretoken]").val();
+        if (confirm('Bạn có chắc ?')){
+            $.ajax({
+                type:'POST',
+                url:location.href,
+                data: {'delete':id, 'csrfmiddlewaretoken':token},
+                success: function(){
+                    $('#list_teacher').DataTable().ajax.reload(null,false);
+                }
+           });
+        }
+    });
+
+    $("#list_teacher").on('click', '.btn-warning', function(){
+        var id = $(this).attr('id').split('_')[1];
+        var token = $("input[name=csrfmiddlewaretoken]").val();
+        if (confirm('Bạn có chắc ?')){
+            $.ajax({
+                type:'POST',
+                url:location.href,
+                data: {'block':id, 'csrfmiddlewaretoken':token},
+                success: function(){
+                    $('#list_teacher').DataTable().ajax.reload(null,false);
+                }
+           });
+        }
     });
 
 });
