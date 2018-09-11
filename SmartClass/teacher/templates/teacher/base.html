@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     {% block head %}
+      {% load static %}
       {% block meta %}
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!-- Meta, title, CSS, favicons, etc. -->
@@ -10,23 +11,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
       {% endblock meta %}
 
-      <title>Gentelella Alela! | {% block title %}{% endblock %}</title>
+      <title>Smart class! | {% block title %}{% endblock %}</title>
 
       {% block stylesheets %}
         <!-- Bootstrap -->
-        <link href="/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="{% static 'vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
         <!-- Font Awesome -->
-        <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        <link href="{% static '/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
         <!-- NProgress -->
-        <link href="/static/vendors/nprogress/nprogress.css" rel="stylesheet">
-        <!-- bootstrap-daterangepicker -->
-        <link href="/static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-        <!-- iCheck -->
-        <link href="/static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-        <!-- bootstrap-progressbar -->
-        <link href="/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
-        <!-- JQVMap -->
-        <link href="/static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+        <!--<link href="{% static 'vendors/nprogress/nprogress.css' %}" rel="stylesheet">-->
+        <!--&lt;!&ndash; bootstrap-daterangepicker &ndash;&gt;-->
+        <!--<link href="{% static 'vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">-->
+        <!--&lt;!&ndash; iCheck &ndash;&gt;-->
+        <!--<link href="{% static 'vendors/iCheck/skins/flat/green.css' %}" rel="stylesheet">-->
+        <!--&lt;!&ndash; bootstrap-progressbar &ndash;&gt;-->
+        <!--<link href="{% static 'vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">-->
+        <!--&lt;!&ndash; JQVMap &ndash;&gt;-->
+        <!--<link href="{% static 'vendors/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>-->
       {% endblock stylesheets %}
       <!-- Custom Theme Style -->
       <link href="/static/build/css/custom.css" rel="stylesheet">
@@ -40,13 +41,104 @@
 
           {% block sidebar %}
             <div class="col-md-3 left_col {% block sidebar_class %} {% endblock sidebar_class %}">
-              {% include "app/sidebar.html" %}
+              <div class="left_col scroll-view">
+                <div class="navbar nav_title" style="border: 0;">
+                  <a href="{% url 'teacher:home' %}" class="site_title"><i class="fa fa-spinner"></i> <span>Teacher</span></a>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <!-- menu profile quick info -->
+                <div class="profile clearfix">
+                  <div class="profile_pic">
+                    <img src="/static/images/img.jpg" alt="..." class="img-circle profile_img">
+                  </div>
+                  <div class="profile_info">
+                    <span>Xin chào</span>
+                    <h2>{{user.fullname}}</h2>
+                  </div>
+                </div>
+                <!-- /menu profile quick info -->
+
+                <br />
+
+                <!-- sidebar menu -->
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                  <div class="menu_section">
+                    <ul class="nav side-menu">
+                      <li><a><i class="fa fa-home"></i> Nhóm học tập </a>
+                      </li>
+                      <li><a><i class="fa fa-edit"></i> Các môn học <span class="fa fa-chevron-down"></span></a>
+                          <ul class="nav child_menu">
+                            <li><a href="">Toán</a></li>
+                            <li><a href="">Lý</a></li>
+                            <li><a href="">Hóa</a></li>
+                          </ul>
+                      </li>
+                      
+                      <li><a href="{% url 'teacher:profile' %}"><i class="fa fa-table"></i> Thông tin cá nhân </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <!-- /sidebar menu -->
+
+              </div>
+
             </div>
           {% endblock sidebar %}
 
           {% block top_navigation %}
             <div class="top_nav">
-              {% include "app/top_navigation.html" %}
+              <div class="nav_menu">
+                <nav>
+                  <div class="nav toggle">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                  </div>
+
+                  <ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                      <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <img src="/static/images/img.jpg" alt="">{{user.username}}
+                        <span class=" fa fa-angle-down"></span>
+                      </a>
+                      <ul class="dropdown-menu dropdown-usermenu pull-right">
+                        <li><a href="{% url 'teacher:profile' %}"> Thông tin cá nhân</a></li>
+                        <li><a href="{% url 'teacher:logout' %}"><i class="fa fa-sign-out pull-right"></i> Đăng xuất</a></li>
+                      </ul>
+                    </li>
+
+                    <li role="presentation" class="dropdown">
+                      <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-envelope-o"></i>
+                        <span class="badge bg-green">6</span>
+                      </a>
+                      <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                        <li>
+                          <a>
+                            <span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span>
+                            <span>
+                              <span>John Doe</span>
+                              <span class="time">3 mins ago</span>
+                            </span>
+                            <span class="message">
+                              Film festivals used to be do-or-die moments for movie makers. They were where...
+                            </span>
+                          </a>
+                        </li>
+                        <li>
+                          <div class="text-center">
+                            <a>
+                              <strong>Tấtcả thông báo</strong>
+                              <i class="fa fa-angle-right"></i>
+                            </a>
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
             </div>
           {% endblock top_navigation %}
 
@@ -56,7 +148,10 @@
 
           {% block footer %}
             <footer>
-              {% include "app/footer.html" %}
+              <div class="pull-right">
+                Smart class
+              </div>
+              <div class="clearfix"></div>
             </footer>
           {% endblock footer %}
         </div>
@@ -64,42 +159,41 @@
 
       {% block javascripts %}
         <!-- jQuery -->
-        <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+        <script src="{% static 'vendors/jquery/dist/jquery.min.js' %}"></script>
         <!-- Bootstrap -->
-        <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="{% static 'vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
         <!-- FastClick -->
-        <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
-        <!-- NProgress -->
-        <script src="/static/vendors/nprogress/nprogress.js"></script>
-        <!-- bootstrap-progressbar -->
-        <script src="/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-        <!-- iCheck -->
-        <script src="/static/vendors/iCheck/icheck.min.js"></script>
-        <!-- bootstrap-daterangepicker -->
-        <script src="/static/vendors/moment/min/moment.min.js"></script>
-        <script src="/static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-        <!-- bootstrap-wysiwyg -->
-        <script src="/static/vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
-        <script src="/static/vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
-        <script src="/static/vendors/google-code-prettify/src/prettify.js"></script>
-        <!-- jQuery Tags Input -->
-        <script src="/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
-        <!-- Switchery -->
-        <script src="/static/vendors/switchery/dist/switchery.min.js"></script>
-        <!-- Select2 -->
-        <script src="/static/vendors/select2/dist/js/select2.full.min.js"></script>
-        <!-- Parsley -->
-        <script src="/static/vendors/parsleyjs/dist/parsley.min.js"></script>
-        <!-- Autosize -->
-        <script src="/static/vendors/autosize/dist/autosize.min.js"></script>
-        <!-- jQuery autocomplete -->
-        <script src="/static/vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
-        <!-- starrr -->
-        <script src="/static/vendors/starrr/dist/starrr.js"></script>
+        <!--<script src="{% static 'vendors/fastclick/lib/fastclick.js' %}"></script>-->
+        <!--&lt;!&ndash; NProgress &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/nprogress/nprogress.js' %}"></script>-->
+        <!--&lt;!&ndash; bootstrap-progressbar &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>-->
+        <!--&lt;!&ndash; iCheck &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/iCheck/icheck.min.js' %}"></script>-->
+        <!--&lt;!&ndash; bootstrap-daterangepicker &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/moment/min/moment.min.js' %}"></script>-->
+        <!--<script src="{% static 'vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>-->
+        <!--&lt;!&ndash; bootstrap-wysiwyg &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js' %}"></script>-->
+        <!--<script src="{% static 'vendors/jquery.hotkeys/jquery.hotkeys.js' %}"></script>-->
+        <!--<script src="{% static 'vendors/google-code-prettify/src/prettify.js' %}"></script>-->
+        <!--&lt;!&ndash; jQuery Tags Input &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/jquery.tagsinput/src/jquery.tagsinput.js' %}"></script>-->
+        <!--&lt;!&ndash; Switchery &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/switchery/dist/switchery.min.js' %}"></script>-->
+        <!--&lt;!&ndash; Select2 &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/select2/dist/js/select2.full.min.js' %}"></script>-->
+        <!--&lt;!&ndash; Parsley &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/parsleyjs/dist/parsley.min.js' %}"></script>-->
+        <!--&lt;!&ndash; Autosize &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/autosize/dist/autosize.min.js' %}"></script>-->
+        <!--&lt;!&ndash; jQuery autocomplete &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js' %}"></script>-->
+        <!--&lt;!&ndash; starrr &ndash;&gt;-->
+        <!--<script src="{% static 'vendors/starrr/dist/starrr.js' %}"></script>-->
       {% endblock %}
       <!-- Custom Theme Scripts -->
-      <script src="/static/build/js/custom.js"></script>
+      <script src="{% static 'build/js/custom.js' %}"></script>
     {% endblock body %}
   </body>
 </html>
-

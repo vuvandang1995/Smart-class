@@ -731,9 +731,9 @@ a:focus {
     text-decoration: none;
     background: transparent
 }
-.nav.child_menu {
+/* .nav.child_menu {
     display: none
-}
+} */
 .nav.child_menu li:hover,
 .nav.child_menu li.active {
     background-color: rgba(255, 255, 255, 0.06)

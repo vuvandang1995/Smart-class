@@ -42,15 +42,6 @@ def home(request):
         return HttpResponseRedirect('/')
 
 
-def home(request):
-    user = request.user
-    if user.is_authenticated and user.position == 0:
-        content = {'username': mark_safe(json.dumps(user.username)),}
-        return render(request, 'student/base.html', content)
-    else:
-        return HttpResponseRedirect('/')
-
-
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/')
@@ -82,5 +73,32 @@ def user_profile(request):
             return HttpResponseRedirect("profile")
         content = {'username': mark_safe(json.dumps(user.username)), 'lop': ChiTietLop.objects.get(myuser_id=user)}
         return render(request, 'student/profile.html', content)
+    else:
+        return redirect("/")
+
+    
+def user_score(request):
+    user = request.user
+    if user.is_authenticated and user.position == 0:
+        list_diem = DiemSo.objects.filter(myuser_id=user).values('mon')
+        print(list_diem)
+        return render(request, 'student/score.html')
+    else:
+        return redirect("/")
+
+
+# def user_score_data(request):
+#     user = request.user
+#     if user.is_authenticated and user.position == 0:
+#         list_diem = DiemSo.objects.filter(myuser_id=user)
+#         list_mon = 
+        
+
+def user_mon(request):
+    user = request.user
+    if user.is_authenticated and user.position == 0:
+        list_diem = DiemSo.objects.filter(myuser_id=user).values('mon')
+        print(list_diem)
+        return render(request, 'student/mon.html')
     else:
         return redirect("/")
