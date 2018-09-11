@@ -22,7 +22,7 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path('', include('teacher.urls', namespace='teacher')),
     path('student', include('student.urls', namespace='student')),
-    path('adminsc', include('adminsc.urls', namespace='adminsc')),
+    path('adminsc/', include('adminsc.urls', namespace='adminsc')),
 ]
 
 if settings.DEBUG:

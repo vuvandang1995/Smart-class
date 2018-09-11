@@ -15,29 +15,36 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="x_panel">
             <div class="x_title">
-              <h2>Danh sách học sinh </h2>
-
-                <button class="btn btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_teacher" data-title="new">
-                    <i class="fa fa-users"></i> Thêm nhiều giáo viên
+                <h2>Danh sách học sinh  </h2>
+                <input list="ls" id="data_lop">
+                <datalist id="ls">
+                    {% for l in ds_lop %}
+                    <option value="{{l.ten}}">
+                    {% endfor %}
+                    <option value="Tất cả">
+                </datalist>
+                <button class="btn btn-xs btn-primary btn-round" id="btn_filter" onclick="change();">
+                    <i class="fa fa-refresh"></i>
                 </button>
-                <button class="btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_teacher" data-title="new">
-                    <i class="fa fa-user-plus"></i> Thêm giáo viên
+
+                <button class="btn btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_student" data-title="new">
+                    <i class="fa fa-users"></i> Thêm nhiều học sinh
+                </button>
+                <button class="btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_student" data-title="new">
+                    <i class="fa fa-user-plus"></i> Thêm học sinh
                 </button>
               <div class="clearfix"></div>
             </div>
 
             <div class="x_content">
 
-
-
               <div class="table-responsive">
-                <table class="table table-striped jambo_table bulk_action" id="list_teacher" width="100%">
+                <table class="table table-striped jambo_table bulk_action" id="list_student" width="100%">
                     <thead>
                       <tr>
                         <th>Họ tên</th>
                         <th>Giới tính</th>
-                        <th>Bộ môn</th>
-                        <th>Lớp phụ trách</th>
+                        <th>Lớp</th>
                         <th>Tên đăng nhập</th>
                         <th>Trạng thái</th>
                         <th>Tùy chọn</th>
@@ -54,13 +61,13 @@
       </div>
     </div>
   </div>
-<div class="modal" id="new_teacher" role="dialog">
+<div class="modal" id="new_student" role="dialog">
       <div  class="modal-dialog modal-lg">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="teacher_title">Thêm mới giáo viên</h4>
+              <h4 class="modal-title" id="teacher_title">Thêm mới học sinh</h4>
             </div>
             <div class="modal-body">
                 {% csrf_token %}
@@ -97,27 +104,25 @@
                   <span class="fa fa-repeat form-control-feedback right" aria-hidden="true"></span>
                 </div>
 
-
-
-                <div class="form-group">
-                  <label class="control-label col-md-2 col-sm-3 col-xs-12">Bộ môn</label>
-                  <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input class="form-control" type="text" id="search_mon" name="search" placeholder="Chọn môn">
-                        <div>
-                            <ul id="list_mon">
-                            </ul>
-                        </div>
-                  </div>
-                </div>
+                <!--<div class="form-group">-->
+                  <!--<label class="control-label col-md-2 col-sm-3 col-xs-12">Bộ môn</label>-->
+                  <!--<div class="col-md-9 col-sm-9 col-xs-12">-->
+                    <!--<input class="form-control" type="text" id="search_mon" name="search" placeholder="Chọn môn">-->
+                        <!--<div>-->
+                            <!--<ul id="list_mon">-->
+                            <!--</ul>-->
+                        <!--</div>-->
+                  <!--</div>-->
+                <!--</div>-->
 
                 <div class="form-group">
-                  <label class="control-label col-md-2 col-sm-3 col-xs-12">Lớp phụ trách</label>
+                  <label class="control-label col-md-2 col-sm-3 col-xs-12">Lớp</label>
                   <div class="col-md-9 col-sm-9 col-xs-12">
                     <input class="form-control" type="text" id="search_lop" name="search_lop" placeholder="Chọn lớp">
-                    <div>
-                        <ul id="list_lop">
-                        </ul>
-                    </div>
+                    <!--<div>-->
+                        <!--<ul id="list_lop">-->
+                        <!--</ul>-->
+                    <!--</div>-->
                   </div>
                 </div>
 
@@ -129,42 +134,10 @@
                   </div>
                 </div>
                 <div class="clearfix"></div>
-               <!--<label>Họ và tên</label>-->
-               <!--<input type="text" class="form-control" name="fullname" placeholder="nhập họ và tên" required>-->
-               <!--<br>-->
-                <!--<label>Bộ môn</label>-->
-                <!--<input class="form-control" type="text" id="search_mon" name="search" placeholder="Chọn môn">-->
-                <!--<div>-->
-                    <!--<ul id="list_mon">-->
-                    <!--</ul>-->
-                <!--</div>-->
-                <!--<label>Lớp phụ trách</label>-->
-                <!--<input class="form-control" type="text" id="search_lop" name="search_lop" placeholder="Chọn lớp">-->
-                <!--<div>-->
-                    <!--<ul id="list_lop">-->
-                    <!--</ul>-->
-                <!--</div>-->
-                <!--<label>Giới tính</label> <br>-->
-                <!--<label class="radio-inline"><input type="radio" id="nam" name="nam" class="gioi_tinh" style="transform: scale(1.2);"> Nam</label>-->
-                <!--<label class="radio-inline"><input type="radio" id="nu" name="nu" class="gioi_tinh" style="transform: scale(1.2);"> Nữ</label>-->
-                <!--<br>-->
-                <!--<br>-->
-               <!--<label name="username">Tên đăng nhập</label>-->
-               <!--<input type="text" class="form-control" name="username" placeholder="nhập tên đăng nhập" required>-->
-               <!--<br>-->
-               <!--<label>Email</label>-->
-               <!--<input type="email" class="form-control" name="email" placeholder="nhập email" required>-->
-               <!--<br>-->
-               <!--<label name="password">Mật khẩu</label>-->
-               <!--<input type="password" class="form-control" name="password" placeholder="nhập mật khẩu" required>-->
-               <!--<br>-->
-               <!--<label name="password2">Nhập lại mật khẩu</label>-->
-               <!--<input type="password" class="form-control" name="password2" placeholder="nhập lại mật khẩu" required>-->
-               <!--<br>-->
             </div>
             <div class="modal-footer">
-               <button type="button" class="btn btn-primary"  id="create_new_teacher">Tạo mới</button>
-               <button type="button" class="btn btn-default" data-dismiss="modal" id="close_new_teacher">Đóng</button>
+               <button type="button" class="btn btn-primary"  id="create_new_student">Tạo mới</button>
+               <button type="button" class="btn btn-default" data-dismiss="modal" id="close_new_student">Đóng</button>
             </div>
         </div>
       </div>
@@ -176,5 +149,5 @@
     <script src="{% static 'js/jquery.easy-autocomplete.min.js' %}"></script>
     <script src="{% static 'vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/adminsc/manage_teacher.js' %}"></script>
+    <script src="{% static 'js/adminsc/manage_student.js' %}"></script>
 {% endblock javascripts %}
