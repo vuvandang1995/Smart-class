@@ -41,12 +41,11 @@ def home(request):
 
 def user_login(request):
     user = request.user
-
     if user.is_authenticated:
         if user.position == 0:
             return redirect("/student")
         elif user.position == 1:
-            return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
+            return redirect("/teacher")
         else:
             return redirect("/adminsc")
     else:
@@ -86,7 +85,7 @@ def user_login(request):
                         if user.position == 0:
                             return HttpResponseRedirect('/student')
                         elif user.position == 1:
-                            return HttpResponseRedirect('/home')
+                            return HttpResponseRedirect('/teacher')
                         else:
                             return redirect('/adminsc/')
                     else:

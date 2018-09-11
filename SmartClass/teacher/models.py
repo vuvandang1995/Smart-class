@@ -216,8 +216,8 @@ class BaiLamHocSinh(models.Model):
 class DiemSo(models.Model):
     de_id = models.ForeignKey('De', models.CASCADE, db_column='de_id')
     myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
-    dap_an = models.CharField(max_length=255)
     ngay_lam = models.DateField(default=timezone.now)
+    mon = models.ForeignKey('Mon', models.CASCADE, db_column='mon_id')
 
     class Meta:
         managed = True
