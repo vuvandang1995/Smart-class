@@ -88,7 +88,7 @@ def user_login(request):
                         elif user.position == 1:
                             return HttpResponseRedirect('/home')
                         else:
-                            return redirect('/adminsc/home')
+                            return redirect('/adminsc/')
                     else:
                         return render(request, 'teacher/login.html', {'error': 'Your account is blocked!'})
                 else:

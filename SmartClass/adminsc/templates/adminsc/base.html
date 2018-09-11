@@ -11,7 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
       {% endblock meta %}
 
-      <title>Smart class! | {% block title %}{% endblock %}</title>
+      <title>Smart class | {% block title %}{% endblock %}</title>
 
       {% block stylesheets %}
         <!-- Bootstrap -->
@@ -54,8 +54,8 @@
                     <img src="/static/images/img.jpg" alt="..." class="img-circle profile_img">
                   </div>
                   <div class="profile_info">
-                    <span>Welcome</span>
-                    <h2>John Doe</h2>
+                    <span>Xin chào</span>
+                    <h2>{{ user.username }}</h2>
                   </div>
                 </div>
                 <!-- /menu profile quick info -->
@@ -66,13 +66,20 @@
                 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                   <div class="menu_section">
                     <ul class="nav side-menu">
-                      <li><a><i class="fa fa-home"></i> Quản lý học sinh </a>
+                      <li>
+                        <a href="{% url 'adminsc:home' %}"><i class="fa fa-home"></i> Trang chủ </a>
                       </li>
-                      <li><a><i class="fa fa-edit"></i> Quản lý lớp học </a>
+                      <li>
+                        <a href="{% url 'adminsc:manage_student' %}"><i class="fa fa-users"></i> Quản lý học sinh </a>
                       </li>
-                      <li><a href="{% url 'adminsc:manage_teacher' %}"><i class="fa fa-desktop"></i> Quản lý giáo viên </a>
+                      <li>
+                        <a href="{% url 'adminsc:manage_teacher' %}"><i class="fa fa-suitcase"></i> Quản lý giáo viên </a>
                       </li>
-                      <li><a href="{% url 'adminsc:profile' %}"><i class="fa fa-table"></i> Thông tin cá nhân </a>
+                      <li>
+                        <a href="{% url 'adminsc:manage_class' %}"><i class="fa fa-book"></i> Quản lý lớp </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'adminsc:profile' %}"><i class="fa fa-info"></i> Thông tin cá nhân </a>
                       </li>
                     </ul>
                   </div>
@@ -95,7 +102,7 @@
                   <ul class="nav navbar-nav navbar-right">
                     <li class="">
                       <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <img src="/static/images/img.jpg" alt="">John Doe
+                        <img src="/static/images/img.jpg" alt="">{{ user.username }}
                         <span class=" fa fa-angle-down"></span>
                       </a>
                       <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -114,7 +121,7 @@
                           <a>
                             <span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span>
                             <span>
-                              <span>John Doe</span>
+                              <span>{{ user.username }}</span>
                               <span class="time">3 mins ago</span>
                             </span>
                             <span class="message">

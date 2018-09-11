@@ -1,25 +1,13 @@
 $(document).ready(function(){
     var table_teacher = $('#list_teacher').DataTable({
-//        "columnDefs": [
-//            { "width": "2%", "targets": 0 },
-//            { "width": "12%", "targets": 1 },
-//            { "width": "10%", "targets": 2 },
-//            { "width": "10%", "targets": 3 },
-//        ],
         "ajax": {
             "type": "GET",
-            "url": "/adminsc/manage_teacher/data",
+            "url": "/adminsc/manage_teacher/data_all",
             "contentType": "application/json; charset=utf-8",
             "data": function(result){
                 return JSON.stringify(result);
             },
-//            "complete": function(){
-//                setTimeout(function(){
-//                    countdowntime();
-//                }, 1000);
-//            }
         },
-//        'dom': 'Rlfrtip',
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
         "displayLength": 10,
     });
@@ -27,7 +15,6 @@ $(document).ready(function(){
     $("#new_teacher").on('show.bs.modal', function(event){
         var button = $(event.relatedTarget);
         var title = button.data('title');
-        console.log = title;
         if (title === 'edit'){
             $('#teacher_title').html("Chỉnh sửa giáo viên")
             var gvid = button.attr('id').split('_')[1];
@@ -152,12 +139,6 @@ $(document).ready(function(){
         getValue: function(element){
             return element.ten+" - "+element.lop;
          },
-//        template: {
-//            type: "description",
-//            fields: {
-//                description: "username"
-//            }
-//        },
 
         list: {
             match: {
@@ -188,12 +169,6 @@ $(document).ready(function(){
         getValue: function(element){
             return element.ten;
          },
-//        template: {
-//            type: "description",
-//            fields: {
-//                description: "username"
-//            }
-//        },
 
         list: {
             match: {
