@@ -38,6 +38,50 @@ def home(request):
     else:
         return HttpResponseRedirect('/')
 
+def user_quanlydiem(request):
+    return render(request, 'teacher/quanlydiem.html')
+
+def manage_point_data(request, lop):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
+        ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+        data = []
+        for student in ls_student:
+            fullname = '<p id="full_{0}">{1}</p>'.format(student.id, student.fullname)
+            username = '<p id="user_{0}">{1}</p>'.format(student.id, student.username)
+            if student.gioi_tinh == 0:
+                gioi_tinh = '<p id="gioi_{}">Nữ</p>'.format(student.id)
+            else:
+                gioi_tinh = '<p id="gioi_{}">Nam</p>'.format(student.id)
+            
+            DiemSo.objects.filter(myuser_id = student,).values('myuser_id')
+            lop_ct = ''
+            try:
+                lop_ct = ChiTietLop.objects.get(myuser_id=student)
+                lop_ct = lop_ct.lop_id.ten
+            except ObjectDoesNotExist:
+                pass
+            ls_lop = '<p class="list_lop{0}">{1}</p>'.format(student.id, lop_ct)
+            options = '''
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#new_student" data-title="edit" id="edit_{0}">
+                        <i class="fa fa-cog" data-toggle="tooltip" title="Chỉnh sửa"></i>
+                    </button> 
+                    <button type="button" class="btn btn-warning" data-title="block" id="block_{0}">
+                        <i class="{2}" data-toggle="tooltip" title="{3}"></i></i>
+                    </button> 
+                    <button type="button" class="btn btn-danger" data-title="del" id="del_{0}">
+                        <i class="fa fa-trash" data-toggle="tooltip" title="Xóa"></i>
+                    </button> 
+                </div>
+                <p hidden id="email_{0}">{1}</p>
+            '''.format(student.id, student.email, icon, title)
+            data.append([fullname, gioi_tinh, ls_lop, username, trang_thai, options])
+        big_data = {"data": data}
+        json_data = json.loads(json.dumps(big_data))
+        return JsonResponse(json_data)
+
 
 def user_login(request):
     user = request.user
