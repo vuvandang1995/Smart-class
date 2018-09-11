@@ -188,8 +188,7 @@ def manage_student(request):
                 else:
                     hs.is_active = True
                 hs.save()
-            else:
-
+            elif 'fullname' in request.POST:
                 if request.POST['kieu'] == 'new':
                     try:
                         hs = MyUser.objects.create_student(email=request.POST['email'],
@@ -215,6 +214,28 @@ def manage_student(request):
 
                     except:
                         pass
+            else:
+                list_student = request.POST['list_student']
+                list_student = json.loads(list_student)
+                for stu in list_student:
+                    tem = stu[1].split(" ")
+                    usname = ''
+                    for s in tem:
+                        usname += s[0].lower()
+                    usname += '_{}_{}'.format(stu[3], stu[0])
+                    email = usname + "@gmail.com"
+                    if stu[2] == 'Nam':
+                        gioi_tinh = 1
+                    else:
+                        gioi_tinh = 0
+                    hs = MyUser.objects.create_student(email=email,
+                                                       fullname=stu[1],
+                                                       username=usname,
+                                                       password=1,
+                                                       gioi_tinh=gioi_tinh)
+                    new_lop = Lop.objects.get(ten=stu[3])
+                    ChiTietLop.objects.create(lop_id=new_lop, myuser_id=hs)
+
         return render(request, 'adminsc/manage_student.html', content)
     else:
         return HttpResponseRedirect('/')
@@ -287,7 +308,6 @@ def manage_class(request):
                     except:
                         pass
                 else:
-                    print(request.POST)
                     hs = Lop.objects.get(id=request.POST['id'])
                     hs.ten = request.POST['ten']
                     hs.save()
