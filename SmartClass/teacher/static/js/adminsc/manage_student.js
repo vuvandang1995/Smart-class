@@ -28,7 +28,7 @@ $(document).ready(function(){
         var button = $(event.relatedTarget);
         var title = button.data('title');
         if (title === 'edit'){
-            $('#teacher_title').html("Chỉnh sửa học sinh")
+            $('#new_student_title').html("Chỉnh sửa học sinh")
             var hsid = button.attr('id').split('_')[1];
 
             var fullname = $("#full_"+hsid).text();
@@ -64,7 +64,7 @@ $(document).ready(function(){
             $("#create_new_student").html("Chỉnh sửa");
 
         }else{
-            $('#teacher_title').html("Thêm mới học sinh")
+            $('#new_student_title').html("Thêm mới học sinh")
             $("#new_student input[name=gvid]").val(0);
             $("#new_student input[name=fullname]").val("");
             $("#new_student input[name=search_mon]").val("");
@@ -171,6 +171,50 @@ $(document).ready(function(){
            });
         }
     });
+
+    var input_dom_element = document.getElementById("file");
+    var result;
+
+    function handle_fr(e) {
+        result = [];
+        var files = e.target.files, f = files[0];
+        var reader = new FileReader();
+        var rABS = !!reader.readAsBinaryString;
+        reader.onload = function(e) {
+            var data = e.target.result;
+            if(!rABS) data = new Uint8Array(data);
+
+            var wb = XLSX.read(data, {type: rABS ? 'binary' : 'array'});
+            var ws = wb.Sheets[wb.SheetNames[0]];
+            result = XLSX.utils.sheet_to_json(ws, {header:1});
+//            wb.SheetNames.forEach(function(sheetName) {
+//                var roa = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {header:1});
+//                if(roa.length) result[sheetName] = roa;
+//            });
+
+        };
+        if(rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+    }
+    var handler = handle_fr;
+    if(input_dom_element.attachEvent) input_dom_element.attachEvent('onchange', handler);
+    else input_dom_element.addEventListener('change', handler, false);
+
+    $('#create_new_student_multi').click(function(){
+//        console.log(typeof result);
+        var token = $("input[name=csrfmiddlewaretoken]").val();
+        if (typeof result != 'undefined' ){
+            $.ajax({
+                type:'POST',
+                url:location.href,
+                data: {'csrfmiddlewaretoken':token, 'list_student':JSON.stringify(result)},
+                success: function(){
+                    $('#list_student').DataTable().ajax.reload(null,false);
+                    $("#new_student_multi").modal("hide");
+                }
+           });
+        }
+    });
+
 });
 
 function change() {
@@ -181,3 +225,5 @@ function change() {
     stu_data =$("#list_student").DataTable();
     stu_data.ajax.url('/adminsc/manage_student/data_'+ lop_hs).load();
 };
+
+
