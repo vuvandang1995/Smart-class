@@ -41,7 +41,6 @@ def home(request):
 
 def user_login(request):
     user = request.user
-
     if user.is_authenticated:
         if user.position == 0:
             return redirect("/student")
