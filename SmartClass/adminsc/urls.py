@@ -13,6 +13,8 @@ urlpatterns = [
     path('manage_student/data_<str:lop>', views.manage_student_data, name='manage_student_data'),
     path('manage_class', views.manage_class, name='manage_class'),
     path('manage_class/data', views.manage_class_data, name='manage_class_data'),
+    path('manage_mon', views.manage_mon, name='manage_mon'),
+    path('manage_mon/data', views.manage_mon_data, name='manage_mon_data'),
     path('profile', views.user_profile, name='profile'),
     path('logout', views.user_logout, name='logout'),
 ]

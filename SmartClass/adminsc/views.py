@@ -58,7 +58,7 @@ def manage_teacher(request):
                 else:
                     gv.is_active = True
                 gv.save()
-            else:
+            elif 'fullname' in request.POST:
                 list_mon = request.POST['list_mon']
                 list_mon = json.loads(list_mon)
                 list_lop = request.POST['list_lop']
@@ -97,6 +97,35 @@ def manage_teacher(request):
                             ChiTietLop.objects.create(lop_id=l, myuser_id=gv)
                     except:
                         pass
+            else:
+                list_teacher = request.POST['list_teacher']
+                list_teacher = json.loads(list_teacher)
+                for tea in list_teacher:
+                    if len(tea) == 0:
+                        continue
+                    tem = tea[1].split(" ")
+                    usname = ''
+                    for s in tem:
+                        usname += s[0].lower()
+                    usname += '_{}'.format(tea[0])
+                    email = usname + "@gmail.com"
+                    if tea[2] == 'Nam':
+                        gioi_tinh = 1
+                    else:
+                        gioi_tinh = 0
+                    gv = MyUser.objects.create_teacher(email=email,
+                                                       fullname=tea[1],
+                                                       username=usname,
+                                                       password=1,
+                                                       gioi_tinh=gioi_tinh)
+                    list_mon = tea[3].split(",")
+                    for mon in list_mon:
+                        ten, lop = mon.split(" - ")
+                        GiaoVienMon.objects.create(myuser_id=gv, mon_id=Mon.objects.get(ten=ten, lop=lop))
+                    list_lop = tea[4].split(",")
+                    for lop in list_lop:
+                        ChiTietLop.objects.create(lop_id=Lop.objects.get(ten=lop), myuser_id=gv)
+
         return render(request, 'adminsc/manage_teacher.html', content)
     else:
         return HttpResponseRedirect('/')
@@ -149,6 +178,56 @@ def manage_teacher_data(request, lop):
                 <p hidden id="email_{0}">{1}</p>
             '''.format(teacher.id, teacher.email, icon, title)
             data.append([fullname, gioi_tinh, ls_mon, ls_lop, username, trang_thai, options])
+        big_data = {"data": data}
+        json_data = json.loads(json.dumps(big_data))
+        return JsonResponse(json_data)
+
+
+def manage_mon(request):
+    user = request.user
+
+    content = {'username': mark_safe(json.dumps(user.username))}
+
+    if user.is_authenticated and user.position == 2:
+        if request.method == 'POST':
+            if 'delete' in request.POST:
+                Mon.objects.get(id=request.POST['delete']).delete()
+            else:
+                if request.POST['kieu'] == 'new':
+                    try:
+                        Mon.objects.create(ten=request.POST['ten'], lop=request.POST['lop'], mo_ta=request.POST['mo_ta'])
+                    except:
+                        pass
+                else:
+                    m = Mon.objects.get(id=request.POST['id'])
+                    m.ten = request.POST['ten']
+                    m.lop = request.POST['lop']
+                    m.mo_ta = request.POST['mo_ta']
+                    m.save()
+        return render(request, 'adminsc/manage_mon.html', content)
+    else:
+        return HttpResponseRedirect('/')
+
+
+def manage_mon_data(request):
+    user = request.user
+    if user.is_authenticated and user.position == 2:
+        data = []
+        for mon in Mon.objects.all():
+            ten = '<p id="ten_{0}">{1}</p>'.format(mon.id, mon.ten)
+            lop = '<p id="lop_{0}">{1}</p>'.format(mon.id, mon.lop)
+            mo_ta = '<p id="mota_{0}">{1}</p>'.format(mon.id, mon.mo_ta)
+            options = '''
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#new_mon" data-title="edit" id="edit_{0}">
+                        <i class="fa fa-cog" data-toggle="tooltip" title="Chỉnh sửa"></i>
+                    </button> 
+                    <button type="button" class="btn btn-danger" data-title="del" id="del_{0}">
+                        <i class="fa fa-trash" data-toggle="tooltip" title="Xóa"></i>
+                    </button> 
+                </div>
+            '''.format(mon.id)
+            data.append([ten, lop, mo_ta, options])
         big_data = {"data": data}
         json_data = json.loads(json.dumps(big_data))
         return JsonResponse(json_data)
@@ -218,6 +297,8 @@ def manage_student(request):
                 list_student = request.POST['list_student']
                 list_student = json.loads(list_student)
                 for stu in list_student:
+                    if stu is None:
+                        continue
                     tem = stu[1].split(" ")
                     usname = ''
                     for s in tem:
@@ -228,13 +309,16 @@ def manage_student(request):
                         gioi_tinh = 1
                     else:
                         gioi_tinh = 0
-                    hs = MyUser.objects.create_student(email=email,
-                                                       fullname=stu[1],
-                                                       username=usname,
-                                                       password=1,
-                                                       gioi_tinh=gioi_tinh)
-                    new_lop = Lop.objects.get(ten=stu[3])
-                    ChiTietLop.objects.create(lop_id=new_lop, myuser_id=hs)
+                    try:
+                        hs = MyUser.objects.create_student(email=email,
+                                                           fullname=stu[1],
+                                                           username=usname,
+                                                           password=1,
+                                                           gioi_tinh=gioi_tinh)
+                        new_lop = Lop.objects.get(ten=stu[3])
+                        ChiTietLop.objects.create(lop_id=new_lop, myuser_id=hs)
+                    except:
+                        pass
 
         return render(request, 'adminsc/manage_student.html', content)
     else:
