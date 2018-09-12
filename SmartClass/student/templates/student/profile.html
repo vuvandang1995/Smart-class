@@ -12,61 +12,61 @@
               <div class="clearfix"></div>
             </div>
 
-            <div class="x_content">
-                <div class="col-lg-4 col-xlg-3 col-md-5">
-                        <div class="card">
-                            <div class="card-body">
-                                <center class="m-t-30"> <img src="{% static 'image/huong.png' %}" class="rounded-circle" width="150" />
-                                    <h4 class="card-title m-t-10">{{ user.fullname}}</h4>
-                                    <h6 class="card-subtitle"> Lớp {{ lop.lop_id.ten }}</h6>
-                                    <h6 class="card-subtitle">{{ user.truong_id.ten }}</h6>
-                                </center>
+                <div class="x_content">
+                    <div class="col-lg-4 col-xlg-3 col-md-5">
+                            <div class="card">
+                                <div class="card-body">
+                                    <center class="m-t-30"> <img src="{% static 'image/huong.png' %}" class="rounded-circle" width="150" />
+                                        <h4 class="card-title m-t-10">{{ user.fullname}}</h4>
+                                        <h6 class="card-subtitle"> Lớp {{ lop.lop_id.ten }}</h6>
+                                        <h6 class="card-subtitle">{{ user.truong_id.ten }}</h6>
+                                    </center>
+                                </div>
                             </div>
                         </div>
+                    <div class="col-lg-8 col-xlg-9 col-md-7">
+                            <div class="card">
+                                <div class="card-body">
+                                        <div class="form-group">
+                                            <label class="col-md-12">Họ tên</label>
+                                            <div class="col-md-12">
+                                                <pre>{{ user.fullname }}</pre>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-12">Giới tính</label>
+                                            <div class="col-md-12">
+                                                {% if user.gioi_tinh == 0 %}
+                                                <pre>Nữ</pre>
+                                                {% else %}
+                                                <pre>Nam</pre>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-12">Tên đăng nhập</label>
+                                            <div class="col-md-12">
+                                                <pre>{{ user.username }}</pre>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-12">Email</label>
+                                            <div class="col-md-12">
+                                                <pre>{{ user.email }}</pre>
+                                            </div>
+                                        </div>
+                                    <div class="form-group">
+                                            <div class="col-sm-12">
+                                                <button class="btn btn-success btn-round" data-toggle="modal" data-target="#profile">Thay đổi thông tin</button>
+                                                <button class="btn btn-danger btn-round" data-toggle="modal" data-target="#pass">Thay đổi mật khẩu</button>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
                     </div>
-                <div class="col-lg-8 col-xlg-9 col-md-7">
-                        <div class="card">
-                            <div class="card-body">
-                                    <div class="form-group">
-                                        <label class="col-md-12">Họ tên</label>
-                                        <div class="col-md-12">
-                                            <pre>{{ user.fullname }}</pre>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-md-12">Giới tính</label>
-                                        <div class="col-md-12">
-                                            {% if user.gioi_tinh == 0 %}
-                                            <pre>Nữ</pre>
-                                              {% else %}
-                                            <pre>Nam</pre>
-                                              {% endif %}
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-md-12">Tên đăng nhập</label>
-                                        <div class="col-md-12">
-                                            <pre>{{ user.username }}</pre>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-md-12">Email</label>
-                                        <div class="col-md-12">
-                                            <pre>{{ user.email }}</pre>
-                                        </div>
-                                    </div>
-                                <div class="form-group">
-                                        <div class="col-sm-12">
-                                            <button class="btn btn-success btn-round" data-toggle="modal" data-target="#profile">Thay đổi thông tin</button>
-                                            <button class="btn btn-danger btn-round" data-toggle="modal" data-target="#pass">Thay đổi mật khẩu</button>
-                                        </div>
-                                    </div>
-                            </div>
-                        </div>
                 </div>
-            </div>
           </div>
         </div>
       </div>

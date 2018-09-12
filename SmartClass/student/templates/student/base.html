@@ -68,9 +68,14 @@
                     <ul class="nav side-menu">
                       <li><a><i class="fa fa-home"></i> Nhóm học tập </a>
                       </li>
-                      <li><a><i class="fa fa-edit"></i> Các môn học </a>
+                      <li><a><i class="fa fa-edit"></i> Các môn học <span class="fa fa-chevron-down"></span></a>
+                          <ul class="nav child_menu">
+                            <li><a href="">Toán</a></li>
+                            <li><a href="">Lý</a></li>
+                            <li><a href="">Hóa</a></li>
+                          </ul>
                       </li>
-                      <li><a><i class="fa fa-desktop"></i> Điểm </a>
+                      <li><a href="{% url 'student:score' %}"><i class="fa fa-desktop"></i> Điểm </a>
                       </li>
                       <li><a href="{% url 'student:profile' %}"><i class="fa fa-table"></i> Thông tin cá nhân </a>
                       </li>
