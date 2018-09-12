@@ -163,7 +163,7 @@ class De(models.Model):
     myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
     mon = models.ForeignKey('Mon', models.CASCADE, db_column='mon_id')
     ngay_tao = models.DateField(default=timezone.now)
-    loai_de = models.IntegerField()
+    loai_de = models.TextField()
     #
 
     class Meta:
@@ -214,10 +214,12 @@ class BaiLamHocSinh(models.Model):
 
 
 class DiemSo(models.Model):
-    de_id = models.ForeignKey('De', models.CASCADE, db_column='de_id')
-    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
+    de_id = models.ForeignKey('De', models.CASCADE, db_column='de_id', null=True)
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, db_column="myuser_id")
     ngay_lam = models.DateField(default=timezone.now)
     mon = models.ForeignKey('Mon', models.CASCADE, db_column='mon_id')
+    loai_diem = models.TextField()
+    diem = models.IntegerField()
 
     class Meta:
         managed = True
