@@ -139,8 +139,28 @@ def manage_question(request):
     user = request.user
     if user.is_authenticated and user.position == 1:
         content = {'username': mark_safe(json.dumps(user.username)),
-                   'list_lop': ChiTietLop.objects.filter(myuser_id=user)}
-        return render(request, 'teacher/base.html', content)
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user),
+                   'list_mon': GiaoVienMon.objects.filter(myuser_id=user)}
+        if request.method == 'POST':
+            ten_mon, lop_mon = request.POST['mon'].split(" - ")
+            mon = Mon.objects.get(ten=ten_mon, lop=lop_mon)
+            if request.POST['do_kho'] == 'Dễ':
+                do_kho = 0
+            elif request.POST['do_kho'] == 'Trung bình':
+                do_kho = 1
+            else:
+                do_kho = 2
+            ch = CauHoi.objects.create(myuser_id=user, mon_id=mon, noi_dung=request.POST['noi_dung'], do_kho=do_kho,
+                                       chu_de=request.POST['chu_de'], dang_cau_hoi=request.POST['dang_cau_hoi'])
+            dap_an = json.loads(request.POST['dap_an'])
+            nd_dap_an = json.loads(request.POST['nd_dap_an'])
+            for i in range(len(dap_an)):
+                if dap_an[i] == 0:
+                    dung = False
+                else:
+                    dung = True
+                DapAn.objects.create(cau_hoi_id=ch, mon_id=mon, noi_dung=nd_dap_an[i], dap_an_dung=dung)
+        return render(request, 'teacher/manage_question.html', content)
     else:
         return HttpResponseRedirect('/')
 
