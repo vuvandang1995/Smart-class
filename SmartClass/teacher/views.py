@@ -1,11 +1,15 @@
+from .tokens import account_activation_token
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth import logout, login
-from django.contrib import auth
+from django.contrib.auth import login, logout
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.contrib.auth.hashers import check_password
+from django.contrib import messages
+from django.contrib.auth import logout
+from django.utils import timezone
 import uuid
 import random
-
 from django.utils.safestring import mark_safe
 import json
 from django.contrib.auth.models import User
@@ -15,11 +19,9 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
-from .tokens import account_activation_token
 from django.core.mail import EmailMessage
-from teacher.models import MyUser
+from teacher.models import *
 
-from django.contrib import messages
 
 class EmailThread(threading.Thread):
     def __init__(self, email):
@@ -34,53 +36,133 @@ class EmailThread(threading.Thread):
 def home(request):
     user = request.user
     if user.is_authenticated and user.position == 1:
-        return render(request, 'teacher/index.html',{'username': mark_safe(json.dumps(user.username)),})
+        content = {'username': mark_safe(json.dumps(user.username)),
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user)}
+        return render(request, 'teacher/base.html', content)
     else:
         return HttpResponseRedirect('/')
 
-def user_quanlydiem(request):
-    return render(request, 'teacher/quanlydiem.html')
 
-def manage_point_data(request, lop):
+def manage_class(request, lop):
     user = request.user
     if user.is_authenticated and user.position == 1:
         ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+        content = {'username': mark_safe(json.dumps(user.username)),
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user),
+                   'lop_ht': lop,
+                   'ls_student': ls_student}
+        return render(request, 'teacher/manage_class.html', content)
+    else:
+        return HttpResponseRedirect('/')
+
+
+def manage_point(request, lop):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        try:
+            lop_Ob = Lop.objects.get(ten=lop)
+            ChiTietLop.objects.get(myuser_id=user, lop_id=lop_Ob)
+        except ObjectDoesNotExist:
+            return HttpResponseRedirect('/')
+
+        content = {'username': mark_safe(json.dumps(user.username)),
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user),
+                   'lop_ht': lop}
+
+        return render(request, 'teacher/manage_point.html', content)
+    else:
+        return HttpResponseRedirect('/')
+
+
+def manage_point_data(request, lop):
+    user = request.user
+
+    if user.is_authenticated and user.position == 1:
         data = []
-        for student in ls_student:
-            fullname = '<p id="full_{0}">{1}</p>'.format(student.id, student.fullname)
-            username = '<p id="user_{0}">{1}</p>'.format(student.id, student.username)
-            if student.gioi_tinh == 0:
-                gioi_tinh = '<p id="gioi_{}">Nữ</p>'.format(student.id)
-            else:
-                gioi_tinh = '<p id="gioi_{}">Nam</p>'.format(student.id)
-            
-            DiemSo.objects.filter(myuser_id = student,).values('myuser_id')
-            lop_ct = ''
+        try:
+            lop_Ob = Lop.objects.get(ten=lop)
+            ChiTietLop.objects.get(myuser_id=user, lop_id=lop_Ob)
+        except ObjectDoesNotExist:
+            pass
+        else:
+            ls_chi_tiet = ChiTietLop.objects.filter(lop_id=lop_Ob).values('myuser_id')
+            ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+            mon_id = GiaoVienMon.objects.filter(myuser_id=user).values('mon_id')
             try:
-                lop_ct = ChiTietLop.objects.get(myuser_id=student)
-                lop_ct = lop_ct.lop_id.ten
-            except ObjectDoesNotExist:
-                pass
-            ls_lop = '<p class="list_lop{0}">{1}</p>'.format(student.id, lop_ct)
-            options = '''
-                <div class="btn-group">
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#new_student" data-title="edit" id="edit_{0}">
-                        <i class="fa fa-cog" data-toggle="tooltip" title="Chỉnh sửa"></i>
-                    </button> 
-                    <button type="button" class="btn btn-warning" data-title="block" id="block_{0}">
-                        <i class="{2}" data-toggle="tooltip" title="{3}"></i></i>
-                    </button> 
-                    <button type="button" class="btn btn-danger" data-title="del" id="del_{0}">
-                        <i class="fa fa-trash" data-toggle="tooltip" title="Xóa"></i>
-                    </button> 
-                </div>
-                <p hidden id="email_{0}">{1}</p>
-            '''.format(student.id, student.email, icon, title)
-            data.append([fullname, gioi_tinh, ls_lop, username, trang_thai, options])
+                lp = int(lop[:2])
+            except:
+                lp = int(lop[0])
+            mon = Mon.objects.get(id__in=mon_id, lop=lp)
+            for student in ls_student:
+                fullname = '<p id="full_{}">{}</p>'.format(student.id, student.fullname)
+                # if student.gioi_tinh == 0:
+                #     gioi_tinh = '<p id="gioi_{}">Nữ</p>'.format(student.id)
+                # else:
+                #     gioi_tinh = '<p id="gioi_{}">Nam</p>'.format(student.id)
+                diem_ly_thuyet = '<div class="row">'
+                diem_thuc_hanh = '<div class="row">'
+                diem_thi = '<div class="row">'
+                for diem in DiemSo.objects.filter(myuser_id=student, mon_id=mon):
+                    if diem.loai_diem == 'lý thuyết':
+                        diem_ly_thuyet += '''
+                        <a class="btn" id="lt_{0}" data-toggle="modal" data-target="#point" data-student-id="{1}" data-ngay-lam="{2}" data-bai-lam="{3}">{4}</a>,
+                        '''.format(diem.id, student.id, str(diem.ngay_lam), "1+1=2", diem.diem)
+                    elif diem.loai_diem == 'thực hành':
+                        diem_thuc_hanh += '''
+                        <a class="btn" id="th_{0}" data-toggle="modal" data-target="#point" data-student-id="{1}" data-ngay-lam="{2}" data-bai-lam="{3}">{4}</a>,
+                        '''.format(diem.id, student.id, str(diem.ngay_lam), "1+1=2", diem.diem)
+                    elif diem.loai_diem == 'thi':
+                        diem_thi += '''
+                        <a class="btn" id="thi_{0}" data-toggle="modal" data-target="#point" data-student-id="{1}" data-ngay-lam="{2}" data-bai-lam="{3}">{4}</a>,
+                        '''.format(diem.id, student.id, str(diem.ngay_lam), "1+1=2", diem.diem)
+                diem_ly_thuyet += '</div>'
+                diem_thuc_hanh += '</div>'
+                diem_thi += '</div>'
+                data.append([fullname, diem_ly_thuyet, diem_thuc_hanh, diem_thi])
         big_data = {"data": data}
         json_data = json.loads(json.dumps(big_data))
         return JsonResponse(json_data)
+
+
+def manage_de(request):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        content = {'username': mark_safe(json.dumps(user.username)),
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user)}
+        return render(request, 'teacher/base.html', content)
+    else:
+        return HttpResponseRedirect('/')
+
+
+def manage_question(request):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        content = {'username': mark_safe(json.dumps(user.username)),
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user),
+                   'list_mon': GiaoVienMon.objects.filter(myuser_id=user)}
+        if request.method == 'POST':
+            ten_mon, lop_mon = request.POST['mon'].split(" - ")
+            mon = Mon.objects.get(ten=ten_mon, lop=lop_mon)
+            if request.POST['do_kho'] == 'Dễ':
+                do_kho = 0
+            elif request.POST['do_kho'] == 'Trung bình':
+                do_kho = 1
+            else:
+                do_kho = 2
+            ch = CauHoi.objects.create(myuser_id=user, mon_id=mon, noi_dung=request.POST['noi_dung'], do_kho=do_kho,
+                                       chu_de=request.POST['chu_de'], dang_cau_hoi=request.POST['dang_cau_hoi'])
+            dap_an = json.loads(request.POST['dap_an'])
+            nd_dap_an = json.loads(request.POST['nd_dap_an'])
+            for i in range(len(dap_an)):
+                if dap_an[i] == 0:
+                    dung = False
+                else:
+                    dung = True
+                DapAn.objects.create(cau_hoi_id=ch, mon_id=mon, noi_dung=nd_dap_an[i], dap_an_dung=dung)
+        return render(request, 'teacher/manage_question.html', content)
+    else:
+        return HttpResponseRedirect('/')
 
 
 def user_login(request):
@@ -178,6 +260,8 @@ def user_logout(request):
 def user_profile(request):
     user = request.user
     if user.is_authenticated and user.position == 1:
-        return render(request, 'teacher/profile.html', {'username': mark_safe(json.dumps(user.username))})
+        content = {'username': mark_safe(json.dumps(user.username)),
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user)}
+        return render(request, 'teacher/profile.html', content)
     else:
         return HttpResponseRedirect('/')

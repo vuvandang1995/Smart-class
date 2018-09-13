@@ -16,7 +16,7 @@
           <div class="x_panel">
             <div class="x_title">
               <h2>Danh sách giáo viên </h2>
-                <button class="btn btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_teacher" data-title="new">
+                <button class="btn btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_teacher_multi" data-title="new">
                     <i class="fa fa-users"></i> Thêm nhiều giáo viên
                 </button>
                 <button class="btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_teacher" data-title="new">
@@ -54,88 +54,108 @@
     </div>
   </div>
 <div class="modal" id="new_teacher" role="dialog">
-      <div  class="modal-dialog modal-lg">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="teacher_title">Thêm mới giáo viên</h4>
+  <div  class="modal-dialog modal-lg">
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title" id="teacher_title">Thêm mới giáo viên</h4>
+        </div>
+        <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" name="gvid">
+            <input type="hidden" name="kieu">
+
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+              <input type="text" class="form-control has-feedback-left" name="fullname" placeholder="Họ tên" required>
+              <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
             </div>
-            <div class="modal-body">
-                {% csrf_token %}
-                <input type="hidden" name="gvid">
-                <input type="hidden" name="kieu">
 
-                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-                  <input type="text" class="form-control has-feedback-left" name="fullname" placeholder="Họ tên" required>
-                  <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
-                </div>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+              <input type="text" class="form-control" name="username" placeholder="Tên đăng nhập" required>
+              <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+            </div>
 
-                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-                  <input type="text" class="form-control" name="username" placeholder="Tên đăng nhập" required>
-                  <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
-                </div>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+              <input type="email" class="form-control has-feedback-left" name="email" placeholder="Email" required>
+              <span class="fa fa-envelope form-control-feedback left" aria-hidden="true"></span>
+            </div>
 
-                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-                  <input type="email" class="form-control has-feedback-left" name="email" placeholder="Email" required>
-                  <span class="fa fa-envelope form-control-feedback left" aria-hidden="true"></span>
-                </div>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+              <input type="text" class="form-control" id="inputSuccess5" name="phone" placeholder="Điện thoại" required>
+              <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
+            </div>
 
-                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-                  <input type="text" class="form-control" id="inputSuccess5" name="phone" placeholder="Điện thoại" required>
-                  <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
-                </div>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback passwd" >
+              <input type="password" class="form-control has-feedback-left" name="password" placeholder="Mật khẩu" required>
+              <span class="fa fa-lock form-control-feedback left" aria-hidden="true"></span>
+            </div>
 
-                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback passwd" >
-                  <input type="password" class="form-control has-feedback-left" name="password" placeholder="Mật khẩu" required>
-                  <span class="fa fa-lock form-control-feedback left" aria-hidden="true"></span>
-                </div>
-
-                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback passwd">
-                  <input type="password" class="form-control" name="password2" placeholder="Nhập lại mật khẩu" required>
-                  <span class="fa fa-repeat form-control-feedback right" aria-hidden="true"></span>
-                </div>
+            <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback passwd">
+              <input type="password" class="form-control" name="password2" placeholder="Nhập lại mật khẩu" required>
+              <span class="fa fa-repeat form-control-feedback right" aria-hidden="true"></span>
+            </div>
 
 
 
-                <div class="form-group">
-                  <label class="control-label col-md-2 col-sm-3 col-xs-12">Bộ môn</label>
-                  <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input class="form-control" type="text" id="search_mon" name="search" placeholder="Chọn môn">
-                        <div>
-                            <ul id="list_mon">
-                            </ul>
-                        </div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label class="control-label col-md-2 col-sm-3 col-xs-12">Lớp phụ trách</label>
-                  <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input class="form-control" type="text" id="search_lop" name="search_lop" placeholder="Chọn lớp">
+            <div class="form-group">
+              <label class="control-label col-md-2 col-sm-3 col-xs-12">Bộ môn</label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <input class="form-control" type="text" id="search_mon" name="search" placeholder="Chọn môn">
                     <div>
-                        <ul id="list_lop">
+                        <ul id="list_mon">
                         </ul>
                     </div>
-                  </div>
-                </div>
+              </div>
+            </div>
 
-                <div class="form-group">
-                  <label class="control-label col-md-2 col-sm-3 col-xs-12">Giới tính</label>
-                  <div class="col-md-9 col-sm-9 col-xs-12">
-                    <label class="radio-inline"><input type="radio" id="nam" name="nam" class="gioi_tinh" style="transform: scale(1.2);"> Nam</label>
-                    <label class="radio-inline"><input type="radio" id="nu" name="nu" class="gioi_tinh" style="transform: scale(1.2);"> Nữ</label>
-                  </div>
+            <div class="form-group">
+              <label class="control-label col-md-2 col-sm-3 col-xs-12">Lớp phụ trách</label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <input class="form-control" type="text" id="search_lop" name="search_lop" placeholder="Chọn lớp">
+                <div>
+                    <ul id="list_lop">
+                    </ul>
                 </div>
-                <div class="clearfix"></div>
+              </div>
             </div>
-            <div class="modal-footer">
-               <button type="button" class="btn btn-primary"  id="create_new_teacher">Tạo mới</button>
-               <button type="button" class="btn btn-default" data-dismiss="modal" id="close_new_teacher">Đóng</button>
+
+            <div class="form-group">
+              <label class="control-label col-md-2 col-sm-3 col-xs-12">Giới tính</label>
+              <div class="col-md-9 col-sm-9 col-xs-12">
+                <label class="radio-inline"><input type="radio" id="nam" name="nam" class="gioi_tinh" style="transform: scale(1.2);"> Nam</label>
+                <label class="radio-inline"><input type="radio" id="nu" name="nu" class="gioi_tinh" style="transform: scale(1.2);"> Nữ</label>
+              </div>
             </div>
+            <div class="clearfix"></div>
         </div>
-      </div>
+        <div class="modal-footer">
+           <button type="button" class="btn btn-primary"  id="create_new_teacher">Tạo mới</button>
+           <button type="button" class="btn btn-default" data-dismiss="modal" id="close_new_teacher">Đóng</button>
+        </div>
     </div>
+  </div>
+</div>
+<div class="modal" id="new_teacher_multi" role="dialog">
+  <div  class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Thêm mới nhiều giáo viên</h4>
+        </div>
+        <div class="modal-body">
+            <input type="file" name="file" id="file" class="form-control">
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="modal-footer">
+           <button type="button" class="btn btn-primary"  id="create_new_teacher_multi">Upload</button>
+           <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+        </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
 {% block javascripts %}
     {{ block.super }}
@@ -143,5 +163,6 @@
     <script src="{% static 'js/jquery.easy-autocomplete.min.js' %}"></script>
     <script src="{% static 'vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/xlsx.full.min.js' %}"></script>
     <script src="{% static 'js/adminsc/manage_teacher.js' %}"></script>
 {% endblock javascripts %}
