@@ -11,6 +11,7 @@ urlpatterns = [
     path('manage_point_data_<str:lop>', views.manage_point_data, name='manage_point_data'),
     path('manage_de', views.manage_de, name='manage_de'),
     path('manage_question', views.manage_question, name='manage_question'),
+    path('question_data_<int:id_mon>', views.question_data, name='question_data'),
     path('profile', views.user_profile, name='profile'),
     path('logout', views.user_logout, name='logout'),
     path(r'^resetpassword/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
