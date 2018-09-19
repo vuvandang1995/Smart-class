@@ -76,7 +76,7 @@ $(document).ready(function(){
                     var loai_de = $('#loai_de option:selected').val();
                     var list_ques = []
                     $('#list_ques_selected tbody tr').each(function(){
-                        list_ques.push($(this).find('p').first().data('id'));
+                        list_ques.push($(this).find('p').first().attr('id').split('_')[1]);
                     });
                     $.ajax({
                         'type':'POST',
@@ -98,6 +98,7 @@ $(document).ready(function(){
 
     $("#gv_mon").on('change', function(){
         table_question.ajax.url("/question_data_" + $("#gv_mon option:selected").val() +"_1").load();
+        table_ques_selected.clear().draw();
     });
 
     $('#list_question tbody').on( 'click', 'tr', function () {
@@ -236,7 +237,6 @@ D:${dap_an[3]} ${dung[3]}
         `
         table_ques_selected.row.add([content]).draw();
         $("#so_luong").html(table_ques_selected.data().count());
-        update_review();
     })
 
     $('#remove_question').on('click', function(){
@@ -246,7 +246,6 @@ D:${dap_an[3]} ${dung[3]}
         var row = $("#ch_"+id).parent().parent();
         table_ques_selected.row(row).remove().draw();
         $("#so_luong").html(table_ques_selected.data().count());
-        update_review();
     })
 
     var table_exam = $("#list_exam").DataTable({
@@ -269,7 +268,6 @@ D:${dap_an[3]} ${dung[3]}
         $.ajax({
             type:"GET",
             url:"/chi_tiet_de_data_" + id,
-            contentType: "application/json; charset=utf-8",
             success: function(data){
                 $("#khung_exam").html(data);
                 $("#exam").modal("show");
