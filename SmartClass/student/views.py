@@ -36,7 +36,7 @@ class EmailThread(threading.Thread):
 def home(request):
     user = request.user
     if user.is_authenticated and user.position == 0:
-        content = {'mon': lop_mon(user)}
+        content = {'mon': lop_mon(user), 'username': mark_safe(json.dumps(user.username))}
         return render(request, 'student/base.html', content)
     else:
         return HttpResponseRedirect('/')
@@ -71,7 +71,7 @@ def user_profile(request):
                 else:
                     messages.warning(request, 'Mật khẩu không đúng')
             return HttpResponseRedirect("profile")
-        content = {'mon': lop_mon(user)}
+        content = {'mon': lop_mon(user), 'username': mark_safe(json.dumps(user.username))}
         return render(request, 'student/profile.html', content)
     else:
         return redirect("/")
@@ -80,7 +80,7 @@ def user_profile(request):
 def score(request):
     user = request.user
     if user.is_authenticated and user.position == 0:
-        content = {'mon': lop_mon(user)}
+        content = {'mon': lop_mon(user), 'username': mark_safe(json.dumps(user.username))}
         return render(request, 'student/score.html', content)
     else:
         return redirect("/")
@@ -95,7 +95,7 @@ def mon(request, id):
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
         ls_teacher = MyUser.objects.filter(id__in=ls_chi_tiet, position=1)
         teacher_ht = GiaoVienMon.objects.get(myuser_id__in=ls_teacher, mon_id=monOb)
-        content = {'mon': lop_mon(user), 'mon_ht': monOb, 'ls_student': ls_student, 'teacher_ht': teacher_ht}
+        content = {'mon': lop_mon(user), 'mon_ht': monOb, 'ls_student': ls_student, 'teacher_ht': teacher_ht, 'username': mark_safe(json.dumps(user.username))}
         return render(request, 'student/subjects.html', content)
     else:
         return redirect("/")
