@@ -219,11 +219,14 @@ $(document).ready(function(){
 
 function change() {
     lop_hs = $('#data_lop').val();
-    if(lop_hs === 'Tất cả'){
-        lop_hs = 'all'
+    if(lop_hs != ''){
+        if(lop_hs === 'Tất cả'){
+            lop_hs = 'all'
+        }
+        stu_data =$("#list_student").DataTable();
+        stu_data.ajax.url('/adminsc/manage_student/data_'+ lop_hs).load();
     }
-    stu_data =$("#list_student").DataTable();
-    stu_data.ajax.url('/adminsc/manage_student/data_'+ lop_hs).load();
+
 };
 
 

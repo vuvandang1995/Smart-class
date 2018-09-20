@@ -1,0 +1,165 @@
+{% extends "teacher/base.html" %}
+{% load staticfiles %}
+{% block stylesheets %}
+    {{ block.super }}
+    <link href="{% static 'vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+    <!--<link href="{% static 'css/easy-autocomplete.css' %}" rel="stylesheet">-->
+    <!--<link href="{% static 'css/easy-autocomplete.min.css' %}" rel="stylesheet">-->
+    <!--<link href="{% static 'css/easy-autocomplete.themes.css' %}" rel="stylesheet">-->
+    <!--<link href="{% static 'css/easy-autocomplete.themes.min.css' %}" rel="stylesheet">-->
+{% endblock stylesheets %}
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+      <!---->
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_content">
+                {% csrf_token %}
+                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                    <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                      <li role="presentation" class="active"><a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Tạo câu hỏi</a>
+                      </li>
+                      <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Câu hỏi đã tạo</a>
+                      </li>
+                    </ul>
+                    <div id="myTabContent" class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+                            <div class="x_title">
+                                <h2>Tạo câu hỏi</h2>
+                                <button class="btn btn-primary" style="float:right">
+                                    <i class="fa fa-file-excel-o"></i> Nhập bằng excel
+                                </button>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div class="row">
+
+                                <div class="col-md-2 col-sm-12 col-xs-12 form-group">
+                                    <select name="mon" class="form-control" id="mon">
+                                        {% for mon in list_mon %}
+                                        <option>{{ mon.mon_id.ten }} - {{mon.mon_id.lop}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 col-sm-12 col-xs-12 form-group">
+                                      <input type="text" placeholder="Chủ đề" name="chu_de" class="form-control" id="chu_de">
+                                </div>
+
+                                <div class="col-md-4 col-sm-12 col-xs-12 form-group" >
+                                  <select name="dang_cau_hoi" class="form-control" id="dang_cau_hoi" >
+                                        <option>Trắc nhiệm 2 đáp án</option>
+                                        <option>Trắc nhiệm 3 đáp án</option>
+                                        <option>Trắc nhiệm 4 đáp án</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 col-sm-12 col-xs-12 form-group">
+                                  <select name="do_kho" class="form-control" id="do_kho">
+                                        <option>Dễ</option>
+                                        <option>Trung bình</option>
+                                        <option>Khó</option>
+                                    </select>
+                                </div>
+                          </div>
+                                <br>
+                                <div class="" id="khung">
+                                    <label>Nội dung:</label>
+                                    <textarea class="form-control" name="noi_dung" placeholder="Nhập nội dung" rows="10"></textarea>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-1 col-sm-12 col-xs-12 form-group">
+                                            <input type="radio" class="form-control dap_an" style="transform:scale(0.6);" name="dap_an">
+                                        </div>
+                                        <div class="col-md-11 col-sm-12 col-xs-12 form-group">
+                                          <textarea class="form-control nd_dap_an" name="nd_dap_an" placeholder="A:"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-1 col-sm-12 col-xs-12 form-group">
+                                          <input type="radio" class="form-control dap_an" style="transform:scale(0.6);" name="dap_an">
+                                        </div>
+                                        <div class="col-md-11 col-sm-12 col-xs-12 form-group">
+                                          <textarea class="form-control nd_dap_an" name="nd_dap_an" placeholder="B:"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <button class="btn btn-success btn-lg" style="float:right" id="luu_cau_hoi">
+                                    <i class="fa fa-save"></i> Lưu
+                                </button>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
+                            <div class="x_title">
+                                <div class="col-md-1 col-sm-12 col-xs-12 form-group">
+                                    <h2>Câu hỏi đã tạo</h2>
+                                </div>
+                                <div class="col-md-3 col-sm-12 col-xs-12 form-group">
+                                    <select class="form-control" id="gv_mon">
+                                        {% for mon in list_mon %}
+                                        <option value="{{ mon.mon_id.id }}">{{ mon.mon_id.ten }} - {{mon.mon_id.lop}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div class="">
+                                    <table class="table table-striped jambo_table bulk_action" id="list_question" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Chủ đề</th>
+                                                <th>Dạng câu hỏi</th>
+                                                <th>Độ khó</th>
+                                                <th>Ngày tạo</th>
+                                                <th>Nội dung</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal" id="question" role="dialog">
+      <div  class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" id="question_title">Câu hỏi</h4>
+            </div>
+            <div class="modal-body" id="khung_modal">
+                {% csrf_token %}
+
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-primary" id="edit_question">Cập nhật</button>
+               <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock content %}
+{% block javascripts %}
+    {{ block.super }}
+    <!--<script src="{% static 'js/jquery.easy-autocomplete.js' %}"></script>-->
+    <!--<script src="{% static 'js/jquery.easy-autocomplete.min.js' %}"></script>-->
+    <script src="{% static 'vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/teacher/manage_question.js' %}"></script>
+{% endblock javascripts %}

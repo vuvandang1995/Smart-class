@@ -11,7 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
       {% endblock meta %}
 
-      <title>Smart class! | {% block title %}{% endblock %}</title>
+      <title>Smart class ! {% block title %}{% endblock %}</title>
 
       {% block stylesheets %}
         <!-- Bootstrap -->
@@ -66,17 +66,29 @@
                 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                   <div class="menu_section">
                     <ul class="nav side-menu">
-                      <li><a><i class="fa fa-home"></i> Nhóm học tập </a>
+                      <li>
+                        <a><i class="fa fa-home"></i>Quản lý lớp <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            {% for lop in list_lop %}
+                            <li><a href="{% url 'teacher:manage_class' lop.lop_id.ten %}">{{lop.lop_id.ten}}</a></li>
+                            {% endfor %}
+                        </ul>
                       </li>
-                      <li><a><i class="fa fa-edit"></i> Các môn học <span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                            <li><a href="">Toán</a></li>
-                            <li><a href="">Lý</a></li>
-                            <li><a href="">Hóa</a></li>
-                          </ul>
+                      <li>
+                        <a><i class="fa fa-edit"></i> Quản lý điểm <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                          {% for lop in list_lop %}
+                          <li><a  href="{% url 'teacher:manage_point' lop.lop_id.ten %}">{{lop.lop_id.ten}}</a></li>
+                          {% endfor %}
+                        </ul>
                       </li>
-                      
-                      <li><a href="{% url 'teacher:profile' %}"><i class="fa fa-table"></i> Thông tin cá nhân </a>
+                       <li><a href="{% url 'teacher:manage_de' %}"><i class="fa fa-table"></i>Quản lý đề </a>
+                      </li> 
+                      <li><a href="{% url 'teacher:manage_question' %}"><i class="fa fa-desktop"></i>Quản lý câu hỏi </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'teacher:profile' %}">
+                          <i class="fa fa-table"></i> Thông tin cá nhân </a>
                       </li>
                     </ul>
                   </div>
@@ -193,7 +205,7 @@
         <!--<script src="{% static 'vendors/starrr/dist/starrr.js' %}"></script>-->
       {% endblock %}
       <!-- Custom Theme Scripts -->
-      <script src="{% static 'build/js/custom.js' %}"></script>
+      <script src="{% static 'build/js/custom.min.js' %}"></script>
     {% endblock body %}
   </body>
 </html>

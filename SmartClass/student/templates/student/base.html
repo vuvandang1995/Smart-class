@@ -70,9 +70,9 @@
                       </li>
                       <li><a><i class="fa fa-edit"></i> Các môn học <span class="fa fa-chevron-down"></span></a>
                           <ul class="nav child_menu">
-                            <li><a href="">Toán</a></li>
-                            <li><a href="">Lý</a></li>
-                            <li><a href="">Hóa</a></li>
+                            {% for m in mon %}
+                            <li><a href="{% url 'student:mon' m.mon_id.id %}">{{m.mon_id.ten}} - {{m.mon_id.lop}}</a></li>
+                            {% endfor %}
                           </ul>
                       </li>
                       <li><a href="{% url 'student:score' %}"><i class="fa fa-desktop"></i> Điểm </a>

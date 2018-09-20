@@ -222,4 +222,46 @@ $(document).ready(function(){
         }
     });
 
+    var input_dom_element = document.getElementById("file");
+    var result;
+
+    function handle_fr(e) {
+        result = [];
+        var files = e.target.files, f = files[0];
+        var reader = new FileReader();
+        var rABS = !!reader.readAsBinaryString;
+        reader.onload = function(e) {
+            var data = e.target.result;
+            if(!rABS) data = new Uint8Array(data);
+
+            var wb = XLSX.read(data, {type: rABS ? 'binary' : 'array'});
+            var ws = wb.Sheets[wb.SheetNames[0]];
+            result = XLSX.utils.sheet_to_json(ws, {header:1});
+//            wb.SheetNames.forEach(function(sheetName) {
+//                var roa = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {header:1});
+//                if(roa.length) result[sheetName] = roa;
+//            });
+
+        };
+        if(rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+    }
+    var handler = handle_fr;
+    if(input_dom_element.attachEvent) input_dom_element.attachEvent('onchange', handler);
+    else input_dom_element.addEventListener('change', handler, false);
+
+    $('#create_new_teacher_multi').click(function(){
+        var token = $("input[name=csrfmiddlewaretoken]").val();
+        if (typeof result != 'undefined' ){
+            $.ajax({
+                type:'POST',
+                url:location.href,
+                data: {'csrfmiddlewaretoken':token, 'list_teacher':JSON.stringify(result)},
+                success: function(){
+                    $("#new_teacher_multi").modal("hide");
+                    $('#list_teacher').DataTable().ajax.reload(null,false);
+                }
+           });
+        }
+    });
+
 });
