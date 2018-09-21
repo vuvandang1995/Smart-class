@@ -213,7 +213,7 @@ def exam(request):
             DiemSo.objects.create(de_id=de, myuser_id=user, mon_id=de.mon_id, loai_diem=de.loai_de, bai_lam=bai_lam,
                                   diem=round(s_dung/ChiTietDe.objects.filter(de_id=de).count(), 3)*10)
         content = {'mon': lop_mon(user),
-                   'lop': ChiTietLop.objects.get(myuser_id=user),}
+                   'lop': ChiTietLop.objects.get(myuser_id=user)}
         return render(request, 'student/exam.html', content)
     else:
         return redirect("/")
