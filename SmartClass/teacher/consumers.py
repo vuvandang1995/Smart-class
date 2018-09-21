@@ -13,7 +13,7 @@ from datetime import timedelta
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'videochat'
+        self.room_group_name = 'classchat'
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -23,21 +23,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()        
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': 'out',
-                'who': str(self.room_name),
-                'stt': 'out'
-            }
-        )
+    #     await self.channel_layer.group_send(
+    #         self.room_group_name,
+    #         {
+    #             'type': 'chat_message',
+    #             'message': 'out',
+    #             'who': str(self.room_name),
+    #             'stt': 'out'
+    #         }
+    #     )
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
-        logout(self.scope)
+        # logout(self.scope)
         
 
 
@@ -46,11 +46,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         who = text_data_json['who']
-        stt = text_data_json['stt']
+        time = text_data_json['time']
         # print(message)
-        await login(self.scope, self.scope["user"])
+        # await login(self.scope, self.scope["user"])
         # save the session (if the session backend does not access the db you can use `sync_to_async`)
-        await database_sync_to_async(self.scope["session"].save)()
+        # await database_sync_to_async(self.scope["session"].save)()
         # print(self.scope)
         
         await self.channel_layer.group_send(
@@ -59,7 +59,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'who': who,
-                'stt': stt
+                'time' : time
             }
         )
 
@@ -67,12 +67,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event['message']
         who = event['who']
-        stt = event['stt']
+        time = event['time']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'who': who,
-            'stt': stt
-
+            'time': time
         }))
