@@ -18,4 +18,6 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path(r'^resetpassword/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.resetpwd, name='resetpassword'),
+    path('share_<str:lop>', views.share, name='share'),
+
 ]
