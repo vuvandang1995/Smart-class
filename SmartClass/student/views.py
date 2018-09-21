@@ -255,7 +255,7 @@ def exam_data(request, id):
             '''.format(i+1, list_ques[i].cau_hoi_id.noi_dung, dap_an)
         content = '''
         <div class="col-sm-1 mail_list_column">{0}</div>
-        <div class="col-sm-11 mail_view">
+        <div class="col-sm-11 mail_view showde">
             <div class="inbox-body">{1}</div>
         <div>
         <input type="hidden" value="{2}" name="de_id">
