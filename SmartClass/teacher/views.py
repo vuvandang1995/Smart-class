@@ -351,3 +351,16 @@ def user_profile(request):
         return render(request, 'teacher/profile.html', content)
     else:
         return HttpResponseRedirect('/')
+
+
+def share(request, lop):
+    user = request.user
+    if user.is_authenticated:
+        ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
+        ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+        content = {'username': mark_safe(json.dumps(user.username)),
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user),
+                   'ls_student': ls_student}
+        return render(request, 'teacher/share.html', content)
+    else:
+        return HttpResponseRedirect('/')
