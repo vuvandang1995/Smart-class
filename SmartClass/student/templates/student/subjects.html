@@ -33,31 +33,16 @@
                     <div class="x_content">
                       <div class="row">
                         <div class="col-sm-3 mail_list_column" style="overflow-y: scroll; height:600px;">
-                          <a href="#">
+                          <a href="javascript:register_popup('{{teacher_ht.myuser_id.username}}', '{{teacher_ht.myuser_id.fullname}}');">
                             <div class="mail_list">
-                              <div class="left">
-                                <i class="fa fa-circle"></i> <i class="fa fa-edit"></i>
-                              </div>
-                              <div class="right">
-                                <h3>{{ teacher_ht.myuser_id.fullname }} <small>{{ teacher_ht.myuser_id.last_login }}</small></h3>
-                                <p>Ut enim ad minim veniam, quis nostrud exercitation enim ad minim veniam, quis nostrud exercitation...</p>
+                                <p hidden>{{teacher_ht.myuser_id.username}}</p>
+                                <div class="right">
+                                  <h3>{{ teacher_ht.myuser_id.fullname }}</h3>
+                                  <p><b>Email:</b> {{teacher_ht.myuser_id.email}}</p>
                               </div>
                             </div>
                           </a>
-                          {% for student in ls_student %}
-                          <a href="#">
-                            <div class="mail_list">
-                              <div class="left">
-                                <i class="fa fa-circle"></i> <i class="fa fa-edit"></i>
-                              </div>
-                              <div class="right">
-                                <h3>{{ student.fullname }} <small>{{ student.last_login }}</small></h3>
-                                <p>Ut enim ad minim veniam, quis nostrud exercitation enim ad minim veniam, quis nostrud exercitation...</p>
-                              </div>
-                            </div>
-                          </a>
-                          {% endfor %}
-
+                          
                         </div>
                         <div class="col-sm-9 mail_view">
                           <div class="inbox-body">
@@ -429,4 +414,5 @@
 
 {% block javascripts %}
   {{ block.super }}
+  <script src="{% static 'js/student/subjects.js' %}"></script>
 {% endblock javascripts %}

@@ -5,7 +5,7 @@
 {% block stylesheets %}
   {{ block.super }}
     <!-- bootstrap-wysiwyg -->
-    <link href="{% static 'css/chat.css' %}" rel="stylesheet">
+    
 {% endblock stylesheets %}
 
 {% block content %}
@@ -34,14 +34,19 @@
                       <div class="row">
                         <div class="col-sm-3 mail_list_column" style="overflow-y: scroll; height:600px;">
                           {% for student in ls_student %}
-                          <a href="#">
+                          <a href="javascript:register_popup('{{student.username}}', '{{student.fullname}}');">
                             <div class="mail_list">
-                              <div class="left">
-                                <i class="fa fa-circle"></i> <i class="fa fa-edit"></i>
-                              </div>
+                              <!-- <div class="left">
+                              </div> -->
+                              <p hidden>{{student.username}}</p>
                               <div class="right">
                                 <h3>{{ student.fullname }} <small>{{ student.last_login }}</small></h3>
-                                <p>Ut enim ad minim veniam, quis nostrud exercitation enim ad minim veniam, quis nostrud exercitation...</p>
+                                {% if student.gioi_tinh == 1%}
+                                  <p><b>Giới tính:</b> Nam</p>
+                                {% else%}
+                                  <p><b>Giới tính:</b> Nữ</p>
+                                {% endif%}
+                                <p><b>Email:</b> {{student.email}}</p>
                               </div>
                             </div>
                           </a>
