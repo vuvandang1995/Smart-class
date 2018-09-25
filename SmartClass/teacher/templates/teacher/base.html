@@ -32,8 +32,8 @@
       <!-- Custom Theme Style -->
       <link href="{% static 'css/chat.css' %}" rel="stylesheet">
       <link href="/static/build/css/custom.css" rel="stylesheet">
-      <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script>
-	    <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script>
+      <!-- <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script> -->
+	    <!-- <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script> -->
     {% endblock head %}
   </head>
 
@@ -185,15 +185,18 @@
                 <h4 class="modal-title" ></h4>
               </div>
               <div class="modal-body">
-                
+                <video hidden id="localStream" width="200" controls></video>
+                  <br /><br />
+                <video hidden id="remoteStream" width="200" controls></video>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-dismiss="modal" id="ok">OK</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" id="close">Close</button>
               </div>
               </div>
             </div>
           </div>
+        
+
         
 
           {% block footer %}
@@ -243,7 +246,7 @@
         <!--<script src="{% static 'vendors/starrr/dist/starrr.js' %}"></script>-->
         <script src="{% static 'build/js/custom.min.js' %}"></script>
       <script src="{% static 'js/teacher/chat_student.js' %}"></script>
-      <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script>
+      <!-- <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script> -->
       <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script>
       <script src="{% static 'js/teacher/peerjs/main.js' %}"></script>
       {% endblock %}

@@ -1,7 +1,7 @@
 function openStream(){
     const config = {
         audio: true,
-        video: false
+        video: true
     };
     return navigator.mediaDevices.getUserMedia(config);
 }
@@ -24,9 +24,9 @@ $('body').on('click', '#btnCall', function(){
         // var video = document.getElementById('localStream');
         // video.volume = 0;
         // try {
-            // video.setAttributeNode(document.createAttribute('muted'));
+        //     video.setAttributeNode(document.createAttribute('muted'));
         // } catch (e) {
-            // video.setAttribute('muted', true);
+        //     video.setAttribute('muted', true);
         // }
         
         const call = peer.call(id, stream);
@@ -64,12 +64,24 @@ $('body').on('click', '#btnCall', function(){
             $('#remoteStream').hide();
             stream.stop();
             stream.getVideoTracks()[0].stop();
-        });
+        });*/
         call.on('stream', remoteStream => {
-            playStream('remoteStream', remoteStream);
+            $('#remoteStream').show();
+            $('#localStream').show();
+            playStream('localStream', stream);
+            var video = document.getElementById('localStream');
+            video.volume = 0;
+            try {
+                video.setAttributeNode(document.createAttribute('muted'));
+            } catch (e) {
+                video.setAttribute('muted', true);
+            }
+            setTimeout(function(){
+                playStream('remoteStream', remoteStream);
+            }, 1000);
             waiting.pause();
         });
-        alert(call.peer);*/
+        // alert(call.peer);
 
     });
 });
@@ -78,5 +90,42 @@ peer.on('call', call => {
     var ring = document.getElementById("ring");
     ring.play();
     $('#ringring').click();
-    $('.modal-title').html('Cuộc gọi đến');
+    $('.modal-title').html('Giáo viên đang goi...');
+    $("#ok").click(function(){
+        openStream()
+        .then(stream => {
+            call.answer(stream);
+            $('#remoteStream').show();
+            $('#localStream').show();
+            ring.pause();
+            // $('#dis_camera').click(() =>{
+            //     var videoTrack = stream.getVideoTracks();
+            //     if (videoTrack.length > 0) {
+            //         stream.removeTrack(videoTrack[0]);
+            //         console.log(stream.getTracks());
+            //     }else{
+            //         stream.addTrack(stream_clone.getVideoTracks()[0]);
+            //         console.log(stream.getTracks());
+            //     }
+            // });
+            // $('#btnDone').show();
+            // $('#btnDone').click(() =>{
+            //     call.close();
+            //     $('#localStream').hide();
+            //     $('#remoteStream').hide();
+            //     $('#btnDone').hide();
+            //     stream.stop();
+            //     stream.getVideoTracks()[0].stop();
+            // });
+            playStream('localStream', stream);
+            var video = document.getElementById('localStream');
+            video.volume = 0;
+            try {
+                video.setAttributeNode(document.createAttribute('muted'));
+            } catch (e) {
+                video.setAttribute('muted', true);
+            }
+            call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
+        });
+    });
 });
