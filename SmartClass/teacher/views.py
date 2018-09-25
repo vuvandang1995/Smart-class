@@ -364,3 +364,12 @@ def share(request, lop):
         return render(request, 'teacher/share.html', content)
     else:
         return HttpResponseRedirect('/')
+
+
+
+def call11(request):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        return render(request, 'videocall/home.html')
+    else:
+        return HttpResponseRedirect('/')

@@ -93,6 +93,35 @@ function register_popup(id, name)
     
 }
 
+// href="/videocall/" target="_blank"
+function register_popup_teacher(id, name)
+{
+    if (check_popup(id, popups) == false){
+        if (check_popup(id, popups2)){
+            popups.unshift(id);
+            calculate_popups();
+        }else{
+            var element = '<div class="live-chat popup-box chat-popup" id="'+ id +'"><header class="clearfix header-chat"><div class="popup-head-right"><a class="chat-close" id="'+id+'"href="javascript:close_popup(\''+ id +'\');">&#10005;</a><a id="btnCall" style="margin-right: 7px;" class="chat-close2" data-name="'+name+'"><i class="fa fa-video-camera"></i></a></div><div class="popup-head-left"><h4 data-toggle="modal">'+ name +'</h4></div><span class="chat-message-counter">'+popups+'</span></header><div class="frame_std chat'+id+'"><ul></ul><div><div class="msj-rta macro"><div class="text text-r" style="background:whitesmoke !important"><input id="chat-message-input'+ name +'" class="mytext1" placeholder="Type a message"/></div></div><div style="padding:10px;"><span id="chat-message-submit'+ name +'" class="glyphicon glyphicon-share-alt yyy"></span></div></div></div></div>';
+            $(".main_container").append(element);
+            popups.push(id);
+            popups2.push(id);
+                    
+            calculate_popups();
+        }
+    }else{
+        for(var iii = 0; iii < popups.length; iii++)
+        {
+            if(id == popups[iii])
+            {
+                Array.remove(popups, iii);
+                popups.unshift(id);
+                calculate_popups();
+            }
+        }
+    }
+    
+}
+
 //calculate the total number of popups suitable and then populate the toatal_popups variable.
 function calculate_popups()
 {

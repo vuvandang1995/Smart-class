@@ -22,7 +22,7 @@ $(document).ready(function(){
          if (dict_ws[std_username] == undefined){
              dict_ws[std_username] = new WebSocket(
              'ws://' + window.location.host +
-             '/ws/' + std_username + '/');
+             '/ws/' + std_username + 'chat11/');
          }
 
          var me = {};
@@ -39,21 +39,21 @@ $(document).ready(function(){
              var control = "";
              var date = time;
              
-             if (who == 'me'){
+             if (who == userName){
 				control = '<li style="padding-top: 15px;margin-left: 5em;width:75%;">' +
 							  '<div class="msj-rta macro" style="background-color: #BFE9F9;">' +
 								  '<div class="text text-r">' +
-									  '<p style="color: #444950;">'+text+'</p>' +
-									  '<p style="margin-left: 30%;"><small style="color: #444950;">'+date+'</small></p>' +
+									  '<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
+									  '<p><small style="color: #444950;">'+date+'</small></p>' +
 								  '</div></div></li>';
 			  }else{
 				control = '<li style="width:75%">' +
 					'<h4 style="margin-bottom: -3px;margin-left: 10%;font-size: 12px;">'+who+'</h4>'+
-					'<div class="avatar" style="padding:5px 0px 0px 10px !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
+					'<div class="avatar" style="padding:5px 0px 0px 10px;width: 20%;margin-left: -12%;margin-top: 5%; !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
 					'<div class="msj-rta macro">' +
 						'<div class="text text-r">' +
-							'<p style="color: #444950;">'+text+'</p>' +
-							'<p style="margin-left: 30%;"><small style="color: #444950;">'+date+'</small></p>' +
+							'<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
+							'<p><small style="color: #444950;">'+date+'</small></p>' +
 						'</div></div>' +
 					'</li>';
 			  }
@@ -72,6 +72,12 @@ $(document).ready(function(){
 			 var time = data['time'];
              insertChat1(who, message, time);
          };
+
+        chatallSocket.send(JSON.stringify({
+        'message' : 'key_peer',
+        'who' : std_username,
+        'time' : 'None'
+        }));
 
      });
 });

@@ -148,6 +148,40 @@
             <!-- {{ content }} -->
           {% endblock content %}
 
+          <audio id="reciver_phone">
+            <source src="{% static 'sound/reciver.mp3' %}" type="audio/mpeg">
+          </audio>
+        
+          <audio id="waiting">
+            <source src="{% static 'sound/phone-tone-1.mp3' %}" type="audio/mpeg">
+          </audio>
+        
+          <audio id="ring">
+            <source src="{% static 'sound/phone_2.wav' %}" type="audio/mpeg">
+          </audio>
+
+          <button style="display: none;" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="ringring"></button>
+
+          <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+              <!-- Modal content-->
+              <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" ></h4>
+              </div>
+              <div class="modal-body">
+                
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal" id="ok">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="close">Close</button>
+              </div>
+              </div>
+            </div>
+          </div>
+
+
           {% block footer %}
             <footer>
               <div class="pull-right">
@@ -195,6 +229,10 @@
         <!--<script src="{% static 'vendors/starrr/dist/starrr.js' %}"></script>-->
       <script src="{% static 'build/js/custom.js' %}"></script>
       <script src="{% static 'js/teacher/chat_student.js' %}"></script>
+      <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script>
+      <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script>
+      <script src="{% static 'js/teacher/peerjs/main.js' %}"></script>
+
       {% endblock %}
       <!-- Custom Theme Scripts -->
     {% endblock body %}
@@ -202,9 +240,13 @@
 
     <script>
       var userName = {{ username }};
-      var classSocket = new WebSocket(
+      var userSocket = new WebSocket(
           'ws://' + window.location.host +
           '/ws/' + userName + '/');
+
+      var chatallSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/' + userName + 'chatall/');
 
 
       function escapeHtml(text) {
@@ -228,7 +270,10 @@
         var strTime = hours + ':' + minutes + ' ' + ampm + ' ' +date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear();
         return strTime;
       }
-
+      var key;
+      peer.on('open', id => {
+        key = id;
+      });
 
       var me = {};
       me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
@@ -245,8 +290,8 @@
                 control = '<li style="padding-top: 15px;margin-left: 5em;width:75%;">' +
                               '<div class="msj-rta macro" style="background-color: #BFE9F9;">' +
                                   '<div class="text text-r">' +
-                                      '<p style="color: #444950;">'+text+'</p>' +
-                                      '<p style="margin-left: 30%;"><small style="color: #444950;">'+date+'</small></p>' +
+                                      '<p style="color: #444950;word-break: break-all;">'+text+'</p>' +
+                                      '<p><small style="color: #444950;">'+date+'</small></p>' +
                                   '</div></div></li>';
               }else{
                 control = '<li style="width:75%">' +
@@ -254,8 +299,8 @@
                     '<div class="avatar" style="padding:5px 0px 0px 10px !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
                     '<div class="msj-rta macro">' +
                         '<div class="text text-r">' +
-                            '<p style="color: #444950;">'+text+'</p>' +
-                            '<p style="margin-left: 30%;"><small style="color: #444950;">'+date+'</small></p>' +
+                            '<p style="color: #444950;word-break: break-all;">'+text+'</p>' +
+                            '<p><small style="color: #444950;">'+date+'</small></p>' +
                         '</div></div>' +
                     '</li>';
               }
@@ -264,12 +309,20 @@
                       $(".frame > ul").append(control).scrollTop($(".frame > ul").prop('scrollHeight'));
                   }, time);
           }
-          classSocket.onmessage = function(e) {
+          chatallSocket.onmessage = function(e) {
               var data = JSON.parse(e.data);
               var message = data['message'];
               var who = data['who'];
               var time = data['time'];
-              insertChat(who, message, time);
+              if (time == 'None'){
+                  chatallSocket.send(JSON.stringify({
+                    'message' : key,
+                    'who': userName,
+                    'time' : 'key'
+                  }));
+              }else{
+                insertChat(who, message, time);
+              }
           };
 
       
@@ -287,7 +340,7 @@
           message = escapeHtml(message);
           var date = formatAMPM(new Date());
           if (message != ''){
-            classSocket.send(JSON.stringify({
+            chatallSocket.send(JSON.stringify({
                   'message' : message,
                   'who' : userName,
                   'time' : date
@@ -299,9 +352,9 @@
 
       var socket_teacher;
       $('.mail_list').on('click',function(){
-        var std_teacher = $(this).children('p').text();
+            var std = $(this).children('p').text();
             //  $("body .noti_chat"+std_username).hide();
-             $('body #'+std_teacher).children('.frame_std').show();
+             $('body #'+std).children('.frame_std').show();
             //  if (typeof(Storage) !== "undefined") {
             //     var herf = $(this).attr('href');
             //     var chat = herf.substring(herf.indexOf("(")+1, herf.indexOf(")")) + ',' + std_username;
@@ -315,7 +368,7 @@
     
             socket_teacher = new WebSocket(
                  'ws://' + window.location.host +
-                 '/ws/' + std_teacher + '/');
+                 '/ws/' + userName +'chat11/');
     
              var me = {};
              me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
@@ -331,39 +384,39 @@
                  var control = "";
                  var date = time;
                  
-                 if (who == 'me'){
-            control = '<li style="padding-top: 15px;margin-left: 5em;width:75%;">' +
-                    '<div class="msj-rta macro" style="background-color: #BFE9F9;">' +
-                      '<div class="text text-r">' +
-                        '<p style="color: #444950;">'+text+'</p>' +
-                        '<p style="margin-left: 30%;"><small style="color: #444950;">'+date+'</small></p>' +
-                      '</div></div></li>';
-            }else{
-            control = '<li style="width:75%">' +
-              '<h4 style="margin-bottom: -3px;margin-left: 10%;font-size: 12px;">'+who+'</h4>'+
-              '<div class="avatar" style="padding:5px 0px 0px 10px !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
-              '<div class="msj-rta macro">' +
-                '<div class="text text-r">' +
-                  '<p style="color: #444950;">'+text+'</p>' +
-                  '<p style="margin-left: 30%;"><small style="color: #444950;">'+date+'</small></p>' +
-                '</div></div>' +
-              '</li>';
-            }
+                 if (who == userName){
+                    control = '<li style="padding-top: 15px;margin-left: 5em;width:75%;">' +
+                            '<div class="msj-rta macro" style="background-color: #BFE9F9;">' +
+                              '<div class="text text-r">' +
+                                '<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
+                                '<p><small style="color: #444950;">'+date+'</small></p>' +
+                              '</div></div></li>';
+                    }else{
+                    control = '<li style="width:75%">' +
+                      '<h4 style="margin-bottom: -3px;margin-left: 10%;font-size: 12px;">'+who+'</h4>'+
+                      '<div class="avatar" style="padding:5px 0px 0px 10px;width: 20%;margin-left: -12%;margin-top: 5%; !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
+                      '<div class="msj-rta macro">' +
+                        '<div class="text text-r">' +
+                          '<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
+                          '<p><small style="color: #444950;">'+date+'</small></p>' +
+                        '</div></div>' +
+                      '</li>';
+                    }
                  setTimeout(
                      function(){                        
-                         $(".chat"+std_teacher).children('ul').append(control).scrollTop($(".chat"+std_teacher).children('ul').prop('scrollHeight'));
+                         $(".chat"+std).children('ul').append(control).scrollTop($(".chat"+std).children('ul').prop('scrollHeight'));
                      }, time);
                  
-             }
+              }
     
              
-             socket_teacher.onmessage = function(e) {
-                 var data = JSON.parse(e.data);
-                 var message = data['message'];
-                 var who = data['who'];
-           var time = data['time'];
-                 insertChat1(who, message, time);
-             };
+              socket_teacher.onmessage = function(e) {
+                var data = JSON.parse(e.data);
+                var message = data['message'];
+                var who = data['who'];
+                var time = data['time'];
+                insertChat1(who, message, time);
+              };
     
          });
     
@@ -390,7 +443,7 @@
             if (message != ''){
               socket_teacher.send(JSON.stringify({
               'message' : message,
-              'who' : 'me',
+              'who' : userName,
               'time' : date
               }));
             }
