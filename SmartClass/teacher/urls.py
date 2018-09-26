@@ -9,6 +9,7 @@ urlpatterns = [
     path('manage_class/<str:lop>', views.manage_class, name='manage_class'),
     path('manage_point/<str:lop>', views.manage_point, name='manage_point'),
     path('manage_point_data_<str:lop>', views.manage_point_data, name='manage_point_data'),
+    path('manage_point_detail_<int:id>', views.manage_point_detail, name='manage_point_detail'),
     path('manage_de', views.manage_de, name='manage_de'),
     path('de_data_<int:all>', views.de_data, name='de_data'),
     path('chi_tiet_de_data_<int:id>', views.chi_tiet_de_data, name='de_data'),
