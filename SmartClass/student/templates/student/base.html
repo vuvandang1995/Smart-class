@@ -232,8 +232,7 @@
       <script src="{% static 'build/js/custom.js' %}"></script>
       <script src="{% static 'js/teacher/chat_student.js' %}"></script>
       <!-- <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script> -->
-      <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script>
-      <script src="{% static 'js/teacher/peerjs/main.js' %}"></script>
+      {% comment %} <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script> {% endcomment %}
 
       {% endblock %}
       <!-- Custom Theme Scripts -->
@@ -272,11 +271,9 @@
         var strTime = hours + ':' + minutes + ' ' + ampm + ' ' +date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear();
         return strTime;
       }
-      var key;
-      peer.on('open', id => {
-        key = id;
-      });
+      
 
+      var key = '';
       var me = {};
       me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
       var you = {};
@@ -317,11 +314,19 @@
               var who = data['who'];
               var time = data['time'];
               if (time == 'None'){
+                if (key == ''){
+                  chatallSocket.send(JSON.stringify({
+                    'message' : 'No',
+                    'who': userName,
+                    'time' : 'key'
+                  }));
+                }else{
                   chatallSocket.send(JSON.stringify({
                     'message' : key,
                     'who': userName,
                     'time' : 'key'
                   }));
+                }
               }else if (time != 'key'){
                 insertChat(who, message, time);
               }

@@ -74,9 +74,9 @@ $(document).ready(function(){
          };
 
         chatallSocket.send(JSON.stringify({
-        'message' : 'key_peer',
-        'who' : std_username,
-        'time' : 'None'
+            'message' : 'key_peer',
+            'who' : std_username,
+            'time' : 'None'
         }));
 
      });
