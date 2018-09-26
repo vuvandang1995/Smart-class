@@ -413,6 +413,14 @@ def share(request, lop):
         return render(request, 'teacher/share.html', content)
     else:
         return HttpResponseRedirect('/')
+
+
+def call11(request):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        return render(request, 'videocall/home.html')
+    else:
+        return HttpResponseRedirect('/')
     
 def handle_uploaded_file(f):
     name = f.name
@@ -423,4 +431,3 @@ def handle_uploaded_file(f):
     for chunk in f.chunks():
         file.write(chunk)
     file.close()   
-   

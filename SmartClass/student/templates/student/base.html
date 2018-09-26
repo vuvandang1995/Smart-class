@@ -30,6 +30,7 @@
         <!--<link href="{% static 'vendors/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>-->
       {% endblock stylesheets %}
       <!-- Custom Theme Style -->
+      <link href="{% static 'css/chat.css' %}" rel="stylesheet">
       <link href="/static/build/css/custom.css" rel="stylesheet">
     {% endblock head %}
   </head>
@@ -147,6 +148,42 @@
             <!-- {{ content }} -->
           {% endblock content %}
 
+          <audio id="reciver_phone">
+            <source src="{% static 'sound/reciver.mp3' %}" type="audio/mpeg">
+          </audio>
+        
+          <audio id="waiting">
+            <source src="{% static 'sound/phone-tone-1.mp3' %}" type="audio/mpeg">
+          </audio>
+        
+          <audio id="ring">
+            <source src="{% static 'sound/phone_2.wav' %}" type="audio/mpeg">
+          </audio>
+
+          <button style="display: none;" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="ringring"></button>
+
+          <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+              <!-- Modal content-->
+              <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" ></h4>
+              </div>
+              <div class="modal-body">
+                  <video hidden id="localStream" width="200" controls></video>
+                    <br /><br />
+                  <video hidden id="remoteStream" width="200" controls></video>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="ok">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="close">Close</button>
+              </div>
+              </div>
+            </div>
+          </div>
+
+
           {% block footer %}
             <footer>
               <div class="pull-right">
@@ -192,17 +229,25 @@
         <!--<script src="{% static 'vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js' %}"></script>-->
         <!--&lt;!&ndash; starrr &ndash;&gt;-->
         <!--<script src="{% static 'vendors/starrr/dist/starrr.js' %}"></script>-->
+      <script src="{% static 'build/js/custom.js' %}"></script>
+      <script src="{% static 'js/teacher/chat_student.js' %}"></script>
+      <!-- <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script> -->
+      {% comment %} <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script> {% endcomment %}
+
       {% endblock %}
       <!-- Custom Theme Scripts -->
-      <script src="{% static 'build/js/custom.js' %}"></script>
     {% endblock body %}
 
 
     <script>
       var userName = {{ username }};
-      var classSocket = new WebSocket(
+      var userSocket = new WebSocket(
           'ws://' + window.location.host +
           '/ws/' + userName + '/');
+
+      var chatallSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/' + userName + 'chatall/');
 
 
       function escapeHtml(text) {
@@ -226,8 +271,9 @@
         var strTime = hours + ':' + minutes + ' ' + ampm + ' ' +date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear();
         return strTime;
       }
+      
 
-
+      var key = '';
       var me = {};
       me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
       var you = {};
@@ -240,36 +286,50 @@
               var control = "";
               var date = time;
               if (who == userName){
-                  control = '<span class="tile online" data-bind="css: contact.statusClassName"><span class="tileName" data-bind="html: heading"><h4>'+userName+'</h4></span></span><li style="width:100%">' +
-                                  '<div class="msj macro">' +
-                                  '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+ me.avatar +'" /></div>' +
-                                      '<div class="text text-l">' +
-                                          '<p>'+ text +'</p>' +
-                                          '<p><small>'+date+'</small></p>' +
-                                      '</div>' +
-                                  '</div>' +
-                              '</li>';
+                control = '<li style="padding-top: 15px;margin-left: 5em;width:75%;">' +
+                              '<div class="msj-rta macro" style="background-color: #BFE9F9;">' +
+                                  '<div class="text text-r">' +
+                                      '<p style="color: #444950;word-break: break-all;">'+text+'</p>' +
+                                      '<p><small style="color: #444950;">'+date+'</small></p>' +
+                                  '</div></div></li>';
               }else{
-                  control = '<span class="tile online" data-bind="css: contact.statusClassName"><span class="tileName" data-bind="html: heading"><h4>'+who+'</h4></span></span><li style="width:100%;">' +
-                                  '<div class="msj-rta macro">' +
-                                      '<div class="text text-r">' +
-                                          '<p>'+text+'</p>' +
-                                          '<p><small>'+date+'</small></p>' +
-                                      '</div>' +
-                                  '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+you.avatar+'" /></div>' +
-                          '</li>';
+                control = '<li style="width:75%">' +
+                    '<h4 style="margin-bottom: -3px;margin-left: 10%;font-size: 12px;">'+who+'</h4>'+
+                    '<div class="avatar" style="padding:5px 0px 0px 10px !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
+                    '<div class="msj-rta macro">' +
+                        '<div class="text text-r">' +
+                            '<p style="color: #444950;word-break: break-all;">'+text+'</p>' +
+                            '<p><small style="color: #444950;">'+date+'</small></p>' +
+                        '</div></div>' +
+                    '</li>';
               }
               setTimeout(
                   function(){
                       $(".frame > ul").append(control).scrollTop($(".frame > ul").prop('scrollHeight'));
                   }, time);
           }
-          classSocket.onmessage = function(e) {
+          chatallSocket.onmessage = function(e) {
               var data = JSON.parse(e.data);
               var message = data['message'];
               var who = data['who'];
               var time = data['time'];
-              insertChat(who, message, time);
+              if (time == 'None'){
+                if (key == ''){
+                  chatallSocket.send(JSON.stringify({
+                    'message' : 'No',
+                    'who': userName,
+                    'time' : 'key'
+                  }));
+                }else{
+                  chatallSocket.send(JSON.stringify({
+                    'message' : key,
+                    'who': userName,
+                    'time' : 'key'
+                  }));
+                }
+              }else if (time != 'key'){
+                insertChat(who, message, time);
+              }
           };
 
       
@@ -287,15 +347,128 @@
           message = escapeHtml(message);
           var date = formatAMPM(new Date());
           if (message != ''){
-            classSocket.send(JSON.stringify({
+            chatallSocket.send(JSON.stringify({
                   'message' : message,
                   'who' : userName,
                   'time' : date
               }));
           }
-          $(this).parent().parent().children().children().children('input').val('');
-          
+          $(this).parent().parent().children().children().children('input').val(''); 
       })
+
+
+      var socket_teacher;
+      $('.mail_list').on('click',function(){
+            var std = $(this).children('p').text();
+            //  $("body .noti_chat"+std_username).hide();
+             $('body #'+std).children('.frame_std').show();
+            //  if (typeof(Storage) !== "undefined") {
+            //     var herf = $(this).attr('href');
+            //     var chat = herf.substring(herf.indexOf("(")+1, herf.indexOf(")")) + ',' + std_username;
+            //     // Gán dữ liệu
+            //     sessionStorage.setItem(std_username, chat);
+                 
+            //     // Lấy dữ liệu
+            // } else {
+            //     document.write('Trình duyệt của bạn không hỗ trợ local storage');
+            // }
+    
+            socket_teacher = new WebSocket(
+                 'ws://' + window.location.host +
+                 '/ws/' + userName +'chat11/');
+    
+             var me = {};
+             me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
+    
+             var you = {};
+             you.avatar = "https://cdn2.iconfinder.com/data/icons/rcons-users-color/32/support_man-512.png";      
+    
+             //-- No use time. It is a javaScript effect.
+             function insertChat1(who, text, time){
+                 if (time === undefined){
+                     time = 0;
+                 }
+                 var control = "";
+                 var date = time;
+                 
+                 if (who == userName){
+                    control = '<li style="padding-top: 15px;margin-left: 5em;width:75%;">' +
+                            '<div class="msj-rta macro" style="background-color: #BFE9F9;">' +
+                              '<div class="text text-r">' +
+                                '<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
+                                '<p><small style="color: #444950;">'+date+'</small></p>' +
+                              '</div></div></li>';
+                    }else{
+                    control = '<li style="width:75%">' +
+                      '<h4 style="margin-bottom: -3px;margin-left: 10%;font-size: 12px;">'+who+'</h4>'+
+                      '<div class="avatar" style="padding:5px 0px 0px 10px;width: 20%;margin-left: -12%;margin-top: 5%; !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
+                      '<div class="msj-rta macro">' +
+                        '<div class="text text-r">' +
+                          '<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
+                          '<p><small style="color: #444950;">'+date+'</small></p>' +
+                        '</div></div>' +
+                      '</li>';
+                    }
+                 setTimeout(
+                     function(){                        
+                         $(".chat"+std).children('ul').append(control).scrollTop($(".chat"+std).children('ul').prop('scrollHeight'));
+                     }, time);
+                 
+              }
+    
+             
+              socket_teacher.onmessage = function(e) {
+                var data = JSON.parse(e.data);
+                var message = data['message'];
+                var who = data['who'];
+                var time = data['time'];
+                insertChat1(who, message, time);
+              };
+    
+         });
+    
+         $('body').on('click', '.header-chat', function(){
+            $(this).next().slideToggle(300, 'swing');
+          })
+    
+          $('body').on('click', '.yyy', function(){
+            $('body .mytext1').trigger({type: 'keydown', which: 13, keyCode: 13});
+          })
+          
+          $("body .mytext1").focus();
+          $('body').on('keyup', '.mytext1', function(e){
+            if (e.keyCode === 13) {
+              $(this).parent().parent().next().children('.yyy').click();
+            }
+          })
+          
+    
+          $('body').on('click', '.yyy', function(){
+            var message = $(this).parent().parent().children().children().children('.mytext1').val();
+            message = escapeHtml(message);
+            var date = formatAMPM(new Date());
+            if (message != ''){
+              socket_teacher.send(JSON.stringify({
+              'message' : message,
+              'who' : userName,
+              'time' : date
+              }));
+            }
+            $(this).parent().parent().children().children().children('input').val('');
+          })
+    
+
+    
+          $('body').on('click', '.chat-close', function(){
+            var teacher_name = $(this).attr('id');
+            socket_teacher.close();
+            // sessionStorage.removeItem(tk_id);
+            $("body #chat"+teacher_name+" .frame > ul").empty();
+          })
+
+
+      
+
     </script>
   </body>
 </html>

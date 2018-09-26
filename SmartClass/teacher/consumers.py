@@ -10,10 +10,16 @@ import fileinput
 from datetime import datetime
 from datetime import timedelta
 
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'classchat'
+        if 'chatall' in self.room_name:
+            self.room_group_name = 'chatall'
+        elif 'chat11' in self.room_name:
+            self.room_group_name = 'chat11_%s' % self.room_name
+        else:
+            self.room_group_name = self.room_name
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -23,15 +29,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()        
 
     async def disconnect(self, close_code):
-    #     await self.channel_layer.group_send(
-    #         self.room_group_name,
-    #         {
-    #             'type': 'chat_message',
-    #             'message': 'out',
-    #             'who': str(self.room_name),
-    #             'stt': 'out'
-    #         }
-    #     )
         # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -47,12 +44,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         who = text_data_json['who']
         time = text_data_json['time']
-        # print(message)
-        # await login(self.scope, self.scope["user"])
-        # save the session (if the session backend does not access the db you can use `sync_to_async`)
-        # await database_sync_to_async(self.scope["session"].save)()
-        # print(self.scope)
-        
+        print(time)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
