@@ -126,4 +126,43 @@ $(document).ready(function(){
     
          });
 
+         $('body').on('click', '.header-chat', function(){
+            $(this).next().slideToggle(300, 'swing');
+          })
+    
+          $('body').on('click', '.yyy', function(){
+            $('body .mytext1').trigger({type: 'keydown', which: 13, keyCode: 13});
+          })
+          
+          $("body .mytext1").focus();
+          $('body').on('keyup', '.mytext1', function(e){
+            if (e.keyCode === 13) {
+              $(this).parent().parent().next().children('.yyy').click();
+            }
+          })
+          
+    
+          $('body').on('click', '.yyy', function(){
+            var message = $(this).parent().parent().children().children().children('.mytext1').val();
+            message = escapeHtml(message);
+            var date = formatAMPM(new Date());
+            if (message != ''){
+              socket_teacher.send(JSON.stringify({
+              'message' : message,
+              'who' : userName,
+              'time' : date
+              }));
+            }
+            $(this).parent().parent().children().children().children('input').val('');
+          })
+    
+
+    
+          $('body').on('click', '.chat-close', function(){
+            var teacher_name = $(this).attr('id');
+            socket_teacher.close();
+            // sessionStorage.removeItem(tk_id);
+            $("body #chat"+teacher_name+" .frame > ul").empty();
+          })
+
 });
