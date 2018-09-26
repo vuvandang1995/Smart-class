@@ -78,16 +78,32 @@ $(document).ready(function(){
                     $('#list_ques_selected tbody tr').each(function(){
                         list_ques.push($(this).find('p').first().attr('id').split('_')[1]);
                     });
+                    $("#processing").modal({backdrop: 'static', keyboard: false});
                     $.ajax({
-                        'type':'POST',
-                        'url':location.href,
-                        'data':{'csrfmiddlewaretoken': token, 'ten_de':ten_de, 'mon':mon, 'loai_de':loai_de,
+                        xhr: function() {
+                            var xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener("progress", function(event){
+                                var percent = Math.round((event.loaded / event.total) * 100) + '%';
+                                $("#progressBar").attr("style","width:"+percent);
+                                $("#progressBar").text(percent);
+            //                    $("#loaded_n_total").html("Tải lên " + event.loaded + " bytes của " + event.total);
+                            }, false);
+                            $("#cancel_upload").click(function(){
+                                xhr.abort();
+                            });
+                            return xhr;
+                          },
+                         type:'POST',
+                         url:location.href,
+                         data:{'csrfmiddlewaretoken': token, 'ten_de':ten_de, 'mon':mon, 'loai_de':loai_de,
                          'list_ques':JSON.stringify(list_ques)},
-                         'success': function(){
+                         success: function(){
+                            $("#processing").modal('hide');
                             location.reload();
                          },
                     });
                 });
+
             }
         },
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -106,10 +122,17 @@ $(document).ready(function(){
         $('#question_title').html('Câu hỏi #'+id);
         var tom_tat = $("#tom_tat_"+id).text();
         var dang_cau_hoi = $("#dang_cau_hoi_"+id).text();
+        var dinh_kem = "/media/" + $("#dinh_kem_"+id).text();
         var noi_dung = $("#noi_dung_"+id).text();
-        var dap_an = []
-        var dung = []
-        var nd ='';
+        var dap_an = [];
+        var dung = [];
+        var ch =`
+        <input type="hidden" name="id" value=${id}>
+        <input type="hidden" name="tom_tat" value="${tom_tat}">
+        <input type="hidden" name="dang_cau_hoi" value="${dang_cau_hoi}">
+        <label>Nội dung:</label>
+        `;
+        var da ='';
         $(".dap_an_"+id).each(function(){
             dap_an.push($(this).text());
             if ($(this).data("dung")=== "True"){
@@ -119,36 +142,22 @@ $(document).ready(function(){
                 dung.push("");
             }
         });
-        if ( dang_cau_hoi.includes("Trắc nhiệm 2 đáp án")){
-            nd = `
-            <input type="hidden" name="id" value="${id}">
-            <input type="hidden" name="tom_tat" value="${tom_tat}">
-            <label>Nội dung:</label>
-            <pre style="white-space: pre-wrap;" name="noi_dung">
-${noi_dung}
-A:${dap_an[0]} ${dung[0]}
-B:${dap_an[1]} ${dung[1]}
-            </pre>
-            `;
+        $("#khung_modal").html("");
+        if (dang_cau_hoi.includes("Hình ảnh")){
+            ch += `<img id="hinh_anh" style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src=${dinh_kem} alt="không tồn tại" />`;
         }
-        else if (dang_cau_hoi.includes("3 đáp án")){
-            nd += `
-            <input type="hidden" name="id" value="${id}">
-            <input type="hidden" name="tom_tat" value="${tom_tat}">
-            <label>Nội dung:</label>
-            <pre style="white-space: pre-wrap;" name="noi_dung">
-${noi_dung}
-A:${dap_an[0]} ${dung[0]}
-B:${dap_an[1]} ${dung[1]}
-C:${dap_an[2]} ${dung[2]}
-            </pre>
-            `;
+
+        if ( dang_cau_hoi.includes("Âm thanh")){
+            ch += `<br><audio id="media" controls width="100%" src=${dinh_kem}></audio>`;
         }
-        else{
-            nd +=`
-            <input type="hidden" name="id" value="${id}">
-            <input type="hidden" name="tom_tat" value="${tom_tat}">
-            <label>Nội dung:</label>
+
+        if ( dang_cau_hoi.includes("Video")){
+            ch += `<video id="media" controls width="100%" src=${dinh_kem}></video>`;
+        }
+
+        if (dang_cau_hoi.includes("Trắc nhiệm")){
+            da +=`
+            <br>
             <pre style="white-space: pre-wrap;" name="noi_dung">
 ${noi_dung}
 A:${dap_an[0]} ${dung[0]}
@@ -158,7 +167,7 @@ D:${dap_an[3]} ${dung[3]}
             </pre>
             `;
         }
-        $("#khung_modal").html(nd);
+        $("#khung_modal").html(ch+da);
         $("#question").modal("show");
         $("#select_question").show();
         $("#remove_question").hide();
@@ -167,61 +176,37 @@ D:${dap_an[3]} ${dung[3]}
     $('#list_ques_selected tbody').on( 'click', 'tr', function () {
         var id = $(this).find('p').first().attr('id').split("_")[1];
         $('#question_title').html('Câu hỏi #'+id);
-        var tom_tat = $("#tom_tat_"+id).text();
-        var dang_cau_hoi = $("#dang_cau_hoi_"+id).text();
-        var noi_dung = $("#noi_dung_"+id).text();
-        var dap_an = []
-        var dung = []
-        var nd ='';
-        $(".dap_an_"+id).each(function(){
-            dap_an.push($(this).text());
-            if ($(this).data("dung")=== "True"){
-                dung.push("(Đúng)");
-            }
-            else{
-                dung.push("");
-            }
-        });
-        if ( dang_cau_hoi.includes("Trắc nhiệm 2 đáp án")){
-            nd = `
-            <input type="hidden" name="id" value="${id}">
-            <input type="hidden" name="tom_tat" value="${tom_tat}">
-            <label>Nội dung:</label>
+        var dang_cau_hoi = $(this).find("input[name=dang_cau_hoi]").first().val();
+        var noi_dung = $(this).find("pre[name=noi_dung]").first().text();
+        var src = $(this).find("input[name=src]").first().val();
+        var media =`
+        <input type="hidden" name="id" value=${id}>
+        <label>Nội dung:</label>
+        `;
+        var text = ''
+        var da ='';
+        $("#khung_modal").html("");
+        if (dang_cau_hoi.includes("Hình ảnh")){
+            media += `<img style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src=${src} alt="không tồn tại" />`;
+        }
+
+        if ( dang_cau_hoi.includes("Âm thanh")){
+            media += `<br><audio controls width="100%" src=${src}></audio>`;
+        }
+
+        if ( dang_cau_hoi.includes("Video")){
+            media += `<video controls width="100%" src=${src}></video>`;
+        }
+
+        if (dang_cau_hoi.includes("Trắc nhiệm")){
+            text +=`
+            <br>
             <pre style="white-space: pre-wrap;" name="noi_dung">
 ${noi_dung}
-A:${dap_an[0]} ${dung[0]}
-B:${dap_an[1]} ${dung[1]}
             </pre>
             `;
         }
-        else if (dang_cau_hoi.includes("3 đáp án")){
-            nd += `
-            <input type="hidden" name="id" value="${id}">
-            <input type="hidden" name="tom_tat" value="${tom_tat}">
-            <label>Nội dung:</label>
-            <pre style="white-space: pre-wrap;" name="noi_dung">
-${noi_dung}
-A:${dap_an[0]} ${dung[0]}
-B:${dap_an[1]} ${dung[1]}
-C:${dap_an[2]} ${dung[2]}
-            </pre>
-            `;
-        }
-        else{
-            nd +=`
-            <input type="hidden" name="id" value="${id}">
-            <input type="hidden" name="tom_tat" value="${tom_tat}">
-            <label>Nội dung:</label>
-            <pre style="white-space: pre-wrap;" name="noi_dung">
-${noi_dung}
-A:${dap_an[0]} ${dung[0]}
-B:${dap_an[1]} ${dung[1]}
-C:${dap_an[2]} ${dung[2]}
-D:${dap_an[3]} ${dung[3]}
-            </pre>
-            `;
-        }
-        $("#khung_modal").html(nd);
+        $("#khung_modal").html(media+text);
         $("#question").modal("show");
         $("#select_question").hide();
         $("#remove_question").show();
@@ -232,11 +217,25 @@ D:${dap_an[3]} ${dung[3]}
         var modal = $(this).parent().parent();
         var id = modal.find('input[name=id]').first().val();
         var tom_tat = modal.find('input[name=tom_tat]').first().val();
+        var noi_dung = modal.find('pre[name=noi_dung]').first().text();
+        var dang_cau_hoi = modal.find('input[name=dang_cau_hoi]').first().val();
+        var src = '';
+        if (dang_cau_hoi.includes("Hình ảnh")){
+            src += modal.find('img').first().attr("src");
+        }else if (dang_cau_hoi.includes("Âm thanh")){
+            src += modal.find('audio').first().attr("src");
+        }else if (dang_cau_hoi.includes("Video")){
+            src += modal.find('video').first().attr("src");
+        }
         var content = `
             <p id="ch_${id}">(${id})  ${tom_tat}</p>
+            <input type="hidden" name="dang_cau_hoi" value="${dang_cau_hoi}">
+            <pre hidden name="noi_dung">${noi_dung}</pre>
+            <input hidden name="src" value=${src}>
         `
         table_ques_selected.row.add([content]).draw();
         $("#so_luong").html(table_ques_selected.data().count());
+//        update_review();
     })
 
     $('#remove_question').on('click', function(){
@@ -246,6 +245,7 @@ D:${dap_an[3]} ${dung[3]}
         var row = $("#ch_"+id).parent().parent();
         table_ques_selected.row(row).remove().draw();
         $("#so_luong").html(table_ques_selected.data().count());
+//        update_review();
     })
 
     var table_exam = $("#list_exam").DataTable({
@@ -278,57 +278,37 @@ D:${dap_an[3]} ${dung[3]}
     function update_review(){
         var content = '';
         $('#list_ques_selected tbody tr').each(function(index){
-            var id = $(this).find('p').first().attr('id').split('_')[1];
-            var dang_cau_hoi = $("#dang_cau_hoi_"+id).text();
-            var noi_dung = $("#noi_dung_"+id).text();
-            var dap_an = []
-            var dung = []
-            var nd ='';
-            $(".dap_an_"+id).each(function(){
-                dap_an.push($(this).text());
-                if ($(this).data("dung")=== "True"){
-                    dung.push("(Đúng)");
-                }
-                else{
-                    dung.push("");
-                }
-            });
             var i = index+1;
-            if ( dang_cau_hoi.includes("Trắc nhiệm 2 đáp án")){
-                content += `
-                <label>Câu hỏi ${i}:</label>
-                <pre style="white-space: pre-wrap;">
-${noi_dung}
-A:${dap_an[0]} ${dung[0]}
-B:${dap_an[1]} ${dung[1]}
-                </pre>
-                `
+            var dang_cau_hoi = $(this).find("input[name=dang_cau_hoi]").first().val();
+            if(typeof(dang_cau_hoi) == 'undefined'){
+                return false;
             }
-            else if (dang_cau_hoi.includes("Trắc nhiệm 3 đáp án")){
-                content += `
-                <label>Câu hỏi ${i}:</label>
-                <pre style="white-space: pre-wrap;">
-${noi_dung}
-A:${dap_an[0]} ${dung[0]}
-B:${dap_an[1]} ${dung[1]}
-C:${dap_an[2]} ${dung[2]}
-                </pre>
-                `
-            }else{
-            content += `
-                <label>Câu hỏi ${i}:</label>
-                <pre style="white-space: pre-wrap;">
-${noi_dung}
-A:${dap_an[0]} ${dung[0]}
-B:${dap_an[1]} ${dung[1]}
-C:${dap_an[2]} ${dung[2]}
-C:${dap_an[3]} ${dung[3]}
-                </pre>
-                `
+            var noi_dung = $(this).find("pre[name=noi_dung]").first().text();
+            var src = $(this).find("input[name=src]").first().val();
+            content +=`
+            <label>Câu hỏi ${i}:</label>
+            `;
+            if (dang_cau_hoi.includes("Hình ảnh")){
+                content += `<img style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src=${src} alt="không tồn tại" />`;
             }
 
+            if ( dang_cau_hoi.includes("Âm thanh")){
+                content += `<br><audio controls width="100%" src=${src}></audio>`;
+            }
+
+            if ( dang_cau_hoi.includes("Video")){
+                content += `<video controls width="100%" src=${src}></video>`;
+            }
+
+            if (dang_cau_hoi.includes("Trắc nhiệm")){
+                content +=`
+                <br>
+                <pre style="white-space: pre-wrap;" name="noi_dung">
+${noi_dung}
+                </pre>
+                `;
+            }
         });
-
         $('#step-3').html(content);
     }
 
