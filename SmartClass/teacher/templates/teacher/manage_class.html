@@ -175,10 +175,12 @@
           </form>
       </div>
     </div>
-
+    <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script>
+    <script src="{% static 'js/teacher/peerjs/main.js' %}"></script>
 {% endblock content %}
 
 {% block javascripts %}
   {{ block.super }}
   <script src="{% static 'js/teacher/manage_class.js' %}"></script>
+  <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script>
 {% endblock javascripts %}

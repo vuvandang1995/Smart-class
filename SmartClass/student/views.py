@@ -95,7 +95,7 @@ def mon(request, id):
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
         ls_teacher = MyUser.objects.filter(id__in=ls_chi_tiet, position=1)
         teacher_ht = GiaoVienMon.objects.get(myuser_id__in=ls_teacher, mon_id=monOb)
-        content = {'mon': lop_mon(user), 'mon_ht': monOb, 'ls_student': ls_student, 'teacher_ht': teacher_ht, 'username': mark_safe(json.dumps(user.username))}
+        content = {'lop': mark_safe(json.dumps(lopOb.lop_id.ten)),'mon': lop_mon(user), 'mon_ht': monOb, 'ls_student': ls_student, 'teacher_ht': teacher_ht, 'username': mark_safe(json.dumps(user.username))}
         return render(request, 'student/subjects.html', content)
     else:
         return redirect("/")
