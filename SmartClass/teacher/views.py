@@ -122,6 +122,7 @@ def manage_point_data(request, lop):
         json_data = json.loads(json.dumps(big_data))
         return JsonResponse(json_data)
 
+
 def manage_point_detail(request, id):
     user = request.user
     if user.is_authenticated and user.position == 1:
@@ -224,40 +225,42 @@ def manage_question(request):
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user),
                    'list_mon': GiaoVienMon.objects.filter(myuser_id=user)}
         if request.method == 'POST':
-            if request.FILES.get('dinh_kem') is not None:
-                if 'edit' in request.POST:
-                    ch = CauHoi.objects.get(id=request.POST['id'])
-                    ch.noi_dung = request.POST['noi_dung']
-                    if request.FILES.get('dinh_kem') is not None:
+            if 'edit' in request.POST:
+                ch = CauHoi.objects.get(id=request.POST['id'])
+                ch.noi_dung = request.POST['noi_dung']
+                if request.FILES.get('dinh_kem') is not None:
+                    try:
                         os.remove(os.path.join(settings.MEDIA_ROOT, str(ch.dinh_kem)))
-                        ch.dinh_kem = request.FILES['dinh_kem']
-                        ch.save()
-                        handle_uploaded_file(request.FILES['dinh_kem'])
+                    except:
+                        pass
+                    ch.dinh_kem = request.FILES['dinh_kem']
                     ch.save()
-                    DapAn.objects.filter(cau_hoi_id=ch).delete()
+                    handle_uploaded_file(request.FILES['dinh_kem'])
+                ch.save()
+                DapAn.objects.filter(cau_hoi_id=ch).delete()
+            else:
+                ten_mon, lop_mon = request.POST['mon'].split(" - ")
+                mon = Mon.objects.get(ten=ten_mon, lop=lop_mon)
+                if request.POST['do_kho'] == 'Dễ':
+                    do_kho = 0
+                elif request.POST['do_kho'] == 'Trung bình':
+                    do_kho = 1
                 else:
-                    ten_mon, lop_mon = request.POST['mon'].split(" - ")
-                    mon = Mon.objects.get(ten=ten_mon, lop=lop_mon)
-                    if request.POST['do_kho'] == 'Dễ':
-                        do_kho = 0
-                    elif request.POST['do_kho'] == 'Trung bình':
-                        do_kho = 1
-                    else:
-                        do_kho = 2
-                    ch = CauHoi.objects.create(myuser_id=user, mon_id=mon, noi_dung=request.POST['noi_dung'], do_kho=do_kho,
-                                               chu_de=request.POST['chu_de'], dang_cau_hoi=request.POST['dang_cau_hoi'])
-                    if request.FILES.get('dinh_kem') is not None:
-                        ch.dinh_kem = request.FILES['dinh_kem']
-                        ch.save()
-                        handle_uploaded_file(request.FILES['dinh_kem'])
-                dap_an = json.loads(request.POST['dap_an'])
-                nd_dap_an = json.loads(request.POST['nd_dap_an'])
-                for i in range(len(dap_an)):
-                    if dap_an[i] == 0:
-                        dung = False
-                    else:
-                        dung = True
-                    DapAn.objects.create(cau_hoi_id=ch, mon_id=ch.mon_id, noi_dung=nd_dap_an[i], dap_an_dung=dung)
+                    do_kho = 2
+                ch = CauHoi.objects.create(myuser_id=user, mon_id=mon, noi_dung=request.POST['noi_dung'], do_kho=do_kho,
+                                           chu_de=request.POST['chu_de'], dang_cau_hoi=request.POST['dang_cau_hoi'])
+                if request.FILES.get('dinh_kem') is not None:
+                    ch.dinh_kem = request.FILES['dinh_kem']
+                    ch.save()
+                    handle_uploaded_file(request.FILES['dinh_kem'])
+            dap_an = json.loads(request.POST['dap_an'])
+            nd_dap_an = json.loads(request.POST['nd_dap_an'])
+            for i in range(len(dap_an)):
+                if dap_an[i] == 0:
+                    dung = False
+                else:
+                    dung = True
+                DapAn.objects.create(cau_hoi_id=ch, mon_id=ch.mon_id, noi_dung=nd_dap_an[i], dap_an_dung=dung)
         return render(request, 'teacher/manage_question.html', content)
     else:
         return HttpResponseRedirect('/')
@@ -359,7 +362,6 @@ def user_login(request):
                     user = user_form.save()
                     return redirect('/')
                 else:
-                    print(user_form.errors)
                     error = ''
                     for field in user_form:
                         error += field.errors
@@ -410,7 +412,10 @@ def share(request, lop):
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user),
                    'ls_student': ls_student}
-        return render(request, 'teacher/share.html', content)
+        if user.position == 0:
+            return render(request, 'student/share.html', content)
+        else:
+            return render(request, 'teacher/share.html', content)
     else:
         return HttpResponseRedirect('/')
 
@@ -421,7 +426,8 @@ def call11(request):
         return render(request, 'videocall/home.html')
     else:
         return HttpResponseRedirect('/')
-    
+
+
 def handle_uploaded_file(f):
     name = f.name
     if " " in name:

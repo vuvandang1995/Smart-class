@@ -4,7 +4,7 @@ if($("#position").val() == 'teacher'){
     };
 
     document.getElementById('reopen-room').onclick = function() {
-        connection.open($('#room-id').text());
+        location.reload();
     };
 }
 
@@ -51,8 +51,10 @@ connection.onstream = function(event) {
         mediaElement.media.play();
     }, 5000);
     mediaElement.id = event.streamid;
-    $('.media-container').attr('style','width:100%');
-    $('#videos-container .media-controls div:first-child').attr('style','opacity:0')
+    $('#videos-container .media-container').attr('style','width:100%');
+    if($("#position").val() == 'teacher'){
+        $('#videos-container .media-controls div:first-child').attr('style','opacity:0');
+    };
 };
 
 
@@ -135,6 +137,10 @@ if(roomid && roomid.length) {
     disableInputButtons();
 }
 
-connection.openOrJoin($('#room-id').text());
+if($("#position").val() == 'teacher'){
+    connection.openOrJoin($('#room-id').text());
+}else{
+    connection.join($('#room-id').text());
+}
 
 
