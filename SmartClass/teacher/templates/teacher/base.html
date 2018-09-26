@@ -248,12 +248,11 @@
         <script src="{% static 'build/js/custom.min.js' %}"></script>
       <script src="{% static 'js/teacher/chat_student.js' %}"></script>
       <!-- <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script> -->
-      <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script>
-      <script src="{% static 'js/teacher/peerjs/main.js' %}"></script>
+      
       {% endblock %}
       <!-- Custom Theme Scripts -->
 
-      <script src="{% static 'build/js/custom.js' %}"></script>
+      {% comment %} <script src="{% static 'build/js/custom.js' %}"></script> {% endcomment %}
     {% endblock body %}
 
     <script>
@@ -261,10 +260,6 @@
       var userSocket = new WebSocket(
           'ws://' + window.location.host +
           '/ws/' + userName + '/');
-
-      var chatallSocket = new WebSocket(
-        'ws://' + window.location.host +
-        '/ws/' + userName + 'chatall/');
 
 
       function escapeHtml(text) {
@@ -288,7 +283,8 @@
         var strTime = hours + ':' + minutes + ' ' + ampm + ' ' +date.getDate()+'/'+(date.getMonth()+1)+'/'+date.getFullYear();
         return strTime;
       }
-	    dict_ws = {};
+      dict_ws = {};
+      var chatallSocket;
 
       
       var me = {};
@@ -325,85 +321,47 @@
                     $(".frame > ul").append(control).scrollTop($(".frame > ul").prop('scrollHeight'));
                 }, time);
         }
-          chatallSocket.onmessage = function(e) {
-              var data = JSON.parse(e.data);
-              var message = data['message'];
-              var who = data['who'];
-              var time = data['time'];
-              if (time == 'key'){
-                document.getElementById("btnCall").setAttribute("name", message); 
-              }else if (time != 'None'){
-                insertChat(who, message, time);
-              }
-              
-          };
 
         
 
-      
-      $('body').on('click', '.xxx', function(){
-          $("body .mytext").trigger({type: 'keydown', which: 13, keyCode: 13});
-      })
-      $("body .mytext").focus();
-      $('body').on('keyup', '.mytext', function(e){
+        $('body').on('click', '.header-chat', function(){
+          $(this).next().slideToggle(300, 'swing');
+        })
+    
+        $('body').on('click', '.yyy', function(){
+          $('body .mytext1').trigger({type: 'keydown', which: 13, keyCode: 13});
+        })
+        
+        $("body .mytext1").focus();
+        $('body').on('keyup', '.mytext1', function(e){
           if (e.keyCode === 13) {
-              $(this).parent().parent().next().children('span').click();
+            $(this).parent().parent().next().children('.yyy').click();
           }
-      })
-      $('body').on('click', '.xxx', function(){
-          var message = $(this).parent().parent().children().children().children('input').val();
+        })
+        $('body').on('click', '.yyy', function(){
+          var message = $(this).parent().parent().children().children().children('.mytext1').val();
           message = escapeHtml(message);
+          var std_username = $(this).parent().parent().parent().parent().attr('id');
           var date = formatAMPM(new Date());
           if (message != ''){
-            chatallSocket.send(JSON.stringify({
-                  'message' : message,
-                  'who' : userName,
-                  'time' : date
-              }));
+            dict_ws[std_username].send(JSON.stringify({
+            'message' : message,
+            'who' : userName,
+            'time' : date
+            }));
           }
           $(this).parent().parent().children().children().children('input').val('');
-          
-      })
-
-      $('body').on('click', '.header-chat', function(){
-        $(this).next().slideToggle(300, 'swing');
-      })
-
-      $('body').on('click', '.yyy', function(){
-        $('body .mytext1').trigger({type: 'keydown', which: 13, keyCode: 13});
-      })
+        })
+    
+    
+        $('body').on('click', '.chat-close', function(){
+          var std_name = $(this).attr('id');
+          dict_ws[std_name].close();
+          delete dict_ws[std_name];
+          // sessionStorage.removeItem(tk_id);
+          $("body #chat"+std_name+" .frame > ul").empty();
+        })
       
-      $("body .mytext1").focus();
-      $('body').on('keyup', '.mytext1', function(e){
-        if (e.keyCode === 13) {
-          $(this).parent().parent().next().children('.yyy').click();
-        }
-      })
-      $('body').on('click', '.yyy', function(){
-        var message = $(this).parent().parent().children().children().children('.mytext1').val();
-        message = escapeHtml(message);
-        var std_username = $(this).parent().parent().parent().parent().attr('id');
-        var date = formatAMPM(new Date());
-        if (message != ''){
-          dict_ws[std_username].send(JSON.stringify({
-          'message' : message,
-          'who' : userName,
-          'time' : date
-          }));
-        }
-        $(this).parent().parent().children().children().children('input').val('');
-      })
-
-
-      $('body').on('click', '.chat-close', function(){
-        var std_name = $(this).attr('id');
-        dict_ws[std_name].close();
-        delete dict_ws[std_name];
-        // sessionStorage.removeItem(tk_id);
-        $("body #chat"+std_name+" .frame > ul").empty();
-      })
-
-
       /*$('body').on('click', '.chat-close2', function(){
         var std_username =  $(this).attr('id').split('_')[1];
         chatallSocket.send(JSON.stringify({

@@ -15,7 +15,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         if 'chatall' in self.room_name:
-            self.room_group_name = 'chatall'
+            self.room_group_name = self.room_name
         elif 'chat11' in self.room_name:
             self.room_group_name = 'chat11_%s' % self.room_name
         else:

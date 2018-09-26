@@ -1,4 +1,24 @@
 $(document).ready(function(){
+    var _class_ = window.location.pathname.split('/');
+    var class_ =  _class_[_class_.length-1];
+    chatallSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/' + userName + 'chatall'+class_+'/');
+
+    
+    chatallSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var message = data['message'];
+        var who = data['who'];
+        var time = data['time'];
+        if (time == 'key'){
+            $("#videocall"+who).attr("name", message); 
+        }else if (time != 'None'){
+            insertChat(who, message, time);
+        }
+        
+    };
+
 	$('#btn_nhom').on('click',function(){
 		$('#chinhsua').modal('show');
 	});
@@ -73,11 +93,31 @@ $(document).ready(function(){
              insertChat1(who, message, time);
          };
 
-        chatallSocket.send(JSON.stringify({
-            'message' : 'key_peer',
-            'who' : std_username,
-            'time' : 'None'
-        }));
-
      });
+
+    $('body').on('click', '.xxx', function(){
+        $("body .mytext").trigger({type: 'keydown', which: 13, keyCode: 13});
+    })
+    $("body .mytext").focus();
+    $('body').on('keyup', '.mytext', function(e){
+        if (e.keyCode === 13) {
+            $(this).parent().parent().next().children('span').click();
+        }
+    })
+    $('body').on('click', '.xxx', function(){
+        var message = $(this).parent().parent().children().children().children('input').val();
+        message = escapeHtml(message);
+        var date = formatAMPM(new Date());
+        if (message != ''){
+          chatallSocket.send(JSON.stringify({
+                'message' : message,
+                'who' : userName,
+                'time' : date
+            }));
+        }
+        $(this).parent().parent().children().children().children('input').val('');
+        
+    })
+
+
 });
