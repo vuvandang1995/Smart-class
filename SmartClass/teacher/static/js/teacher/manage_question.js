@@ -136,9 +136,17 @@ $(document).ready(function(){
         var token = $("input[name=csrfmiddlewaretoken]").val();
         var mon = $("#mon option:selected").text();
         var chu_de = $("#chu_de").val();
+        if(chu_de == ''){
+            alert("Chưa có chủ đề");
+            return false;
+        }
         var dang_cau_hoi = $("#dang_cau_hoi option:selected").text();
         var do_kho = $("#do_kho option:selected").text();
         var noi_dung = $("#khung textarea[name=noi_dung]").val();
+        if(noi_dung == ''){
+            alert("Chưa nhập nội dung");
+            return false;
+        }
         var dap_an = [];
         $("#khung .dap_an").each(function(){
             if ($(this).is(':checked')){
@@ -147,10 +155,19 @@ $(document).ready(function(){
                 dap_an.push(0);
             }
         });
+        if (jQuery.inArray( 1, dap_an) == -1){
+            alert("Chưa chọn đáp án đúng");
+            return false;
+        }
         var nd_dap_an = [];
         $("#khung .nd_dap_an").each(function(){
             nd_dap_an.push($(this).val());
         });
+        if (jQuery.inArray( "", nd_dap_an) != -1){
+            alert("Chưa nhập nội dung đáp án");
+            return false;
+        }
+
         var formData = new FormData();
         formData.append('csrfmiddlewaretoken',$("input[name=csrfmiddlewaretoken]").val());
         formData.append('mon',$("#mon option:selected").text());
@@ -160,7 +177,14 @@ $(document).ready(function(){
         formData.append('noi_dung',$("#khung textarea[name=noi_dung]").val());
         formData.append('dap_an',JSON.stringify(dap_an));
         formData.append('nd_dap_an',JSON.stringify(nd_dap_an));
-        formData.append('dinh_kem',$("input[type=file]")[0].files[0]);
+        if (typeof($("input[type=file]")[0]) == "undefined"){
+
+        }else if (typeof($("input[type=file]")[0].files[0]) == "undefined"){
+            alert("Chưa chọn file");
+            return false;
+        }else{
+            formData.append('dinh_kem',$("input[type=file]")[0].files[0]);
+        }
         $("#processing").modal({backdrop: 'static', keyboard: false});
         $.ajax({
             xhr: function() {
@@ -217,6 +241,9 @@ $(document).ready(function(){
     });
 
     $('#list_question tbody').on( 'click', 'tr', function () {
+        if(table_question.data().count() == 0){
+            return false;
+        }
         var id = $(this).find('p').first().attr('id').split("_")[2];
         var dang_cau_hoi = $("#dang_cau_hoi_"+id).text();
         var noi_dung = $("#noi_dung_"+id).text();
