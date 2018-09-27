@@ -21,6 +21,7 @@ from django.core.mail import EmailMessage
 from teacher.models import *
 
 from django.contrib import messages
+import re
 
 
 class EmailThread(threading.Thread):
@@ -213,11 +214,12 @@ def exam(request):
                     else:
                         if da.id in dap_an_id:
                             dung += '(Chọn)'
-                    tempt += '{0}: {1}{2}\n'.format(s, da.noi_dung, dung)
+                    result = re.search('<p>(.*)</p>', da.noi_dung)
+                    tempt += '<p>{0}: {1}{2}</p>'.format(s, result.group(1), dung)
                 bai_lam += '''
                 <label>Câu hỏi {0}:</label>
                 {3}
-                <pre style="white-space: pre-wrap;">{1}{2}</pre>
+                <ul class="list-unstyled msg_list"><li><a>{1}{2}</a></li></ul>
                 '''.format(i + 1, ch.cau_hoi_id.noi_dung, tempt, media)
             DiemSo.objects.create(de_id=de, myuser_id=user, mon_id=de.mon_id, loai_diem=de.loai_de, bai_lam=bai_lam,
                                   diem=round(s_dung/ChiTietDe.objects.filter(de_id=de).count(), 3)*10)
@@ -254,19 +256,20 @@ def exam_data(request, id):
             list_dap_an = DapAn.objects.filter(cau_hoi_id=ques.cau_hoi_id)
             for k, da in enumerate(list_dap_an):
                 s = chr(ord(str(k)) + 17)
+                result = re.search('<p>(.*)</p>', da.noi_dung)
                 dap_an += '''<div class="row">
                     <div class="col-md-1 col-sm-12 col-xs-12 form-group">
                       <input type="radio" class="form-control" data-id="{0}" data-ch_id="{1}" data-da_id="{4}" style="transform:scale(0.6);" name="dap_an_{1}">
                     </div>
                     <div class="col-md-11 col-sm-12 col-xs-12 form-group">
-                      <pre style="white-space: pre-wrap;">{2}: {3}</pre>
+                        <ul class="list-unstyled msg_list"><li><a>{2}: {3}</a></li></ul>
                     </div>
-                </div>'''.format(i+1, ques.cau_hoi_id.id, s, da.noi_dung, da.id)
+                </div>'''.format(i+1, ques.cau_hoi_id.id, s, result.group(1), da.id)
             right_content += '''
                 <div id="cau_{0}">
                     <label>Câu hỏi {0}:</label>
                     {3}
-                    <pre style="white-space: pre-wrap;">{1}</pre>
+                    <ul class="list-unstyled msg_list"><li><a>{1}</a></li></ul>
                     {2}
                 </div>
             <div>

@@ -23,6 +23,7 @@ from django.core.mail import EmailMessage
 from teacher.models import *
 import os
 from django.conf import settings
+import re
 
 
 class EmailThread(threading.Thread):
@@ -196,7 +197,7 @@ def chi_tiet_de_data(request, id):
         for i, ques in enumerate(list_ques):
             media = ''
             if "Hình ảnh" in ques.cau_hoi_id.dang_cau_hoi:
-                media = '<img style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src="/media/{}" alt="khÃ´ng tá»“n táº¡i" />'.format(ques.cau_hoi_id.dinh_kem)
+                media = '<img style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src="/media/{}" alt="không tồn tại" />'.format(ques.cau_hoi_id.dinh_kem)
             elif "Âm thanh" in ques.cau_hoi_id.dang_cau_hoi:
                 media = '<br><audio controls width="100%" src="/media/{}"></audio>'.format(ques.cau_hoi_id.dinh_kem)
             elif "Video" in ques.cau_hoi_id.dang_cau_hoi:
@@ -209,11 +210,15 @@ def chi_tiet_de_data(request, id):
                     dung = '(Đúng)'
                 else:
                     dung = ''
-                dap_an += '{0}: {1}{2}\n'.format(s, da.noi_dung, dung)
+                result = re.search('<p>(.*)</p>', da.noi_dung)
+                dap_an += '''
+                <p>{0}: {2} {1}</p>
+                '''.format(s, dung, result.group(1))
             content += '''
             <label>Câu hỏi {0}:</label>
             {3}
-            <pre style="white-space: pre-wrap;">{1}{2}</pre>
+            <ul class="list-unstyled msg_list">
+            <li><a>{1}{2}</a></li>
             '''.format(i+1, list_ques[i].cau_hoi_id.noi_dung, dap_an, media)
         return HttpResponse(content)
 
@@ -285,22 +290,125 @@ def question_data(request, id_mon, all):
             else:
                 do_kho += 'Khó</p>'
             ngay_tao = '<p id="ngay_tao_{}">{}</p>'.format(ques.id, str(ques.ngay_tao))
-            ls_dap_an = ''
-            for dap_an in DapAn.objects.filter(cau_hoi_id=ques):
-                ls_dap_an += '<p hidden id="dap_an_{0}" class="dap_an_{1}" data-dung="{2}">{3}</p>'.format(dap_an.id, ques.id, dap_an.dap_an_dung, dap_an.noi_dung)
+            # result = re.search('<p>(.*)</p>', ques.noi_dung)
+            # try:
+            #     print(result.group(0))
+            # except:
+            #     pass
             noi_dung = '''
-            <p hidden id="noi_dung_{0}">{1} </p>
-            <p id="tom_tat_{0}">{2} ...</p>
-            {3}
-            <p hidden id="dinh_kem_{0}">{4}</p>
-            '''.format(ques.id, ques.noi_dung, ques.noi_dung[:40], ls_dap_an, ques.dinh_kem)
+            <div id="tom_tat_{0}" class="row">{1}</div>
+            '''.format(ques.id, ques.noi_dung[:40])
             if all == 0:
                 data.append([chu_de, dang_cau_hoi, do_kho, ngay_tao, noi_dung])
             else:
                 ten = '<p>{}</p>'.format(ques.myuser_id.fullname)
-                data.append([ques.id, chu_de, dang_cau_hoi, do_kho, ten , ngay_tao, noi_dung])
+                data.append([ques.id, chu_de, dang_cau_hoi, do_kho, ten, ngay_tao, noi_dung])
         json_data = json.loads(json.dumps({"data": data}))
         return JsonResponse(json_data)
+
+
+def question_data_detail(request, id, kieu):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        ques = CauHoi.objects.get(id=id)
+
+        media = ''
+        if kieu == 'edit':
+            dat = ''
+            if "Văn bản" in ques.dang_cau_hoi:
+                media = '''
+                <div id="noi_dung_modal" class="ques-container">{0}</div>
+                <br>
+                '''.format(ques.noi_dung)
+            elif "Hình ảnh" in ques.dang_cau_hoi:
+                media = '''
+                <div class="row">
+                    <div class="col-md-8 col-sm-12 col-xs-12 form-group">
+                        <img id="hinh_anh_modal" style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src="/media/{0}" alt="chọn hình ảnh" />
+                        <input type='file' style="display: block; margin-left: auto;margin-right: auto;" accept="image/*" />
+                    </div>
+                    <div class="col-md-4 col-sm-12 col-xs-12 form-group">
+                      <div id="noi_dung_modal" class="ques-container">{1}</div>
+                    </div>
+                </div>
+                <br>
+                '''.format(ques.dinh_kem, ques.noi_dung)
+            elif "Âm thanh" in ques.dang_cau_hoi:
+                media = '''
+                <div class="row">
+                    <div class="col-md-4 col-sm-12 col-xs-12 form-group">
+                      <audio id="media" controls width="100%" src="/media/{0}"></audio>
+                      <input type="file" style="display: block; margin-left: auto;margin-right: auto;"  accept="audio/*">
+                    </div>
+                    <div class="col-md-8 col-sm-12 col-xs-12 form-group">
+                      <div id="noi_dung_modal" class="ques-container">{1}</div>
+                    </div>
+                </div>
+                <br>
+                '''.format(ques.dinh_kem, ques.noi_dung)
+            elif "Video" in ques.dang_cau_hoi:
+                media = '''
+                <div class="row">
+                    <div class="col-md-8 col-sm-12 col-xs-12 form-group">
+                      <video id="media" controls width="100%" src="/media/{0}"></video>
+                      <input type="file" style="display: block; margin-left: auto;margin-right: auto;" accept="video/*">
+                    </div>
+                    <div class="col-md-4 col-sm-12 col-xs-12 form-group">
+                      <div id="noi_dung_modal" class="ques-container">{1}</div>
+                    </div>
+                </div>
+                <br>
+                '''.format(ques.dinh_kem, ques.noi_dung)
+            for i, da in enumerate(DapAn.objects.filter(cau_hoi_id=ques)):
+                s = chr(ord(str(i)) + 17)
+                if da.dap_an_dung:
+                    dung = 'checked'
+                else:
+                    dung = ''
+                dat += '''
+                <div class="row">
+                    <div class="col-md-1 col-sm-12 col-xs-12 form-group">
+                      <input type="radio" class="form-control dap_an" style="transform:scale(0.6);" name="dap_an" {0}>
+                    </div>
+                    <div class="col-md-11 col-sm-12 col-xs-12 form-group">
+                      <div id="dap_an_{1}_modal" class="answer-container nd_dap_an">{2}</div>
+                    </div>
+                </div>
+                '''.format(dung, s, da.noi_dung)
+            content = '''
+            <input hidden name="id" value="{2}">
+            <input hidden name="dang_cau_hoi" value="{3}">
+            {1}{0}'''.format(dat, media, ques.id, ques.dang_cau_hoi)
+        if kieu == 'read':
+            dat = ''
+            if "Hình ảnh" in ques.dang_cau_hoi:
+                media = '''
+                <img id="hinh_anh_modal" style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src="/media/{0}" alt="chọn hình ảnh" /><br>
+                '''.format(ques.dinh_kem)
+            elif "Âm thanh" in ques.dang_cau_hoi:
+                media = '''
+                <audio id="media" controls width="100%" src="/media/{0}"></audio>
+                '''.format(ques.dinh_kem)
+            elif "Video" in ques.dang_cau_hoi:
+                media = '''
+                <video id="media" controls width="100%" src="/media/{0}"></video>
+                '''.format(ques.dinh_kem, ques.noi_dung)
+            for i, da in enumerate(DapAn.objects.filter(cau_hoi_id=ques)):
+                s = chr(ord(str(i)) + 17)
+                if da.dap_an_dung:
+                    dung = '(Đúng)'
+                else:
+                    dung = ''
+                result = re.search('<p>(.*)</p>', da.noi_dung)
+                dat += '''
+                <p>{0}: {2} {1}</p>
+                '''.format(s, dung, result.group(1))
+            content = '''
+            <input hidden name="id" value="{2}">{0}
+            <ul class="list-unstyled msg_list">
+            <li><a>{3}{1}</a></li>
+            '''.format(media, dat, ques.id, ques.noi_dung)
+        return HttpResponse(content)
 
 
 def user_login(request):
