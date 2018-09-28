@@ -108,4 +108,4 @@ server {
 }
 
 ```
-
+*Mỗi khi update code, cần restart lại 4 service: gunicorn, daphne, nginx, redis ()*
