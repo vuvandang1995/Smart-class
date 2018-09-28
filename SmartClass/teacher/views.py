@@ -98,26 +98,31 @@ def manage_point_data(request, lop):
                 lp = int(lop[0])
             mon = Mon.objects.get(id__in=mon_id, lop=lp)
             for student in ls_student:
-                fullname = '<p id="full_{}">{}</p>'.format(student.id, student.fullname)
-                kiem_tra_15p = '<div class="row">'
-                kiem_tra_1_tiet = '<div class="row">'
-                diem_thi = '<div class="row">'
+                fullname = '<h5 id="full_{}">{}</h5>'.format(student.id, student.fullname)
+                kiem_tra_15p = '<h4>'
+                kiem_tra_1_tiet = '<h4>'
+                diem_thi = '<h4>'
                 for diem in DiemSo.objects.filter(myuser_id=student, mon_id=mon):
+                    if diem.diem < 5.0:
+                        loai = "danger"
+                    elif diem.diem >= 5.0 and diem.diem < 6.5:
+                        loai = "warning"
+                    elif diem.diem >= 6.5 and diem.diem < 8.0:
+                        loai = "info"
+                    else:
+                        loai = "success"
+                    temp = '''
+                    <span class="label label-{2}" data-id="{0}" data-toggle="modal" data-target="#point" >{1}</span>
+                    '''.format(diem.id, diem.diem, loai)
                     if diem.loai_diem == "kiểm tra 15'":
-                        kiem_tra_15p += '''
-                        <a class="btn" data-id="{0}" data-toggle="modal" data-target="#point" >{1}</a>,
-                        '''.format(diem.id, diem.diem)
+                        kiem_tra_15p += temp
                     elif diem.loai_diem == 'kiểm tra 1 tiết':
-                        kiem_tra_1_tiet += '''
-                               <a class="btn" data-id="{0}" data-toggle="modal" data-target="#point" >{1}</a>,
-                                '''.format(diem.id, diem.diem)
+                        kiem_tra_1_tiet += temp
                     elif diem.loai_diem == 'thi':
-                        diem_thi += '''
-                        <a class="btn" data-id="{0}" data-toggle="modal" data-target="#point" >{1}</a>,
-                                '''.format(diem.id, diem.diem)
-                kiem_tra_15p += '</div>'
-                kiem_tra_1_tiet += '</div>'
-                diem_thi += '</div>'
+                        diem_thi += temp
+                kiem_tra_15p += '</h4>'
+                kiem_tra_1_tiet += '</h4>'
+                diem_thi += '</h4>'
                 data.append([fullname, kiem_tra_15p, kiem_tra_1_tiet, diem_thi])
         big_data = {"data": data}
         json_data = json.loads(json.dumps(big_data))
@@ -134,7 +139,7 @@ def manage_point_detail(request, id):
           <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
         </div>
         <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-          <input type="number" class="form-control has-feedback-left" value="{1}" disabled>
+          <input type="number" class="form-control has-feedback-left" value="{1}" min=0 max=100 disabled>
           <span class="fa fa-edit form-control-feedback left" aria-hidden="true"></span>
         </div>
         <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
@@ -145,7 +150,7 @@ def manage_point_detail(request, id):
           <input type="text" class="form-control has-feedback-left" value="{3}" disabled>
           <span class="fa fa-book form-control-feedback left" aria-hidden="true"></span>
         </div>
-        <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
+        <div class="col-md-12 col-sm-12 col-xs-12">
             {4}
         </div>
         <div class="clearfix"></div>

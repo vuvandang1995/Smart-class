@@ -408,6 +408,27 @@ function create_editor_modal(kind){
     }
 }
 
+thisRespondHightlightText(".select--highlight--active");
 
+
+function thisRespondHightlightText(thisDiv){
+    $(thisDiv).on("mouseup", function () {
+        var selectedText = getSelectionText();
+        console.log(selectedText);
+        var selectedTextRegExp = new RegExp(selectedText,"g");
+        var text = $(this).text().replace(selectedTextRegExp, " (...) ");
+        $(this).html(text);
+    });
+}
+
+function getSelectionText() {
+    var text = "";
+    if (window.getSelection) {
+        text = window.getSelection().toString();
+    } else if (document.selection && document.selection.type != "Control") {
+        text = document.selection.createRange().text;
+    }
+    return text;
+}
 
 
