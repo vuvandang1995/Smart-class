@@ -13,6 +13,8 @@ sudo apt-get -y upgrade
 
 `sudo apt-get install git`
 
+## Install docker
+
 ## Clone repo and run requirements.txt file
 
 ```
