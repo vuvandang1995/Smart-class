@@ -2,7 +2,7 @@ $(document).ready(function(){
     $('#thi').click(function(){
         $.ajax({
             type: 'GET',
-            url: '/student/exam_data_13',
+            url: '/student/exam_data_14',
             success: function(data){
                 $("#de_thi").html(data);
                 $('input[type=radio]').change(function(){
@@ -10,9 +10,27 @@ $(document).ready(function(){
                     $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
                     $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
                 });
+                $('input[type=text]').change(function(){
+                    check_empty($(this).data('id'),$(this).data('ch_id'));
+                });
             },
         });
     })
+
+    function check_empty(id,ch_id){
+        var ar = []
+        $("input[name=dap_an_"+ch_id+"]").each(function(){
+            ar.push($(this).val());
+        })
+        console.log(ar);
+        if (jQuery.inArray("", ar) == -1){
+            $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
+            $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
+        }else{
+            $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
+            $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
+        }
+    }
 
     $("#submit").click(function(){
         if(confirm("Bạn có chắc chắn nộp bài không ?")){
