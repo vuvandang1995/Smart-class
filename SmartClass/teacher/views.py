@@ -510,6 +510,27 @@ def user_logout(request):
 def user_profile(request):
     user = request.user
     if user.is_authenticated and user.position == 1:
+        if request.method == 'POST':
+            if 'fullname' in request.POST:
+                if check_password(request.POST['password'], user.password):
+                    user.fullname = request.POST['fullname']
+                    user.email = request.POST['email']
+                    if 'nu' in request.POST:
+                        user.gioi_tinh = 0
+                    else:
+                        user.gioi_tinh = 1
+                    user.save()
+                    messages.success(request, "Cập nhật thành công")
+                else:
+                    messages.warning(request, 'Mật khẩu không đúng')
+            else:
+                if check_password(request.POST['pass1'], user.password):
+                    user.set_password(request.POST['pass2'])
+                    user.save()
+                    messages.success(request, "Cập nhật thành công")
+                else:
+                    messages.warning(request, 'Mật khẩu không đúng')
+            return HttpResponseRedirect("profile")
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user)}
         return render(request, 'teacher/profile.html', content)
