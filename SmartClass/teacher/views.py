@@ -159,7 +159,6 @@ def manage_point(request, lop):
 
 def manage_point_data(request, lop):
     user = request.user
-
     if user.is_authenticated and user.position == 1:
         data = []
         try:
@@ -522,10 +521,11 @@ def question_data_detail(request, id, kieu):
                     <p>({0}): {1}</p>
                     '''.format(i+1, result.group(1))
             content = '''
-            <input hidden name="id" value="{2}">{0}
+            <input hidden name="id" value="{2}">
+            <input hidden name="dang_cau_hoi" value="{4}">{0}
             <ul class="list-unstyled msg_list">
             <li><a>{3}{1}</a></li>
-            '''.format(media, dat, ques.id, ques.noi_dung)
+            '''.format(media, dat, ques.id, ques.noi_dung, ques.dang_cau_hoi)
         return HttpResponse(content)
 
 
