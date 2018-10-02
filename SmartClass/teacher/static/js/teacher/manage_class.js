@@ -19,10 +19,62 @@ $(document).ready(function(){
         
     };
 
-	$('#btn_nhom').on('click',function(){
-		$('#chinhsua').modal('show');
-	});
+    function reload(){
+        $('body #list_group').html('');
+        $.ajax({
+            type:'GET',
+            url: "/group_data/"+class_,
+            success: function(data){
+                $('body #list_group').html(data);
+                $('body .delete_gr').on('click',function(){
+                    var token = $("input[name=csrfmiddlewaretoken]").val();
+                    var groupid = $(this).attr('name');
+                    var r = confirm('Bạn chắc chắn xóa?');
+                    if (r == true){
+                        $.ajax({
+                            type:'POST',
+                            url:location.href,
+                            data: {'delete_group':groupid, 'csrfmiddlewaretoken':token},
+                            success: function(){
+                                reload();
+                            }
+                       });
+                    }
+                });
+            }
+        });
+    }
+    reload();
+	
+    $("body #chinhsua").on('show.bs.modal', function(event){
+        var button = $(event.relatedTarget);
+        var title = button.parent().parent().parent().children().children('.left').children('.list-unstyled').children('li');
+        title.each(function(){
+            
+        });
+    });
+    $('body #btn_random_group').on('click',function(){
+		$('#group_random').modal('show');
+    });
+    
 
+    $("body #group_random").on('show.bs.modal', function(event){
+        $("input[name=number_mem]").val("2");
+    });
+
+    $('body').on('click', '#save_create_group', function(){
+        var token = $("input[name=csrfmiddlewaretoken]").val();
+        var number_mem = $("input[name=number_mem]").val();
+        $.ajax({
+            type:'POST',
+            url:location.href,
+            data:{'csrfmiddlewaretoken': token, 'number_mem':number_mem},
+            success: function(){
+                document.getElementById("close_modal_create").click();
+                reload();
+            }
+        });
+    })
 
 	$('.mail_list').on('click',function(){
 		var std_username = $(this).children('p').text();
@@ -119,5 +171,5 @@ $(document).ready(function(){
         
     })
 
-
+    
 });

@@ -25,6 +25,20 @@ import os
 from django.conf import settings
 import re
 
+def randomNhom(myList,number):
+    list_group = []
+    while len(myList) !=0 :
+        if len(myList) <= number:
+            list_group.append(myList)
+            myList = []
+        else:
+            group = []
+            while len(group) != number:
+                a = random.choice(myList)
+                del myList[myList.index(a)]
+                group.append(a)
+            list_group.append(group)
+    return list_group
 
 class EmailThread(threading.Thread):
     def __init__(self, email):
@@ -54,10 +68,75 @@ def manage_class(request, lop):
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user),
                    'lop_ht': lop,
-                   'ls_student': ls_student}
+                   'ls_student': ls_student,
+                   }
+        list_std = []
+        for std in ls_student:
+            list_std.append(std)
+        if request.method == "POST":
+            if 'number_mem' in request.POST:
+                number_mem = request.POST['number_mem']
+                list_group = randomNhom(list_std,int(number_mem))
+                try:
+                    Nhom.objects.filter(myuser_id=user, lop_id=Lop.objects.get(ten=lop)).delete()
+                except:
+                    pass
+                for lg in list_group:
+                    ten_nhom = 'Group' +str(list_group.index(lg))
+                    nhom = Nhom.objects.create(ten_nhom=ten_nhom, myuser_id=user, lop_id=Lop.objects.get(ten=lop))
+                    for std in lg:
+                        ChiTietNhom.objects.create(nhom_id=nhom, myuser_id=std)
+            elif 'delete_group' in request.POST:
+                groupid = request.POST['delete_group']
+                try:
+                    Nhom.objects.get(id=groupid).delete()
+                except:
+                    pass
         return render(request, 'teacher/manage_class.html', content)
     else:
         return HttpResponseRedirect('/')
+
+
+def group_data(request, lop):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        # data = []
+        ls_nhom = Nhom.objects.filter(myuser_id=user, lop_id=Lop.objects.get(ten=lop))
+        html = ''
+        for lsg in ls_nhom:
+            html += '''
+                <div class="col-md-4 col-sm-4 col-xs-12 profile_details" >
+                            <div class="well profile_view">
+                                <div class="col-sm-12">
+                                <h4 class="brief"><i>'''+lsg.ten_nhom+'''</i></h4>
+                                <div class="left col-xs-7">
+                                    <h2>Thành viên</h2>
+                                    <ul class="list-unstyled">
+            '''
+            for std in ChiTietNhom.objects.filter(nhom_id=lsg):
+                html += '''<li id="drag1" draggable="true"><i class="fa fa-user"></i>'''+std.myuser_id.fullname+'''</li>'''
+            html += '''</ul>
+                              </div>
+                              <div class="right col-xs-5 text-center">
+                                <img src="/static/images/img.jpg" alt="" class="img-circle img-responsive">
+                              </div>
+                            </div>
+                            <div class="col-xs-12 bottom text-center">
+                              <div class="col-xs-12 col-sm-6 emphasis">
+                              </div>
+                              <div class="col-xs-12 col-sm-6 emphasis">
+                                <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
+                                <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#chinhsua" name="dang">
+                                  Chỉnh sửa
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>'''
+            # data.append(html)
+
+        # json_data = json.loads(json.dumps({"data": data}))
+        return HttpResponse(html)
 
 
 def manage_point(request, lop):

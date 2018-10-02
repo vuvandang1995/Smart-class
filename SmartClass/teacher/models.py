@@ -232,7 +232,9 @@ class DiemSo(models.Model):
 
 class Nhom(models.Model):
     ten_nhom = models.CharField(max_length=255)
-    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id") 
+    myuser_id = models.ForeignKey('MyUser', models.CASCADE, null=True, db_column="myuser_id")
+    lop_id = models.ForeignKey('Lop', models.CASCADE, null=True, db_column="lopid")
+
 
     class Meta:
         managed = True
