@@ -22,13 +22,13 @@ $(document).ready(function(){
         $("input[name=dap_an_"+ch_id+"]").each(function(){
             ar.push($(this).val());
         })
-        console.log(ar);
+
         if (jQuery.inArray("", ar) == -1){
-            $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
-            $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
-        }else{
             $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
             $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
+        }else{
+            $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
+            $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
         }
     }
 
@@ -38,6 +38,10 @@ $(document).ready(function(){
             var dap_an_id = [];
             $("input[type=radio]:checked").each(function(){
                 dap_an_id.push($(this).data('da_id'));
+            })
+            var dien_tu = {};
+            $("input[type=text]").each(function(){
+                dien_tu[$(this).data("da_id")] = $(this).val();
             })
             var token = $("input[name=csrfmiddlewaretoken]").val();
             $("#processing").modal({backdrop: 'static', keyboard: false});
@@ -57,7 +61,8 @@ $(document).ready(function(){
                   },
                 type: 'POST',
                 url: location.href,
-                data:{'csrfmiddlewaretoken':token, 'de_id':de_id,'dap_an_id':JSON.stringify(dap_an_id)},
+                data:{'csrfmiddlewaretoken':token, 'de_id':de_id,'dap_an_id':JSON.stringify(dap_an_id),
+                'dien_tu':JSON.stringify(dien_tu)},
                 success:function(){
                     $("#processing").modal('hide');
                     location.reload();
