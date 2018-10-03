@@ -168,7 +168,6 @@ class De(models.Model):
     so_luong = models.IntegerField()
     chi_tiet_so_luong = models.CharField(max_length=255)
 
-
     class Meta:
         managed = True
         db_table = 'de'
@@ -253,3 +252,16 @@ class ChiTietNhom(models.Model):
     class Meta:
         managed = True
         db_table = 'chi_tiet_nhom'
+
+
+class Khoa(models.Model):
+    ten_khoa = models.CharField()
+    mo_ta = models.CharField()
+
+    class Meta:
+        managed = True
+        db_table = 'khoa'
+
+
+class NienKhoa(models.Model):
+    ten_nien_khoa = models.CharField()
