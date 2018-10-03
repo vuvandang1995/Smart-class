@@ -97,6 +97,50 @@ def manage_class(request, lop):
         return HttpResponseRedirect('/')
 
 
+# def group_data(request, lop):
+#     user = request.user
+#     if user.is_authenticated and user.position == 1:
+#         # data = []
+#         ls_nhom = Nhom.objects.filter(myuser_id=user, lop_id=Lop.objects.get(ten=lop))
+#         html = ''
+#         for lsg in ls_nhom:
+#             html += '''
+#                 <div class="col-md-3 col-sm-4 col-xs-12 profile_details" >
+#                             <div class="well profile_view">
+#                                 <div class="col-sm-12">
+#                                 <h4 class="brief">
+#                                 <i>'''+lsg.ten_nhom+'''</i>
+#                                 <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
+#                                 <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#chinhsua" name="dang">Chỉnh sửa</button>
+#                                 </h4>
+#                                 <div class="left col-xs-7">
+#                                     <h2>Thành viên</h2>
+#                                     <ul class="list-unstyled">
+#             '''
+#             for std in ChiTietNhom.objects.filter(nhom_id=lsg):
+#                 html += '''<li id="drag1" draggable="true"><i class="fa fa-user"></i>'''+std.myuser_id.fullname+'''</li>'''
+#             html += '''</ul>
+#                               </div>
+                              
+#                             </div>
+#                             <div class="col-xs-12 bottom text-center">
+#                               <div class="col-xs-12 col-sm-6 emphasis">
+#                               </div>
+#                               <div class="col-xs-12 col-sm-6 emphasis">
+#                                 <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
+#                                 <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#chinhsua" name="dang">
+#                                   Chỉnh sửa
+#                                 </button>
+#                               </div>
+#                             </div>
+#                           </div>
+#                         </div>'''
+#             # data.append(html)
+
+#         # json_data = json.loads(json.dumps({"data": data}))
+#         return HttpResponse(html)
+
+
 def group_data(request, lop):
     user = request.user
     if user.is_authenticated and user.position == 1:
@@ -105,37 +149,18 @@ def group_data(request, lop):
         html = ''
         for lsg in ls_nhom:
             html += '''
-                <div class="col-md-4 col-sm-4 col-xs-12 profile_details" >
-                            <div class="well profile_view">
-                                <div class="col-sm-12">
-                                <h4 class="brief"><i>'''+lsg.ten_nhom+'''</i></h4>
-                                <div class="left col-xs-7">
-                                    <h2>Thành viên</h2>
-                                    <ul class="list-unstyled">
+                    <div class="mail_list group_class">
+                    <p hidden>'''+lop+user.username+lsg.ten_nhom+'''</p>
+                    <p hidden>'''+lsg.ten_nhom+'''</p>
+                    <div class="right">
+                        <h3>'''+lsg.ten_nhom+'''<small>
+                            <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
+                            <button type="button" class="btn btn-primary btn-xs change_gr" data-toggle="modal" data-target="#chinhsua" name="dang">Chỉnh sửa</button>
+                            </small></h3>
             '''
             for std in ChiTietNhom.objects.filter(nhom_id=lsg):
-                html += '''<li id="drag1" draggable="true"><i class="fa fa-user"></i>'''+std.myuser_id.fullname+'''</li>'''
-            html += '''</ul>
-                              </div>
-                              <div class="right col-xs-5 text-center">
-                                <img src="/static/images/img.jpg" alt="" class="img-circle img-responsive">
-                              </div>
-                            </div>
-                            <div class="col-xs-12 bottom text-center">
-                              <div class="col-xs-12 col-sm-6 emphasis">
-                              </div>
-                              <div class="col-xs-12 col-sm-6 emphasis">
-                                <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
-                                <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#chinhsua" name="dang">
-                                  Chỉnh sửa
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>'''
-            # data.append(html)
-
-        # json_data = json.loads(json.dumps({"data": data}))
+                html += '''<p><i class="fa fa-user"></i> '''+std.myuser_id.fullname+'''</p>'''
+            html += '''</div></div>'''
         return HttpResponse(html)
 
 
