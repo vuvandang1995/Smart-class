@@ -13,6 +13,20 @@ $(document).ready(function(){
                 $('input[type=text]').change(function(){
                     check_empty($(this).data('id'),$(this).data('ch_id'));
                 });
+
+                $('textarea').change(function(){
+                    console.log("hihi");
+                    var text = $(this).val();
+                    var id = $(this).data('id');
+                    if (!text.replace(/\s/g, '').length) {
+                        $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
+                        $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
+                    }else{
+                        $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
+                        $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
+                    }
+
+                });
             },
         });
     })

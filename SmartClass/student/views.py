@@ -263,7 +263,7 @@ def exam_data(request, id):
         left_content = ''
         right_content = ''
         for i, ques in enumerate(list_ques):
-            dap_an = '\n'
+            dap_an = ''
             left_content += '''
             <div class="mail_list">
                 <a href="#cau_{0}" id="stt_{0}">
@@ -313,6 +313,19 @@ def exam_data(request, id):
                     </div>
                 <div>
                 '''.format(i + 1, nd_cau_hoi, media)
+            elif "Tự luận" in ques.cau_hoi_id.dang_cau_hoi:
+                dap_an += '''
+                <textarea class="form-control" cols="100" rows="10" data-id="{0}" data-ch_id="{1}" name="dap_an_{1}"></textarea>
+                '''.format(i+1, ques.cau_hoi_id.id, s)
+                right_content += '''
+                    <div id="cau_{0}">
+                        <label>Câu hỏi {0}:</label>
+                        {2}
+                        <ul class="list-unstyled msg_list">
+                        <li><a>{1}{3}</a></li>
+                    </div>
+                <div>
+                '''.format(i + 1, ques.cau_hoi_id.noi_dung, media, dap_an)
         content = '''
         <div class="col-sm-1 mail_list_column">{0}</div>
         <div class="col-sm-11 mail_view showde">

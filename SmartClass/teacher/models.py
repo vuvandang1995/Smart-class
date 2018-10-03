@@ -164,6 +164,10 @@ class De(models.Model):
     mon_id = models.ForeignKey('Mon', models.CASCADE, db_column='mon_id')
     ngay_tao = models.DateField(default=timezone.now)
     loai_de = models.TextField()
+    cau_truc = models.CharField(max_length=255)
+    so_luong = models.IntegerField()
+    chi_tiet_so_luong = models.CharField(max_length=255)
+
 
     class Meta:
         managed = True
@@ -173,6 +177,7 @@ class De(models.Model):
 class ChiTietDe(models.Model):
     de_id = models.ForeignKey('De', models.CASCADE, db_column='de_id')
     cau_hoi_id = models.ForeignKey('CauHoi', models.CASCADE, db_column='cau_hoi_id')
+    diem = models.FloatField()
 
     class Meta:
         managed = True

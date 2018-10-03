@@ -167,8 +167,6 @@ $(document).ready(function(){
         formData.append('noi_dung',noi_dung);
         var dang_cau_hoi = $("#dang_cau_hoi option:selected").text();
         var dang_media = $('#dang_media option:selected').text();
-
-        formData.append('dang_cau_hoi',dang_media + " + " + dang_cau_hoi);
         if (dang_cau_hoi.includes("Trắc nhiệm")){
             var dap_an = [];
             $(".dap_an").each(function(){
@@ -193,6 +191,8 @@ $(document).ready(function(){
                 return false;
             }
             formData.append('nd_dap_an',JSON.stringify(nd_dap_an));
+            formData.append('dang_cau_hoi',dang_media + " + " + dang_cau_hoi);
+
         }
         else if(dang_cau_hoi.includes("Điền từ")){
             var nd_dap_an = [];
@@ -204,6 +204,9 @@ $(document).ready(function(){
                 return false;
             }
             formData.append('nd_dap_an',JSON.stringify(nd_dap_an));
+            formData.append('dang_cau_hoi',dang_media + " + " + dang_cau_hoi + " + " + $("#so_dap_an").val()+ " từ");
+        }else{
+            formData.append('dang_cau_hoi',dang_media + " + " + dang_cau_hoi);
         }
 
         formData.append('do_kho',$("#do_kho option:selected").text());
@@ -367,11 +370,6 @@ $(document).ready(function(){
             formData.append('dinh_kem',$("input[type=file]")[0].files[0]);
         }
 
-//        if (typeof($("input[type=file]")[0]) == "undefined"){
-//        }else if (typeof($("input[type=file]")[0].files[0]) == "undefined"){
-//        }else{
-//            formData.append('dinh_kem',$("input[type=file]")[0].files[0]);
-//        }
         $("#processing").modal({backdrop: 'static', keyboard: false});
         $.ajax({
             xhr: function() {
