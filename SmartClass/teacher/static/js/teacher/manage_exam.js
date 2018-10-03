@@ -219,23 +219,39 @@ $(document).ready(function(){
                     }
                     var mon = $('#gv_mon option:selected').val();
                     var loai_de = $('#loai_de option:selected').val();
-                    var cau_truc = [];
+                    var cau_truc = {};
                     var pham_tram = 0;
                     $(".phan_tram").each(function(){
                         if(typeof($(this).attr("disabled")) == 'undefined'){
-                            cau_truc.push(parseInt($(this).val()));
+                            cau_truc[$(this).attr('name')] = parseInt($(this).val());
                             pham_tram += parseInt($(this).val());
                         }
                         else{
-                            cau_truc.push(-1);
+                            cau_truc[$(this).attr('name')] = (-1);
                         }
                     });
+
                     if(pham_tram != 100){
                         alert("Tổng phần trăm điểm số phải đủ 100%");
                         return false;
                     }
                     if(jQuery.inArray(0, cau_truc) != -1){
                         alert("Chưa chọn phần trăm điểm số");
+                        return false;
+                    }
+                    var so_luong = 0;
+                    var chi_tiet_so_luong = {}
+                    $(".so_luong").each(function(){
+                        if(typeof($(this).attr("disabled")) == 'undefined'){
+                            chi_tiet_so_luong[$(this).attr('name')] = parseInt($(this).val());
+                            so_luong += parseInt($(this).val());
+                        }
+                        else{
+                            chi_tiet_so_luong[$(this).attr('name')] = (-1);
+                        }
+                    });
+                    if(jQuery.inArray(0, chi_tiet_so_luong) != -1){
+                        alert("Chưa chọn số lượng câu hỏi");
                         return false;
                     }
                     var list_ques = [];
@@ -260,7 +276,8 @@ $(document).ready(function(){
                          type:'POST',
                          url:location.href,
                          data:{'csrfmiddlewaretoken': token, 'ten_de':ten_de, 'mon':mon, 'loai_de':loai_de,
-                         'list_ques':JSON.stringify(list_ques), 'cau_truc':JSON.stringify(cau_truc)},
+                         'list_ques':JSON.stringify(list_ques), 'cau_truc':JSON.stringify(cau_truc),
+                         'so_luong': so_luong, 'chi_tiet_so_luong':JSON.stringify(chi_tiet_so_luong)},
                          success: function(){
                             $("#processing").modal('hide');
                             location.reload();
