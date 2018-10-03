@@ -67,6 +67,7 @@ $(document).ready(function(){
                     var token = $("input[name=csrfmiddlewaretoken]").val();
                     var groupid = $(this).attr('name');
                     var r = confirm('Bạn chắc chắn xóa?');
+                    var chatgroup = $(this).parent().parent().parent().parent().children('p').text();
                     if (r == true){
                         $.ajax({
                             type:'POST',
@@ -75,7 +76,11 @@ $(document).ready(function(){
                             success: function(){
                                 reload();
                             }
-                       });
+                        
+                        });
+                        chatgroup.onopen = function (event) {
+                            chatgroup.close();
+                        };
                     }
                 });
 
@@ -223,6 +228,9 @@ $(document).ready(function(){
             'ws://' + window.location.host +
             '/ws/' + group_chat_name + 'chatgroup/');
     
+            var group_name = $(this).children('p').next('p').text();
+            $('#title-chat').html(group_name);
+            $("#chat-group-text").prop('disabled', false);
             //  var me = {};
             //  me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
     

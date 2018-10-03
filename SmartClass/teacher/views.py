@@ -151,6 +151,7 @@ def group_data(request, lop):
             html += '''
                     <div class="mail_list group_class">
                     <p hidden>'''+lop+user.username+lsg.ten_nhom+'''</p>
+                    <p hidden>'''+lsg.ten_nhom+'''</p>
                     <div class="right">
                         <h3>'''+lsg.ten_nhom+'''<small>
                             <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
