@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'teacher.MyUser'
 
 MIDDLEWARE = [
+    'SmartClass.middleware.ActiveUserMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,6 +57,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',              
+    }
+}
+# Number of seconds of inactivity before a user is marked offline
+USER_ONLINE_TIMEOUT = 10
+
+# Number of seconds that we will keep track of inactive users for before 
+# their last seen is removed from the cache
+USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
 
 ROOT_URLCONF = 'SmartClass.urls'
 

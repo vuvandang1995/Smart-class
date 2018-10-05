@@ -4,6 +4,10 @@ from django.contrib.auth.models import (
 )
 from django.utils import timezone
 
+from django.core.cache import cache 
+import datetime
+from SmartClass import settings
+
 
 def get_truong(name):
     try:
@@ -110,6 +114,20 @@ class MyUser(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+    def last_seen(self):
+        return cache.get('seen_%s' % self.username)
+
+    def online(self):
+        if self.last_seen():
+            now = datetime.datetime.now()
+            if now > self.last_seen() + datetime.timedelta(
+                        seconds=settings.USER_ONLINE_TIMEOUT):
+                return False
+            else:
+                return True
+        else:
+            return False 
 
 
 class Truong(models.Model):

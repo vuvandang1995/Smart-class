@@ -61,6 +61,7 @@ def home(request):
 
 
 def manage_class(request, lop):
+    print(request.user.username)
     user = request.user
     if user.is_authenticated and user.position == 1:
         ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')

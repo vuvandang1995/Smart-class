@@ -23,7 +23,6 @@ from teacher.models import *
 from django.contrib import messages
 import re
 
-
 class EmailThread(threading.Thread):
     def __init__(self, email):
         threading.Thread.__init__(self)
