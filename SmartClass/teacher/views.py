@@ -299,10 +299,24 @@ def manage_de(request):
                                    mon_id=Mon.objects.get(id=request.POST['mon']), myuser_id=user)
             chi_tiet_so_luong = json.loads(de.chi_tiet_so_luong)
             cau_truc = json.loads(de.cau_truc)
+            diem_tn = float(cau_truc['pt_tn'] / 10 / chi_tiet_so_luong['sl_tn'])
+            diem_dt = float(cau_truc['pt_dt'] / 10 / chi_tiet_so_luong['sl_dt'])
+            diem_tl = float(cau_truc['pt_tl'] / 10 / chi_tiet_so_luong['sl_tl'])
+            diem_ga = float(cau_truc['pt_ga'] / 10 / chi_tiet_so_luong['sl_ga'])
+            diem_gh = float(cau_truc['pt_gh'] / 10 / chi_tiet_so_luong['sl_gh'])
             for q in json.loads(request.POST['list_ques']):
-
-                ChiTietDe.objects.create(cau_hoi_id=CauHoi.objects.get(id=q), de_id=de, diem=0.25)
-                
+                ch = CauHoi.objects.get(id=q)
+                if "Trắc nhiệm" in ch.dang_cau_hoi:
+                    diem = diem_tn
+                elif "Điền từ" in ch.dang_cau_hoi:
+                    diem = diem_dt
+                elif "Tự luận" in ch.dang_cau_hoi:
+                    diem = diem_tl
+                elif "Ghi âm" in ch.dang_cau_hoi:
+                    diem = diem_ga
+                elif "Ghi hình" in ch.dang_cau_hoi:
+                    diem = diem_gh
+                ChiTietDe.objects.create(cau_hoi_id=ch, de_id=de, diem=diem)
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user),
                    'list_mon': GiaoVienMon.objects.filter(myuser_id=user),}
@@ -720,7 +734,7 @@ def share(request, lop):
         if user.position == 0:
             return render(request, 'student/share.html', content)
         else:
-            return render(request, 'teacher/share.html', content)
+            return render(request, 'teacher/share1.html', content)
     else:
         return HttpResponseRedirect('/')
 

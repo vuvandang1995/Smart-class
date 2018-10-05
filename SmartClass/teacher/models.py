@@ -124,6 +124,8 @@ class Truong(models.Model):
 class Lop(models.Model):
     ten = models.CharField(max_length=255)
     truong_id = models.ForeignKey('Truong', models.CASCADE, db_column='truong_id')
+    khoa_id = models.ForeignKey('Khoa', models.SET_NULL, null=True, db_column='khoa_id')
+    nien_khoa_id = models.ForeignKey('NienKhoa', models.SET_NULL, null=True, db_column='nien_khoa_id')
 
     class Meta:
         managed = True
@@ -167,7 +169,6 @@ class De(models.Model):
     cau_truc = models.CharField(max_length=255)
     so_luong = models.IntegerField()
     chi_tiet_so_luong = models.CharField(max_length=255)
-
 
     class Meta:
         managed = True
@@ -253,3 +254,21 @@ class ChiTietNhom(models.Model):
     class Meta:
         managed = True
         db_table = 'chi_tiet_nhom'
+
+
+class Khoa(models.Model):
+    ten_khoa = models.CharField(max_length=255)
+    mo_ta = models.CharField(max_length=255)
+
+    class Meta:
+        managed = True
+        db_table = 'khoa'
+
+
+class NienKhoa(models.Model):
+    ten_nien_khoa = models.CharField(max_length=255)
+    nam_hoc = models.IntegerField()
+
+    class Meta:
+        managed = True
+        db_table = 'nien_khoa'
