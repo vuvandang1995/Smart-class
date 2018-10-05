@@ -77,6 +77,10 @@
                             {% endfor %}
                         </ul>
                       </li>
+                      <li><a href="{% url 'teacher:manage_question' %}"><i class="fa fa-desktop"></i>Quản lý câu hỏi </a>
+                      </li>
+                      <li><a href="{% url 'teacher:manage_de' %}"><i class="fa fa-table"></i>Quản lý đề thi</a>
+                      </li>
                       <li>
                         <a><i class="fa fa-edit"></i> Quản lý điểm <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
@@ -84,10 +88,6 @@
                           <li><a  href="{% url 'teacher:manage_point' lop.lop_id.ten %}">{{lop.lop_id.ten}}</a></li>
                           {% endfor %}
                         </ul>
-                      </li>
-                       <li><a href="{% url 'teacher:manage_de' %}"><i class="fa fa-table"></i>Quản lý đề </a>
-                      </li> 
-                      <li><a href="{% url 'teacher:manage_question' %}"><i class="fa fa-desktop"></i>Quản lý câu hỏi </a>
                       </li>
                       <li>
                         <a href="{% url 'teacher:profile' %}">
