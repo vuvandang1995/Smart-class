@@ -65,7 +65,7 @@ $(document).ready(function(){
 
                 });
             }else{
-                alert('Học sinh '+std_name + ' đang không trực tuyến!')
+                alert('Học sinh '+std_name + ' đang không trong lớp!')
             }
         }, 2000);
         setTimeout(() => {
