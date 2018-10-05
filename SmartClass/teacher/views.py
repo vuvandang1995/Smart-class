@@ -92,10 +92,35 @@ def manage_class(request, lop):
                     Nhom.objects.get(id=groupid).delete()
                 except:
                     pass
+            elif 'groupname' in request.POST:
+                list_std = request.POST['list_std[]']
+                list_std = json.loads(list_std) 
+                ten_nhom = request.POST['groupname']
+                try:
+                    nhom = Nhom.objects.create(ten_nhom=ten_nhom, myuser_id=user, lop_id=Lop.objects.get(ten=lop))
+                    for std in list_std:
+                        ChiTietNhom.objects.create(nhom_id=nhom, myuser_id=MyUser.objects.get(username=std))
+                except:
+                    pass
         return render(request, 'teacher/manage_class.html', content)
     else:
         return HttpResponseRedirect('/')
 
+
+def fullname_std_data(request, lop):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
+        ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+        list_std = []
+        for std in ls_student:
+            try:
+                ChiTietNhom.objects.get(myuser_id=std)
+            except:
+                list_std.append({"username": std.username, "fullname": std.fullname})
+        return JsonResponse(list_std, safe=False)
+    else:
+        return redirect('/')
 
 # def group_data(request, lop):
 #     user = request.user
@@ -145,22 +170,25 @@ def group_data(request, lop):
     user = request.user
     if user.is_authenticated and user.position == 1:
         # data = []
-        ls_nhom = Nhom.objects.filter(myuser_id=user, lop_id=Lop.objects.get(ten=lop))
         html = ''
-        for lsg in ls_nhom:
-            html += '''
-                    <div class="mail_list group_class">
-                    <p hidden>'''+lop+user.username+lsg.ten_nhom+'''</p>
-                    <p hidden>'''+lsg.ten_nhom+'''</p>
-                    <div class="right">
-                        <h3>'''+lsg.ten_nhom+'''<small>
-                            <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
-                            <button type="button" class="btn btn-primary btn-xs change_gr" data-toggle="modal" data-target="#chinhsua" name="dang">Chỉnh sửa</button>
-                            </small></h3>
-            '''
-            for std in ChiTietNhom.objects.filter(nhom_id=lsg):
-                html += '''<p><i class="fa fa-user"></i> '''+std.myuser_id.fullname+'''</p>'''
-            html += '''</div></div>'''
+        try:
+            ls_nhom = Nhom.objects.filter(myuser_id=user, lop_id=Lop.objects.get(ten=lop))
+            for lsg in ls_nhom:
+                html += '''
+                        <div class="mail_list group_class">
+                        <p hidden>'''+lop+user.username+lsg.ten_nhom+'''</p>
+                        <p hidden>'''+lsg.ten_nhom+'''</p>
+                        <div class="right">
+                            <h3>'''+lsg.ten_nhom+'''<small>
+                                <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
+                                <button type="button" class="btn btn-primary btn-xs change_gr" data-toggle="modal" data-target="#chinhsua" name="dang">Chỉnh sửa</button>
+                                </small></h3>
+                '''
+                for std in ChiTietNhom.objects.filter(nhom_id=lsg):
+                    html += '''<p><i class="fa fa-user"></i> '''+std.myuser_id.fullname+'''</p>'''
+                html += '''</div></div>'''
+        except:
+            pass
         return HttpResponse(html)
 
 
