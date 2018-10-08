@@ -32,6 +32,7 @@
       <!-- Custom Theme Style -->
       <link href="{% static 'css/chat.css' %}" rel="stylesheet">
       <link href="/static/build/css/custom.css" rel="stylesheet">
+
       <!-- <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script> -->
 	    <!-- <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script> -->
     {% endblock head %}
@@ -79,7 +80,7 @@
                       </li>
                       <li><a href="{% url 'teacher:manage_question' %}"><i class="fa fa-desktop"></i>Quản lý câu hỏi </a>
                       </li>
-                      <li><a href="{% url 'teacher:manage_de' %}"><i class="fa fa-table"></i>Quản lý đề thi</a>
+                      <li><a href="{% url 'teacher:manage_de' %}"><i class="fa fa-table"></i>Quản lý đề</a>
                       </li>
                       <li>
                         <a><i class="fa fa-edit"></i> Quản lý điểm <span class="fa fa-chevron-down"></span></a>
