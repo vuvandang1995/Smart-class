@@ -1,21 +1,19 @@
 $(document).ready(function(){
-    $('#thi').click(function(){
+    get_de(36);
+    function get_de(de_id){
         $.ajax({
             type: 'GET',
-            url: '/student/exam_data_14',
+            url: '/student/exam_data_'+ de_id,
             success: function(data){
-                $("#de_thi").html(data);
-                $('input[type=radio]').change(function(){
-                    var id = $(this).data('id');
-                    $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
-                    $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
+                $("#load_de").html(data);
+                $('input[type=checkbox]').change(function(){
+                    check_checked($(this).data('id'),$(this).data('ch_id'));
                 });
                 $('input[type=text]').change(function(){
                     check_empty($(this).data('id'),$(this).data('ch_id'));
                 });
 
                 $('textarea').change(function(){
-                    console.log("hihi");
                     var text = $(this).val();
                     var id = $(this).data('id');
                     if (!text.replace(/\s/g, '').length) {
@@ -29,63 +27,85 @@ $(document).ready(function(){
                 });
             },
         });
-    })
+    };
 
-    function check_empty(id,ch_id){
-        var ar = []
-        $("input[name=dap_an_"+ch_id+"]").each(function(){
-            ar.push($(this).val());
-        })
 
-        if (jQuery.inArray("", ar) == -1){
-            $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
-            $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
-        }else{
-            $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
-            $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
-        }
-    }
-
-    $("#submit").click(function(){
-        if(confirm("Bạn có chắc chắn nộp bài không ?")){
-            var de_id = $("input[name=de_id]").val();
-            var dap_an_id = [];
-            $("input[type=radio]:checked").each(function(){
-                dap_an_id.push($(this).data('da_id'));
-            })
-            var dien_tu = {};
-            $("input[type=text]").each(function(){
-                dien_tu[$(this).data("da_id")] = $(this).val();
-            })
-            var token = $("input[name=csrfmiddlewaretoken]").val();
-            $("#processing").modal({backdrop: 'static', keyboard: false});
-            $.ajax({
-                xhr: function() {
-                    var xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", function(event){
-                        var percent = Math.round((event.loaded / event.total) * 100) + '%';
-                        $("#progressBar").attr("style","width:"+percent);
-                        $("#progressBar").text(percent);
-    //                    $("#loaded_n_total").html("Tải lên " + event.loaded + " bytes của " + event.total);
-                    }, false);
-                    $("#cancel_upload").click(function(){
-                        xhr.abort();
-                    });
-                    return xhr;
-                  },
-                type: 'POST',
-                url: location.href,
-                data:{'csrfmiddlewaretoken':token, 'de_id':de_id,'dap_an_id':JSON.stringify(dap_an_id),
-                'dien_tu':JSON.stringify(dien_tu)},
-                success:function(){
-                    $("#processing").modal('hide');
-                    location.reload();
-                },
-            });
-        }
-    });
 
 });
 
+function check_checked(id,ch_id){
+        var ar = []
+        $("input[name=dap_an_"+ch_id+"]").each(function(){
+            if($(this).is(":checked")){
+                ar.push(1);
+            }else{
+                ar.push(0);
+            }
+        });
+        if (jQuery.inArray(1, ar) == -1){
+            $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
+            $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
+        }else{
+            $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
+            $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
+        }
+    }
 
+function check_empty(id,ch_id){
+    var ar = []
+    $("input[name=dap_an_"+ch_id+"]").each(function(){
+        ar.push($(this).val());
+    })
+
+    if (jQuery.inArray("", ar) == -1){
+        $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
+        $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
+    }else{
+        $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
+        $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
+    }
+}
+
+function nopBai(){
+    if(confirm("Bạn có chắc chắn nộp bài không ?")){
+        var ds_dap_an = {}
+        $(".dap_an").each(function(){
+            if($(this).data('kind') == 'tn'){
+                if($(this).is(":checked")){
+                    ds_dap_an[$(this).data('ch_id')+'_'+$(this).data("da_id")] = true;
+                }else{
+                    ds_dap_an[$(this).data('ch_id')+'_'+$(this).data("da_id")] = false;
+                }
+            }
+            else {
+                ds_dap_an[$(this).data('ch_id')+'_'+$(this).data("da_id")] = $(this).val();
+            }
+            $(this).prop("disabled", true);
+        });
+        $("#processing").modal({backdrop: 'static', keyboard: false});
+        $.ajax({
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(event){
+                    var percent = Math.round((event.loaded / event.total) * 100) + '%';
+                    $("#progressBar").attr("style","width:"+percent);
+                    $("#progressBar").text(percent);
+//                    $("#loaded_n_total").html("Tải lên " + event.loaded + " bytes của " + event.total);
+                }, false);
+                $("#cancel_upload").click(function(){
+                    xhr.abort();
+                });
+                return xhr;
+              },
+            type: 'POST',
+            url: location.href,
+            data:{'csrfmiddlewaretoken':$("input[name=csrfmiddlewaretoken]").val(),'de_id':$("input[name=de_id]").val(),
+            'ds_dap_an':JSON.stringify(ds_dap_an),'bai_lam':$("#bai_lam").html()},
+            success:function(){
+                $("#processing").modal('hide');
+                location.reload();
+            },
+        });
+    }
+};
 
