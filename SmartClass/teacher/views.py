@@ -482,18 +482,54 @@ def manage_question(request):
                    'list_mon': GiaoVienMon.objects.filter(myuser_id=user)}
         if request.method == 'POST':
             if 'edit' in request.POST:
-                ch = CauHoi.objects.get(id=request.POST['id'])
-                ch.noi_dung = request.POST['noi_dung']
-                if request.FILES.get('dinh_kem') is not None:
-                    try:
-                        os.remove(os.path.join(settings.MEDIA_ROOT, str(ch.dinh_kem)))
-                    except:
-                        pass
-                    ch.dinh_kem = request.FILES['dinh_kem']
+                if 'nd_cau_hoi' in request.POST:
+                    ch = CauHoiDa.objects.get(id=request.POST['id'])
+                    ch.noi_dung = request.POST['noi_dung']
+                    ch.noi_dung = request.POST['noi_dung']
+                    if request.FILES.get('dinh_kem') is not None:
+                        try:
+                            os.remove(os.path.join(settings.MEDIA_ROOT, str(ch.dinh_kem)))
+                        except:
+                            pass
+                        ch.dinh_kem = request.FILES['dinh_kem']
+                        ch.save()
+                        handle_uploaded_file(request.FILES['dinh_kem'])
                     ch.save()
-                    handle_uploaded_file(request.FILES['dinh_kem'])
-                ch.save()
-                DapAn.objects.filter(cau_hoi_id=ch).delete()
+                    nd_cau_hoi = json.loads(request.POST['nd_cau_hoi'])
+
+                    for i, ques in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ch)):
+                        ques.cau_hoi_id.noi_dung = nd_cau_hoi[i]
+                        DapAn.objects.filter(cau_hoi_id=ques.cau_hoi_id).delete()
+                        if "Trắc nhiệm" in ch.dang_cau_hoi:
+                            dap_an = json.loads(request.POST['dap_an'])
+                            nd_dap_an = json.loads(request.POST['nd_dap_an'])
+                            so_dap_an_dung = 0
+                            so_dap_an = int(len(dap_an) / ch.so_cau_hoi)
+                            for k in range(i, i + so_dap_an):
+                                if dap_an[k] == 0:
+                                    dung = False
+                                else:
+                                    dung = True
+                                    so_dap_an_dung += 1
+                                DapAn.objects.create(cau_hoi_id=ques.cau_hoi_id, mon_id=ch.mon_id, noi_dung=nd_dap_an[k],
+                                                     dap_an_dung=dung)
+                            i += so_dap_an
+                            ques.cau_hoi_id.so_dap_an_dung = so_dap_an_dung
+                            ques.cau_hoi_id.save()
+
+                else:
+                    ch = CauHoi.objects.get(id=request.POST['id'])
+                    ch.noi_dung = request.POST['noi_dung']
+                    if request.FILES.get('dinh_kem') is not None:
+                        try:
+                            os.remove(os.path.join(settings.MEDIA_ROOT, str(ch.dinh_kem)))
+                        except:
+                            pass
+                        ch.dinh_kem = request.FILES['dinh_kem']
+                        ch.save()
+                        handle_uploaded_file(request.FILES['dinh_kem'])
+                    ch.save()
+                    DapAn.objects.filter(cau_hoi_id=ch).delete()
             else:
                 ten_mon, lop_mon = request.POST['mon'].split(" - ")
                 mon = Mon.objects.get(ten=ten_mon, lop=lop_mon)
@@ -571,7 +607,7 @@ def question_data(request, id_mon, all, dung_lam):
             list_ques = CauHoi.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon), don=True)
             list_ques_da = CauHoiDa.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon))
         else:
-            list_ques = CauHoi.objects.filter(mon_id=Mon.objects.get(id=id_mon), don=True,dung_lam=dung_lam)
+            list_ques = CauHoi.objects.filter(mon_id=Mon.objects.get(id=id_mon), don=True, dung_lam=dung_lam)
             list_ques_da = CauHoiDa.objects.filter(mon_id=Mon.objects.get(id=id_mon), dung_lam=dung_lam)
         for ques in list(chain(list_ques, list_ques_da)):
             dang_cau_hoi = '<p id="dang_cau_hoi_{}">{}</p>'.format(ques.id, ques.dang_cau_hoi)
@@ -582,7 +618,7 @@ def question_data(request, id_mon, all, dung_lam):
                 so_cau_hoi = '<p id="so_cau_hoi_{}">1<p>'.format(ques.id)
             else:
                 chu_de = '<p id="chu_de_{0}" data-don="da">{1}</p>'.format(ques.id, ques.chu_de)
-            loai_cau_hoi = ques.dung_lam
+            loai_cau_hoi = '<p>{}</p>'.format(ques.dung_lam)
             do_kho = '<p id="do_kho_{}">'.format(ques.id)
             if ques.do_kho == 0:
                 do_kho += 'Dễ</p>'
@@ -590,12 +626,12 @@ def question_data(request, id_mon, all, dung_lam):
                 do_kho += 'Trung bình</p>'
             else:
                 do_kho += 'Khó</p>'
-            ngay_tao = '<p>{}</p>'.format(ques.id, str(ques.ngay_tao))
+            ngay_tao = '<p>{}</p>'.format(str(ques.ngay_tao))
             noi_dung = '''
             <div id="tom_tat_{0}" class="row">{1}</div>
             '''.format(ques.id, ques.noi_dung[:40])
             if all == 0:
-                data.append([chu_de, dang_cau_hoi, so_cau_hoi, loai_cau_hoi, do_kho, ngay_tao, noi_dung])
+                data.append([chu_de, loai_cau_hoi, dang_cau_hoi, so_cau_hoi, do_kho, ngay_tao, noi_dung])
             else:
                 ten = '<p>{}</p>'.format(ques.myuser_id.fullname)
                 data.append([ques.id, chu_de, dang_cau_hoi, so_cau_hoi, do_kho, ten, ngay_tao, noi_dung])
@@ -609,15 +645,66 @@ def question_data_detail(request, id, bien):
         kieu, don = bien.split('_')
         content = ''
         media = ''
+        dat = ''
         if kieu == 'edit':
             if don == 'don':
                 ques = CauHoi.objects.get(id=id)
+                content += '<input hidden name="so_cau_hoi" value="1">'
+                if "Trắc nhiệm" in ques.dang_cau_hoi:
+                    for i, da in enumerate(DapAn.objects.filter(cau_hoi_id=ques)):
+                        if da.dap_an_dung:
+                            dung = 'checked'
+                        else:
+                            dung = ''
+                        dat += '''
+                        <div class="row">
+                            <div class="col-md-1 col-sm-12 col-xs-12 form-group">
+                              <input type="checkbox" class="form-control dap_an" style="transform:scale(0.6);" name="dap_an" {0}>
+                            </div>
+                            <div class="col-md-11 col-sm-12 col-xs-12 form-group">
+                              <div id="dap_an_{1}_modal" class="answer-container nd_dap_an editor_da">{2}</div>
+                            </div>
+                        </div>
+                        '''.format(dung, i, da.noi_dung)
+                elif "Điền từ" in ques.dang_cau_hoi:
+                    for i, da in enumerate(DapAn.objects.filter(cau_hoi_id=ques)):
+                        dat += '''
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                              <div id="dap_an_{0}_modal" class="answer-container nd_dap_an editor_da">{1}</div>
+                            </div>
+                        </div>
+                        '''.format(i, da.noi_dung)
             else:
-                ques = CauHoiDa.objecst.get(id=id)
-            dat = ''
+                ques = CauHoiDa.objects.get(id=id)
+                content += '<input hidden name="so_cau_hoi" value="{}">'.format(ques.so_cau_hoi)
+                if "Trắc nhiệm" in ques.dang_cau_hoi:
+                    for index, ch in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ques)):
+                        dat += '''
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                              <div id="cau_hoi_{0}_modal" class="answer-container nd_cau_hoi editor_da">{1}</div>
+                            </div>
+                        </div>
+                        '''.format(index+1, ch.cau_hoi_id.noi_dung)
+                        for i, da in enumerate(DapAn.objects.filter(cau_hoi_id=ch.cau_hoi_id)):
+                            if da.dap_an_dung:
+                                dung = 'checked'
+                            else:
+                                dung = ''
+                            dat += '''
+                            <div class="row">
+                                <div class="col-md-1 col-sm-12 col-xs-12 form-group">
+                                  <input type="checkbox" class="form-control dap_an" style="transform:scale(0.6);" name="dap_an" {0}>
+                                </div>
+                                <div class="col-md-11 col-sm-12 col-xs-12 form-group">
+                                  <div id="dap_an_{3}_{1}_modal" class="answer-container nd_dap_an editor_da">{2}</div>
+                                </div>
+                            </div>
+                            '''.format(dung, i, da.noi_dung, index)
             if "Văn bản" in ques.dang_cau_hoi:
                 media = '''
-                <div id="noi_dung_modal" class="ques-container">{0}</div>
+                <div id="noi_dung_modal" class="ques-container editor_da">{0}</div>
                 <br>
                 '''.format(ques.noi_dung)
             elif "Hình ảnh" in ques.dang_cau_hoi:
@@ -628,7 +715,7 @@ def question_data_detail(request, id, bien):
                             <input type='file' style="display: block; margin-left: auto;margin-right: auto;" accept="image/*" />
                         </div>
                         <div class="col-md-4 col-sm-12 col-xs-12 form-group">
-                          <div id="noi_dung_modal" class="ques-container">{1}</div>
+                          <div id="noi_dung_modal" class="ques-container editor_da">{1}</div>
                         </div>
                     </div>
                 <br>
@@ -641,7 +728,7 @@ def question_data_detail(request, id, bien):
                           <input type="file" style="display: block; margin-left: auto;margin-right: auto;"  accept="audio/*">
                         </div>
                         <div class="col-md-8 col-sm-12 col-xs-12 form-group">
-                          <div id="noi_dung_modal" class="ques-container">{1}</div>
+                          <div id="noi_dung_modal" class="ques-container editor_da">{1}</div>
                         </div>
                     </div>
                 <br>
@@ -654,38 +741,12 @@ def question_data_detail(request, id, bien):
                           <input type="file" style="display: block; margin-left: auto;margin-right: auto;" accept="video/*">
                         </div>
                         <div class="col-md-4 col-sm-12 col-xs-12 form-group">
-                          <div id="noi_dung_modal" class="ques-container">{1}</div>
+                          <div id="noi_dung_modal" class="ques-container editor_da">{1}</div>
                         </div>
                     </div>
                 <br>
                 '''.format(ques.dinh_kem, ques.noi_dung)
-
-            if "Trắc nhiệm" in ques.dang_cau_hoi:
-                for i, da in enumerate(DapAn.objects.filter(cau_hoi_id=ques)):
-                    if da.dap_an_dung:
-                        dung = 'checked'
-                    else:
-                        dung = ''
-                    dat += '''
-                    <div class="row">
-                        <div class="col-md-1 col-sm-12 col-xs-12 form-group">
-                          <input type="radio" class="form-control dap_an" style="transform:scale(0.6);" name="dap_an" {0}>
-                        </div>
-                        <div class="col-md-11 col-sm-12 col-xs-12 form-group">
-                          <div id="dap_an_{1}_modal" class="answer-container nd_dap_an">{2}</div>
-                        </div>
-                    </div>
-                    '''.format(dung, i, da.noi_dung)
-            elif "Điền từ" in ques.dang_cau_hoi:
-                for i, da in enumerate(DapAn.objects.filter(cau_hoi_id=ques)):
-                    dat += '''
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12 col-xs-12 form-group">
-                          <div id="dap_an_{0}_modal" class="answer-container nd_dap_an">{1}</div>
-                        </div>
-                    </div>
-                    '''.format(i, da.noi_dung)
-            content = '''
+            content += '''
             <input hidden name="id" value="{2}">
             <input hidden name="dang_cau_hoi" value="{3}">
             {1}{0}'''.format(dat, media, ques.id, ques.dang_cau_hoi)
