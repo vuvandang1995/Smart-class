@@ -131,6 +131,21 @@ $(document).ready(function(){
                 connection.join(group_name);
             } else {
                 connection.open(group_name);
+                $('.done_gr').show();
+                $('.done_gr').click(function(){
+                    connection.attachStreams.forEach(function(localStream) {
+                        localStream.stop();
+                    });
+                
+                    // close socket.io connection
+                    connection.close();
+                    $('.done_gr').hide();
+                });
+                chatallSocket.send(JSON.stringify({
+                    'message' : 'teacher_call',
+                    'who' : userName,
+                    'time' : 'teacher_call'
+                }));
             }
         });
     }

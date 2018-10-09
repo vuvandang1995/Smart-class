@@ -45,6 +45,10 @@ connection.onMediaError = function(e) {
 };
 
 connection.onclose = function() {
+    alert('ok')
+    connection.attachStreams.forEach(function(localStream) {
+        localStream.stop();
+    });
     connection.close();
 };
 connection.onEntireSessionClosed = function(event) {

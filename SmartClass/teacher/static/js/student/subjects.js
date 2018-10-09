@@ -41,6 +41,22 @@ $(document).ready(function(){
                     makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                 }, time);
             }
+        }else if (time === 'teacher_call'){
+                if ($('#audiocall').length){
+                    $('#audiocall').show();
+                    $("#demo").show();
+                    var time = 1;
+                    $('#group_class .right').children('p').each(function(index){
+                        if (userName == $(this).attr("name")){
+                            time = index*1000;
+                            return false;
+                        }
+                    });
+                    // alert(time)
+                    setTimeout(function(){
+                        makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
+                    }, time);
+                }    
         }else if (time != 'key'){
             insertChat(who, message, time);
         }
@@ -87,6 +103,14 @@ $(document).ready(function(){
                 mediaElement.media.play();
             }, 5000);
             mediaElement.id = event.streamid;
+        };
+
+        connection.onclose = function() {
+            alert('ok')
+            connection.attachStreams.forEach(function(localStream) {
+                localStream.stop();
+            });
+            connection.close();
         };
         connection.checkPresence(roomid, function(roomExist, roomid) {
             if (roomExist === true) {
