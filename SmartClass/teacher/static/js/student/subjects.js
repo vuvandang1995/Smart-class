@@ -5,7 +5,6 @@ $(document).ready(function(){
         '/ws/' + teacher_name + 'chatall'+lop+'/');
 
 
-    
     chatallSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
@@ -25,18 +24,122 @@ $(document).ready(function(){
                 'time' : 'key'
             }));
             }
+        }else if (time === 'call_time'){
+            if ($('#audiocall').length){
+                $('#audiocall').show();
+                $("#demo").show();
+                countdowntime(message);
+                var time = 1;
+                $('#group_class .right').children('p').each(function(index){
+                    if (userName == $(this).attr("name")){
+                        time = index*1000;
+                        return false;
+                    }
+                });
+                // alert(time)
+                setTimeout(function(){
+                    makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
+                }, time);
+            }
         }else if (time != 'key'){
             insertChat(who, message, time);
         }
     };
 
+    function makeOrJoinRoom(roomid) {
+        connection.videosContainer = document.getElementById('videos-container');
+        connection.onstream = function(event) {
+            var existing = document.getElementById(event.streamid);
+            if(existing && existing.parentNode) {
+              existing.parentNode.removeChild(existing);
+            }
+            event.mediaElement.removeAttribute('src');
+            event.mediaElement.removeAttribute('srcObject');
+            //event.mediaElement.muted = true;
+            //event.mediaElement.volume = 0;
+            var video = document.createElement('audio');
+            try {
+                video.setAttributeNode(document.createAttribute('autoplay'));
+                video.setAttributeNode(document.createAttribute('playsinline'));
+            } catch (e) {
+                video.setAttribute('autoplay', true);
+                video.setAttribute('playsinline', true);
+            }
+            if(event.type === 'local') {
+              video.volume = 0;
+              try {
+                  video.setAttributeNode(document.createAttribute('muted'));
+              } catch (e) {
+                  video.setAttribute('muted', true);
+              }
+            }
+            video.srcObject = event.stream;
+            var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
+            var mediaElement = getHTMLMediaElement(video, {
+                title: event.userid,
+                // buttons: ['full-screen'],
+                width: 'auto',
+                height: 'auto',
+                // showOnMouseEnter: false
+            });
+            connection.videosContainer.appendChild(mediaElement);
+            setTimeout(function() {
+                mediaElement.media.play();
+            }, 5000);
+            mediaElement.id = event.streamid;
+        };
+        connection.checkPresence(roomid, function(roomExist, roomid) {
+            if (roomExist === true) {
+                connection.join(roomid);
+            } else {
+                connection.open(roomid);
+            }
+        });
+    }
+    
+    function countdowntime(dateend){
+        var countDownDate = new Date().getTime() + parseInt(dateend)*60000;
+
+        // Update the count down every 1 second
+        var x = setInterval(function() {
+
+            // Get todays date and time
+            var now = new Date().getTime();
+            
+            // Find the distance between now and the count down date
+            var distance = countDownDate - now;
+            
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            // Output the result in an element with id="demo"
+            document.getElementById("demo").innerHTML = "Thời gian còn lại: "+ minutes + "phút " + seconds + "giây ";
+            
+            // If the count down is over, write some text 
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("demo").innerHTML = "Hết giờ!";
+                connection.attachStreams.forEach(function(localStream) {
+                    localStream.stop();
+                });
+            
+                // close socket.io connection
+                connection.close();
+                $('#audiocall').hide();
+            }
+        }, 1000);
+    }
+
     function reload(){
-        $('body .list_group_all').html('');
+        // $('body .list_group_all').html('');
         $.ajax({
             type:'GET',
             url: "/student/group_data/"+teacher_name,
             success: function(data){
-                $('body .list_group_all').html(data);
+                $('body .list_group_all').prepend(data);
                 if ($('#group_class').length){
                     var group_chat_name = $('#group_class').children('p').text();
                     var chatgroup = new WebSocket(
@@ -117,7 +220,10 @@ $(document).ready(function(){
                         $(this).parent().parent().children().children().children('input').val('');
                         
                     })
+
+                    $('#audiocall').attr('name', group_name);
                 };
+
             }
         });
     }

@@ -63,6 +63,7 @@ def home(request):
 
 
 def manage_class(request, lop):
+    print(request.user.username)
     user = request.user
     if user.is_authenticated and user.position == 1:
         ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
@@ -182,12 +183,17 @@ def group_data(request, lop):
                         <div class="right">
                             <h3>'''+lsg.ten_nhom+'''<small>
                                 <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
-                                <button type="button" class="btn btn-primary btn-xs change_gr" data-toggle="modal" data-target="#chinhsua" name="dang">Chỉnh sửa</button>
+                                <button type="button" class="btn btn-primary btn-xs join_gr" name="'''+lsg.ten_nhom+'''">Audio</button>
                                 </small></h3>
                 '''
                 for std in ChiTietNhom.objects.filter(nhom_id=lsg):
                     html += '''<p><i class="fa fa-user"></i> '''+std.myuser_id.fullname+'''</p>'''
-                html += '''</div></div>'''
+                html += '''<div class="mail_list">
+                                <section class="make-center">
+                                    <div id="videos-container'''+lsg.ten_nhom+'''">
+                                    </div>
+                                </section>
+                            </div></div></div>'''
         except:
             pass
         return HttpResponse(html)

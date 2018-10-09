@@ -23,7 +23,6 @@ from teacher.models import *
 from django.contrib import messages
 import re
 
-
 class EmailThread(threading.Thread):
     def __init__(self, email):
         threading.Thread.__init__(self)
@@ -122,7 +121,7 @@ def group_data(request, teacher):
                     <h3>'''+nhom[0].ten_nhom+'''</h3>
             '''
             for std in ChiTietNhom.objects.filter(nhom_id=nhom[0]):
-                html += '''<p><i class="fa fa-user"></i> '''+std.myuser_id.fullname+'''</p>'''
+                html += '''<p name='''+std.myuser_id.username+'''><i class="fa fa-user"></i> '''+std.myuser_id.fullname+'''</p>'''
             html += '''</div></div>'''
         except:
             pass
