@@ -13,7 +13,7 @@ $(document).ready(function(){
         var time = data['time'];
         if (time == 'key'){
             $("#videocall"+who).attr("name", message); 
-        }else if (time != 'None'){
+        }else if ((time != 'None') && time != 'call_time'){
             insertChat(who, message, time);
         }
         
@@ -48,11 +48,93 @@ $(document).ready(function(){
     $('body #profile-tab').on('click',function(){
         $('#btn_random_group').show();
         $('#btn_manual_group').show();
+        $('#btn_audiocall').show();
     });
     $('body #home-tab').on('click',function(){
 		$('#btn_random_group').hide();
-		$('#btn_manual_group').hide();
+        $('#btn_manual_group').hide();
+        $('#btn_audiocall').hide();
     });
+
+    function countdowntime(dateend){
+        // $('.demo').each(function(){
+            var countDownDate = new Date().getTime() + dateend*60000;
+            // var p = $(this);
+            // Update the count down every 1 second
+            var x = setInterval(function() {
+
+                // Get todays date and time
+                var now = new Date().getTime();
+                
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+                
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                document.getElementById("demo").innerHTML = "Thời gian còn lại: "+ minutes + "phút " + seconds + "giây ";
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("demo").innerHTML = "Hết giờ!";
+                }
+            }, 1000);
+        // });
+    }
+
+    function makeOrJoinRoom(roomid) {
+        connection.videosContainer = document.getElementById('videos-container'+roomid);
+        connection.onstream = function(event) {
+            var existing = document.getElementById(event.streamid);
+            if(existing && existing.parentNode) {
+              existing.parentNode.removeChild(existing);
+            }
+            event.mediaElement.removeAttribute('src');
+            event.mediaElement.removeAttribute('srcObject');
+            //event.mediaElement.muted = true;
+            //event.mediaElement.volume = 0;
+            var video = document.createElement('audio');
+            try {
+                video.setAttributeNode(document.createAttribute('autoplay'));
+                video.setAttributeNode(document.createAttribute('playsinline'));
+            } catch (e) {
+                video.setAttribute('autoplay', true);
+                video.setAttribute('playsinline', true);
+            }
+            if(event.type === 'local') {
+              video.volume = 0;
+              try {
+                  video.setAttributeNode(document.createAttribute('muted'));
+              } catch (e) {
+                  video.setAttribute('muted', true);
+              }
+            }
+            video.srcObject = event.stream;
+            var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
+            var mediaElement = getHTMLMediaElement(video, {
+                title: event.userid,
+                // buttons: ['full-screen'],
+                width: 'auto',
+                height: 'auto',
+                // showOnMouseEnter: false
+            });
+            connection.videosContainer.appendChild(mediaElement);
+            setTimeout(function() {
+                mediaElement.media.play();
+            }, 5000);
+            mediaElement.id = event.streamid;
+        };
+        var group_name = roomid+'_'+class_+'_'+userName;
+        connection.checkPresence(group_name, function(roomExist, group_name) {
+            if (roomExist === true) {
+                connection.join(group_name);
+            } else {
+                connection.open(group_name);
+            }
+        });
+    }
+
 
     function reload(){
         $('body .list_group_all').html('');
@@ -85,9 +167,13 @@ $(document).ready(function(){
                     }
                 });
 
-                $('body .change_gr').on('click',function(event){
+                $('body .join_gr').on('click',function(event){
                     event.stopPropagation();
-                    $('#chinhsua').modal('show');
+                    var gr_name = $(this).attr("name");
+                    $('#videos-container'+gr_name).show();
+                    makeOrJoinRoom(gr_name, class_, userName);
+                    // $('#chinhsua').modal('show');
+
                 });
                 
                 click_group_chat();
@@ -97,6 +183,27 @@ $(document).ready(function(){
     }
     reload();
 
+    $("#save_audiocall").click(function() {
+        var call_time = $("input[name=call_time]").val();
+        var date = formatAMPM(new Date());
+        // $.ajax({
+        //     type:'POST',
+        //     url:location.href,
+        //     data: {'call_time': call_time, 'csrfmiddlewaretoken':token},
+        //     success: function(){
+        //         document.getElementById("close_modal_audiocall").click();
+        //     }
+        // });
+
+        chatallSocket.send(JSON.stringify({
+            'message' : call_time,
+            'who' : userName,
+            'time' : 'call_time'
+        }));
+        document.getElementById("close_modal_audiocall").click();
+        countdowntime(call_time);
+    });
+
 	
     $("body #chinhsua").on('show.bs.modal', function(event){
         var button = $(event.relatedTarget);
@@ -105,12 +212,17 @@ $(document).ready(function(){
             
         });
     });
+
     $('body #btn_random_group').on('click',function(){
 		$('#group_random').modal('show');
     });
 
     $('body #btn_manual_group').on('click',function(){
 		$('#group_manual').modal('show');
+    });
+
+    $('body #btn_audiocall').on('click',function(){
+		$('#audiocall').modal('show');
     });
     
 
@@ -124,6 +236,10 @@ $(document).ready(function(){
         $("input[name=search]").val("");
         $("input[name=search_std]").val("");
         $('body #list_std').empty();
+    });
+
+    $("body #audiocall").on('show.bs.modal', function(event){
+        $("input[name=call_time]").val("1");
     });
 
     $('body').on('click', '#save_create_group', function(){
@@ -225,7 +341,7 @@ $(document).ready(function(){
         message = escapeHtml(message);
         var date = formatAMPM(new Date());
         if (message != ''){
-          chatallSocket.send(JSON.stringify({
+            chatallSocket.send(JSON.stringify({
                 'message' : message,
                 'who' : userName,
                 'time' : date
@@ -392,7 +508,6 @@ $(document).ready(function(){
             });
         }
     });
-
 
     
 });

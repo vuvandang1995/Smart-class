@@ -32,6 +32,12 @@
                   </li>
                   <li><button style="display:none;" class="btn btn-primary" id="btn_manual_group">Tạo nhóm theo thứ tự</button>
                   </li>
+
+                  <li><button style="display:none;" class="btn btn-primary" id="btn_audiocall">Thiết lập cuộc gọi nhóm</button>
+                  </li>
+
+                  <li><p id="demo"></p>
+                  </li>
                 </ul>
                 <div id="myTabContent" class="tab-content">
                   <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
@@ -232,7 +238,46 @@
     </div>
 
 
+    <div class="modal" id="audiocall" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" id="teacher_title">Thiết lập cuộc gọi nhóm</h4>
+            </div>
+            <div class="modal-body form-horizontal form-label-left">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label><b>Thời gian cuộc gọi</b></label><br>
+                    <input type="number" name="call_time" min="1" max="100" value="1" required> Phút
+                    <font id="nameerr" color="red"></font><br>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="modal-footer">
+               <button type="submit" class="btn btn-primary"  id="save_audiocall">Tạo</button>
+               <button type="button" class="btn btn-default" data-dismiss="modal" id="close_modal_audiocall">Đóng</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+
     <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script>
+
+    <!-- For RTC-->
+    <script src="{% static 'js/teacher/RTC/videocall/menu.js' %}"></script>
+    <script src="{% static 'js/teacher/RTC/RTCMultiConnection.min.js' %}"></script>
+    <script src="{% static 'js/teacher/RTC/videocall/adapter.js' %}"></script>
+    {% comment %} <script src="https://192.168.100.22:443/socket.io/socket.io.js"></script> {% endcomment %}
+    <script src="http://192.168.100.22:9002/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="{% static 'js/teacher/RTC/videocall/getHTMLMediaElement.css' %}">
+    <script src="{% static 'js/teacher/RTC/videocall/getHTMLMediaElement.js' %}"></script>
+    <script src="{% static 'js/teacher/RTC/videocall/FileBufferReader.js' %}"></script>
+    <script src="{% static 'js/teacher/RTC/RTC.js' %}"></script>
+
+    <!-- for Peerjs-->
     <script src="{% static 'js/teacher/peerjs/main.js' %}"></script>
 {% endblock content %}
 
@@ -244,9 +289,11 @@
 
   <script src="{% static 'js/jquery.easy-autocomplete.js' %}"></script>
   <script src="{% static 'js/jquery.easy-autocomplete.min.js' %}"></script>
+
   <!-- CSS file -->
   <link href="{% static 'css/easy-autocomplete.css' %}" rel="stylesheet">
   <link href="{% static 'css/easy-autocomplete.min.css' %}" rel="stylesheet">
   <link href="{% static 'css/easy-autocomplete.themes.css' %}" rel="stylesheet">
   <link href="{% static 'css/easy-autocomplete.themes.min.css' %}" rel="stylesheet">
+
 {% endblock javascripts %}

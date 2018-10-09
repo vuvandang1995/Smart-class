@@ -26,7 +26,7 @@ SECRET_KEY = 'k1^5!@h0ovice6d%4)zxak4=r_y9zkx=$m1sij8&+)rsw=$%ak'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 ASGI_APPLICATION = 'SmartClass.routing.application'
 
 
@@ -66,7 +66,7 @@ CACHES = {
     }
 }
 # Number of seconds of inactivity before a user is marked offline
-USER_ONLINE_TIMEOUT = 300
+USER_ONLINE_TIMEOUT = 60
 
 # Number of seconds that we will keep track of inactive users for before 
 # their last seen is removed from the cache
