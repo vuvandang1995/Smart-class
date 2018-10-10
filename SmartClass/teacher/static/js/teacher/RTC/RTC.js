@@ -2,8 +2,6 @@ window.enableAdapter = true;
 
 var connection = new RTCMultiConnection();
 connection.socketURL = "http://192.168.100.22:9002/";
-connection.socketMessageEvent = 'video-conference-demo';
-connection.enableFileSharing = true;
 connection.session = {
     audio: true,
     video: false,
@@ -23,6 +21,38 @@ connection.onRoomFull = function(roomid) {
 
 // set this line to close room as soon as owner leaves
 connection.autoCloseEntireSession = true;
+
+// connection.onUserStatusChanged = function(event) {
+//     if (event.status === 'offline') {
+//       // Is the room owner here?	
+//       var remoteUserId = connection.sessionid; // chat_room is the room name, set higher in the script.
+//       var chatters = [connection.userid] // initialize array of users with me.
+//       var isUserConnectedWithYou = connection.getAllParticipants().indexOf(remoteUserId) !== -1;	
+//       if (isUserConnectedWithYou) {
+//         // The owner is here...
+//         console.log('Primary user is here. Nothing to do.');
+//       } else {
+//         console.log('Primary user is not here!');
+//         connection.attachStreams.forEach(function(localStream) {
+//             localStream.stop();
+//         });
+    
+//         // close socket.io connection
+//         connection.close();
+//       }
+//     }
+// };
+
+
+connection.onUserStatusChanged = function(event) {
+    if (event.status === 'offline') {
+        if (event.userid == connection.sessionid){
+            connection.closeEntireSession(function() {
+                console.log('close');
+            });
+        }
+    }
+};
 
 connection.onstreamended = function(event) {
     var mediaElement = document.getElementById(event.streamid);
@@ -45,26 +75,20 @@ connection.onMediaError = function(e) {
 };
 
 connection.onclose = function() {
-    alert('ok')
     connection.attachStreams.forEach(function(localStream) {
         localStream.stop();
     });
     connection.close();
 };
+
+
 connection.onEntireSessionClosed = function(event) {
-    document.getElementById('share-file').disabled = true;
-    document.getElementById('input-text-chat').disabled = true;
-    document.getElementById('btn-leave-room').disabled = true;
-    document.getElementById('open-or-join-room').disabled = false;
-    document.getElementById('open-room').disabled = false;
-    document.getElementById('join-room').disabled = false;
-    document.getElementById('room-id').disabled = false;
     connection.attachStreams.forEach(function(stream) {
         stream.stop();
     });
     // don't display alert for moderator
     if (connection.userid === event.userid) return;
-    document.querySelector('h1').innerHTML = 'Entire session has been closed by the moderator: ' + event.userid;
+        console.log('close');
 };
 connection.onUserIdAlreadyTaken = function(useridAlreadyTaken, yourNewUserId) {
     // seems room is already opened

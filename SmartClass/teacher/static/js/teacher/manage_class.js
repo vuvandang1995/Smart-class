@@ -13,7 +13,7 @@ $(document).ready(function(){
         var time = data['time'];
         if (time == 'key'){
             $("#videocall"+who).attr("name", message); 
-        }else if ((time != 'None') && time != 'call_time'){
+        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_call') && (time != 'teacher_audio_all')){
             insertChat(who, message, time);
         }
         
@@ -49,11 +49,15 @@ $(document).ready(function(){
         $('#btn_random_group').show();
         $('#btn_manual_group').show();
         $('#btn_audiocall').show();
+        $('#btn_audio_all').hide();
+        $('#audio_all').hide();
     });
     $('body #home-tab').on('click',function(){
 		$('#btn_random_group').hide();
         $('#btn_manual_group').hide();
         $('#btn_audiocall').hide();
+        $('#btn_audio_all').show();
+        $('#audio_all').show();
     });
 
     function countdowntime(dateend){
@@ -125,22 +129,35 @@ $(document).ready(function(){
             }, 5000);
             mediaElement.id = event.streamid;
         };
+
+
         var group_name = roomid+'_'+class_+'_'+userName;
         connection.checkPresence(group_name, function(roomExist, group_name) {
+            $('.done_gr').show();
+            $('.done_gr').click(function(){
+                // connection.attachStreams.forEach(function(localStream) {
+                //     localStream.stop();
+                // });
+            
+                // // close socket.io connection
+                // connection.close();
+
+                if (connection.isInitiator) {
+                    connection.closeEntireSession(function() {
+                        console.log('close');
+                    });
+                } else {
+                    connection.leave();
+                    connection.attachStreams.forEach(function(localStream) {
+                        localStream.stop();
+                    });
+                }
+                $('.done_gr').hide();
+            });
             if (roomExist === true) {
                 connection.join(group_name);
             } else {
                 connection.open(group_name);
-                $('.done_gr').show();
-                $('.done_gr').click(function(){
-                    connection.attachStreams.forEach(function(localStream) {
-                        localStream.stop();
-                    });
-                
-                    // close socket.io connection
-                    connection.close();
-                    $('.done_gr').hide();
-                });
                 chatallSocket.send(JSON.stringify({
                     'message' : 'teacher_call',
                     'who' : userName,
@@ -230,6 +247,61 @@ $(document).ready(function(){
 
     $('body #btn_random_group').on('click',function(){
 		$('#group_random').modal('show');
+    });
+
+    $('body #btn_audio_all').on('click',function(){
+        connection.videosContainer = document.getElementById('videos-container');
+        connection.onstream = function(event) {
+            var existing = document.getElementById(event.streamid);
+            if(existing && existing.parentNode) {
+              existing.parentNode.removeChild(existing);
+            }
+            event.mediaElement.removeAttribute('src');
+            event.mediaElement.removeAttribute('srcObject');
+            //event.mediaElement.muted = true;
+            //event.mediaElement.volume = 0;
+            var video = document.createElement('audio');
+            try {
+                video.setAttributeNode(document.createAttribute('autoplay'));
+                video.setAttributeNode(document.createAttribute('playsinline'));
+            } catch (e) {
+                video.setAttribute('autoplay', true);
+                video.setAttribute('playsinline', true);
+            }
+            if(event.type === 'local') {
+              video.volume = 0;
+              try {
+                  video.setAttributeNode(document.createAttribute('muted'));
+              } catch (e) {
+                  video.setAttribute('muted', true);
+              }
+            }
+            video.srcObject = event.stream;
+            var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
+            var mediaElement = getHTMLMediaElement(video, {
+                title: event.userid,
+                // buttons: ['full-screen'],
+                width: 'auto',
+                height: 'auto',
+                // showOnMouseEnter: false
+            });
+            connection.videosContainer.appendChild(mediaElement);
+            setTimeout(function() {
+                mediaElement.media.play();
+            }, 5000);
+            mediaElement.id = event.streamid;
+            $('#videos-container .media-container ').each(function(){
+                if ($(this).find('h2').first().text() != (userName+'_'+class_)){
+                    $(this).hide();
+                }
+            });
+        };
+		connection.open(userName+'_'+class_);
+        chatallSocket.send(JSON.stringify({
+            'message' : 'teacher_audio_all',
+            'who' : userName,
+            'time' : 'teacher_audio_all'
+        }));
     });
 
     $('body #btn_manual_group').on('click',function(){

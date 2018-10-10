@@ -57,10 +57,62 @@ $(document).ready(function(){
                         makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                     }, time);
                 }    
+        }else if (time === 'teacher_audio_all'){
+            if ($('#audiocall').length){
+                $('#audiocall').show();
+                connection.videosContainer = document.getElementById('videos-container');
+                connection.onstream = function(event) {
+                    var existing = document.getElementById(event.streamid);
+                    if(existing && existing.parentNode) {
+                    existing.parentNode.removeChild(existing);
+                    }
+                    event.mediaElement.removeAttribute('src');
+                    event.mediaElement.removeAttribute('srcObject');
+                    //event.mediaElement.muted = true;
+                    //event.mediaElement.volume = 0;
+                    var video = document.createElement('audio');
+                    try {
+                        video.setAttributeNode(document.createAttribute('autoplay'));
+                        video.setAttributeNode(document.createAttribute('playsinline'));
+                    } catch (e) {
+                        video.setAttribute('autoplay', true);
+                        video.setAttribute('playsinline', true);
+                    }
+                    if(event.type === 'local') {
+                    video.volume = 0;
+                    try {
+                        video.setAttributeNode(document.createAttribute('muted'));
+                    } catch (e) {
+                        video.setAttribute('muted', true);
+                    }
+                    }
+                    video.srcObject = event.stream;
+                    var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
+                    var mediaElement = getHTMLMediaElement(video, {
+                        title: event.userid,
+                        // buttons: ['full-screen'],
+                        width: 'auto',
+                        height: 'auto',
+                        // showOnMouseEnter: false
+                    });
+                    connection.videosContainer.appendChild(mediaElement);
+                    setTimeout(function() {
+                        mediaElement.media.play();
+                    }, 5000);
+                    mediaElement.id = event.streamid;
+                    $('#videos-container .media-container ').each(function(){
+                        if ($(this).find('h2').first().text() != (teacher_name+'_'+lop)){
+                            $(this).hide();
+                        }
+                    });
+                };
+
+                connection.join(teacher_name+'_'+lop);
+            }    
         }else if (time != 'key'){
-            insertChat(who, message, time);
-        }
-    };
+                insertChat(who, message, time);
+            }
+        };
 
     function makeOrJoinRoom(roomid) {
         connection.videosContainer = document.getElementById('videos-container');
@@ -104,14 +156,6 @@ $(document).ready(function(){
             }, 5000);
             mediaElement.id = event.streamid;
         };
-
-        connection.onclose = function() {
-            alert('ok')
-            connection.attachStreams.forEach(function(localStream) {
-                localStream.stop();
-            });
-            connection.close();
-        };
         connection.checkPresence(roomid, function(roomExist, roomid) {
             if (roomExist === true) {
                 connection.join(roomid);
@@ -146,12 +190,22 @@ $(document).ready(function(){
             if (distance < 0) {
                 clearInterval(x);
                 document.getElementById("demo").innerHTML = "Hết giờ!";
-                connection.attachStreams.forEach(function(localStream) {
-                    localStream.stop();
-                });
+                // connection.attachStreams.forEach(function(localStream) {
+                //     localStream.stop();
+                // });
             
-                // close socket.io connection
-                connection.close();
+                // // close socket.io connection
+                // connection.close();
+
+
+
+                if (connection.isInitiator) {
+                    connection.closeEntireSession(function() {
+                        console.log('close');
+                    });
+                } else {
+                    connection.leave();
+                }
                 $('#audiocall').hide();
             }
         }, 1000);
