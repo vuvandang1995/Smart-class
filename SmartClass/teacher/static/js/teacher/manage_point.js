@@ -19,13 +19,67 @@ $(document).ready(function(){
         var button = $(event.relatedTarget);
         var id_diem = button.data('id');
         $("#point_data").load("/manage_point_detail_"+ id_diem);
-//        $.ajax({
-//            type: "GET",
-//            url: "/manage_point_detail_"+ id_diem,
-//            success: function(data){
-//                $("#point_data").html(data);
-//            },
-//        });
+        $('#in').show();
+        $('#cham_diem').show();
+        $('#luu_diem').hide();
+        $('#huy').hide();
+        $("#close").show();
+        $(".diem_tu_luan").prop("disabled",true)
+        $(".nhan_xet").prop("disabled",true)
+    });
+
+    $("#cham_diem").click(function(){
+        $('#in').hide();
+        $(this).hide();
+        $('#luu_diem').show();
+        $('#huy').show();
+        $("#close").hide();
+        $(".diem_tu_luan").prop("disabled",false)
+        $(".nhan_xet").prop("disabled",false)
+    });
+
+    $("#huy").click(function(){
+        $('#in').show();
+        $('#cham_diem').show();
+        $('#luu_diem').hide();
+        $(this).hide();
+        $("#close").show();
+        $(".diem_tu_luan").prop("disabled",true)
+        $(".nhan_xet").prop("disabled",true)
+    });
+
+    $("#luu_diem").click(function(){
+        $('#in').show();
+        $('#cham_diem').show();
+        $('#luu_diem').hide();
+        $("#huy").hide();
+        $("#close").show();
+        $(".diem_tu_luan").prop("disabled",true)
+        $(".nhan_xet").prop("disabled",true)
+        var diem = {}
+        $(".diem_tu_luan").each(function(){
+            if(parseFloat($(this).val()) == 'NaN'){
+                alert("error");
+                return false;
+            }
+            diem[$(this).data('id')]= $(this).val()
+            $(this).prop("disabled",true)
+        });
+        var nhan_xet = {}
+        $(".nhan_xet").each(function(){
+            nhan_xet[$(this).data('id')]= $(this).val()
+            $(this).prop("disabled",true)
+        });
+        console.log(diem,nhan_xet);
+        return false;
+        $.ajax({
+            type: "POST",
+            url: location.href,
+            data:{'diem_tu_luan': diem_tu_luan, 'nhan_xet': nhan_xet},
+            success: function(){
+                $('#point').modal('hide');
+            }
+        });
     });
 
 });

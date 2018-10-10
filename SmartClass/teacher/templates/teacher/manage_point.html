@@ -12,6 +12,20 @@
     <!--<link href="{% static 'css/easy-autocomplete.min.css' %}" rel="stylesheet">-->
     <!--<link href="{% static 'css/easy-autocomplete.themes.css' %}" rel="stylesheet">-->
     <!--<link href="{% static 'css/easy-autocomplete.themes.min.css' %}" rel="stylesheet">-->
+    <style>
+      ::placeholder {
+          color: red;
+          opacity: 1; /* Firefox */
+      }
+
+      :-ms-input-placeholder { /* Internet Explorer 10-11 */
+         color: red;
+      }
+
+      ::-ms-input-placeholder { /* Microsoft Edge */
+         color: red;
+      }
+    </style>
  {% endblock stylesheets %}
 {% block content %}
   <div class="right_col" role="main">
@@ -32,9 +46,7 @@
                     <thead>
                       <tr>
                         <th>Họ tên</th>
-                        <th>Điểm kiểm tra 15'</th>
-                        <th>Điểm kiểm tra 1 tiết</th>
-                        <th>Điểm thi</th>
+                        <th>Điểm</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -60,7 +72,10 @@
         </div>
         <div class="modal-footer">
             <button class="btn btn-info" id="in" onclick="PrintElem()"><i class="fa fa-print"></i> In</button>
-           <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            <button class="btn btn-primary" id="cham_diem" ><i class="fa fa-edit"></i> Chấm điểm</button>
+            <button class="btn btn-success" id="luu_diem" ><i class="fa fa-save"></i> Lưu điểm</button>
+            <button class="btn btn-warning" id="huy" ><i class="fa fa-close"></i> Hủy</button>
+           <button type="button" class="btn btn-default" id="close" data-dismiss="modal">Đóng</button>
         </div>
     </div>
   </div>

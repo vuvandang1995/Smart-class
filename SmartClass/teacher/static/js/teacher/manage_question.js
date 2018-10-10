@@ -191,7 +191,7 @@ $(document).ready(function(){
         var dap_an = [];
         var nd_dap_an = [];
         if (so_cau_hoi > 1){
-            $(".nd_cau_hoi .ql-editor").each(function(){
+            $("#tab_content1 .nd_cau_hoi .ql-editor").each(function(){
                 nd_cau_hoi.push($(this).html());
             });
             if (jQuery.inArray("<p><br></p>", nd_cau_hoi) != -1){
@@ -203,7 +203,7 @@ $(document).ready(function(){
             formData.append('nd_cau_hoi',JSON.stringify(nd_cau_hoi));
         }
         if (dang_cau_hoi.includes("Trắc nhiệm")){
-            $(".dap_an").each(function(){
+            $("#tab_content1 .dap_an").each(function(){
                 if ($(this).is(':checked')){
                     dap_an.push(1);
                 }else{
@@ -219,7 +219,7 @@ $(document).ready(function(){
             }
             formData.append('dap_an',JSON.stringify(dap_an));
 
-            $(".nd_dap_an .ql-editor").each(function(){
+            $("#tab_content1 .nd_dap_an .ql-editor").each(function(){
                 nd_dap_an.push($(this).html());
             });
             if (jQuery.inArray("<p><br></p>", nd_dap_an) != -1){
@@ -229,7 +229,7 @@ $(document).ready(function(){
             formData.append('nd_dap_an',JSON.stringify(nd_dap_an));
         }
         else if(dang_cau_hoi.includes("Điền từ")){
-            $(".nd_dap_an .ql-editor").each(function(){
+            $("#tab_content1 .nd_dap_an .ql-editor").each(function(){
                 nd_dap_an.push($(this).html());
             });
             if (jQuery.inArray("<p><br></p>", nd_dap_an) != -1){
@@ -239,11 +239,11 @@ $(document).ready(function(){
             formData.append('nd_dap_an',JSON.stringify(nd_dap_an));
         }
         if(!dang_media.includes("Văn bản")){
-            if (typeof($("input[type=file]")[0].files[0]) == "undefined"){
+            if (typeof($("#tab_content1 input[type=file]")[0].files[0]) == "undefined"){
                 alert("Chưa chọn file");
                 return false;
             }else{
-                formData.append('dinh_kem',$("input[type=file]")[0].files[0]);
+                formData.append('dinh_kem',$("#tab_content1 input[type=file]")[0].files[0]);
             }
         }
         formData.append('do_kho',$("#do_kho option:selected").text());
@@ -270,13 +270,13 @@ $(document).ready(function(){
             processData: false,
             success : function(){
                 $("#noi_dung .ql-editor").empty();
-                $(".nd_cau_hoi .ql-editor").each(function(){
+                $("#tab_content1 .nd_cau_hoi .ql-editor").each(function(){
                     $(this).empty();
                 });
-                $(".dap_an").each(function(){
+                $("#tab_content1 .dap_an").each(function(){
                     $(this).prop('checked', false);
                 });
-                $(".nd_dap_an .ql-editor").each(function(){
+                $("#tab_content1 .nd_dap_an .ql-editor").each(function(){
                     $(this).empty();
                 });
                 table_question.ajax.reload(null, false);
@@ -335,8 +335,8 @@ $(document).ready(function(){
             formData.append('nd_dap_an',JSON.stringify(nd_dap_an));
         }
 
-        if(!dang_cau_hoi.includes("Văn bản")&&(typeof($("input[type=file]")[0].files[0]) != "undefined")){
-            formData.append('dinh_kem',$("input[type=file]")[0].files[0]);
+        if(!dang_cau_hoi.includes("Văn bản")&&(typeof($("#khung_modal input[type=file]")[0].files[0]) != "undefined")){
+            formData.append('dinh_kem',$("#khung_modal input[type=file]")[0].files[0]);
         }
 
         $("#processing").modal({backdrop: 'static', keyboard: false});

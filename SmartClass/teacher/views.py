@@ -237,8 +237,6 @@ def manage_point_data(request, lop):
             mon = Mon.objects.get(id__in=mon_id, lop=lp)
             for student in ls_student:
                 fullname = '<h5 id="full_{}">{}</h5>'.format(student.id, student.fullname)
-                kiem_tra_15p = '<h4>'
-                kiem_tra_1_tiet = '<h4>'
                 diem_thi = '<h4>'
                 for diem in DiemSo.objects.filter(myuser_id=student, mon_id=mon):
                     if diem.diem < 5.0:
@@ -252,16 +250,9 @@ def manage_point_data(request, lop):
                     temp = '''
                     <span class="label label-{2}" data-id="{0}" data-toggle="modal" data-target="#point" >{1}</span>
                     '''.format(diem.id, diem.diem, loai)
-                    if diem.loai_diem == "kiểm tra 15'":
-                        kiem_tra_15p += temp
-                    elif diem.loai_diem == 'kiểm tra 1 tiết':
-                        kiem_tra_1_tiet += temp
-                    elif diem.loai_diem == 'thi':
-                        diem_thi += temp
-                kiem_tra_15p += '</h4>'
-                kiem_tra_1_tiet += '</h4>'
+                    diem_thi += temp
                 diem_thi += '</h4>'
-                data.append([fullname, kiem_tra_15p, kiem_tra_1_tiet, diem_thi])
+                data.append([fullname, diem_thi])
         big_data = {"data": data}
         json_data = json.loads(json.dumps(big_data))
         return JsonResponse(json_data)
@@ -372,9 +363,10 @@ def manage_de(request):
                 diem_tn = round(float(cau_truc['pt_tn'] / 10 / chi_tiet_so_luong['sl_tn']), 2)
                 diem_dt = round(float(cau_truc['pt_dt'] / 10 / chi_tiet_so_luong['sl_dt']), 2)
                 diem_tl = round(float(cau_truc['pt_tl'] / 10 / chi_tiet_so_luong['sl_tl']), 2)
-                for key, value in json.loads(request.POST['dict_ques']).items():
-                    if value == 'don':
-                        ch = CauHoi.objects.get(id=key)
+                for temp in json.loads(request.POST['list_ques']):
+                    id, don = temp.split("_")
+                    if don == 'don':
+                        ch = CauHoi.objects.get(id=int(id))
                         if "Trắc nhiệm" in ch.dang_cau_hoi:
                             diem = diem_tn
                         elif "Điền từ" in ch.dang_cau_hoi:
@@ -383,7 +375,7 @@ def manage_de(request):
                             diem = diem_tl
                         ChiTietDe.objects.create(cau_hoi_id=ch, de_id=de, diem=diem)
                     else:
-                        ch = CauHoiDa.objects.get(id=key)
+                        ch = CauHoiDa.objects.get(id=int(id))
                         if "Trắc nhiệm" in ch.dang_cau_hoi:
                             diem = diem_tn
                         elif "Điền từ" in ch.dang_cau_hoi:
@@ -491,7 +483,6 @@ def manage_question(request):
                 if 'nd_cau_hoi' in request.POST:
                     ch = CauHoiDa.objects.get(id=request.POST['id'])
                     ch.noi_dung = request.POST['noi_dung']
-                    ch.noi_dung = request.POST['noi_dung']
                     if request.FILES.get('dinh_kem') is not None:
                         try:
                             os.remove(os.path.join(settings.MEDIA_ROOT, str(ch.dinh_kem)))
@@ -502,27 +493,26 @@ def manage_question(request):
                         handle_uploaded_file(request.FILES['dinh_kem'])
                     ch.save()
                     nd_cau_hoi = json.loads(request.POST['nd_cau_hoi'])
-
+                    print(request.POST)
                     for i, ques in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ch)):
-                        ques.cau_hoi_id.noi_dung = nd_cau_hoi[i]
-                        DapAn.objects.filter(cau_hoi_id=ques.cau_hoi_id).delete()
+                        chdon = CauHoi.objects.get(id=ques.cau_hoi_id.id)
+                        chdon.noi_dung = nd_cau_hoi[i]
                         if "Trắc nhiệm" in ch.dang_cau_hoi:
+                            DapAn.objects.filter(cau_hoi_id=chdon).delete()
                             dap_an = json.loads(request.POST['dap_an'])
                             nd_dap_an = json.loads(request.POST['nd_dap_an'])
                             so_dap_an_dung = 0
                             so_dap_an = int(len(dap_an) / ch.so_cau_hoi)
-                            for k in range(i, i + so_dap_an):
+                            for k in range(i*so_dap_an, i*so_dap_an + so_dap_an):
                                 if dap_an[k] == 0:
                                     dung = False
                                 else:
                                     dung = True
                                     so_dap_an_dung += 1
-                                DapAn.objects.create(cau_hoi_id=ques.cau_hoi_id, mon_id=ch.mon_id, noi_dung=nd_dap_an[k],
+                                DapAn.objects.create(cau_hoi_id=chdon, mon_id=ch.mon_id, noi_dung=nd_dap_an[k],
                                                      dap_an_dung=dung)
-                            i += so_dap_an
-                            ques.cau_hoi_id.so_dap_an_dung = so_dap_an_dung
-                            ques.cau_hoi_id.save()
-
+                            chdon.so_dap_an_dung = so_dap_an_dung
+                        chdon.save()
                 else:
                     ch = CauHoi.objects.get(id=request.POST['id'])
                     ch.noi_dung = request.POST['noi_dung']
@@ -708,6 +698,15 @@ def question_data_detail(request, id, bien):
                                 </div>
                             </div>
                             '''.format(dung, i, da.noi_dung, index)
+                elif "Tự luận" in ques.dang_cau_hoi:
+                    for index, ch in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ques)):
+                        dat += '''
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                              <div id="cau_hoi_{0}_modal" class="answer-container nd_cau_hoi editor_da">{1}</div>
+                            </div>
+                        </div>
+                        '''.format(index+1, ch.cau_hoi_id.noi_dung)
             if "Văn bản" in ques.dang_cau_hoi:
                 media = '''
                 <div id="noi_dung_modal" class="ques-container editor_da">{0}</div>
@@ -822,6 +821,59 @@ def question_data_detail(request, id, bien):
             <ul class="list-unstyled msg_list">
             <li><a>{3}{1}</a></li>
             '''.format(media, dat, ques.id, ques.noi_dung, ques.dang_cau_hoi)
+        return HttpResponse(content)
+
+
+def question_data_detail_review(request, ds_ch):
+    user = request.user
+    if user.is_authenticated and user.position == 1:
+        content = ''
+        for i, temp in enumerate(json.loads(ds_ch)):
+            id, don = temp.split('_')
+            dap_an = ''
+            if don == 'da':
+                ques = CauHoiDa.objects.get(id=int(id))
+                for index, cht in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ques)):
+                    result = re.search('<p>(.*)</p>', cht.cau_hoi_id.noi_dung)
+                    dap_an += '''<p>{2}.{0}: {1}</p>'''.format(index + 1, result.group(1), i + 1)
+                    if "Trắc nhiệm" in ques.dang_cau_hoi:
+                        for k, da in enumerate(DapAn.objects.filter(cau_hoi_id=cht.cau_hoi_id)):
+                            s = chr(ord(str(k)) + 17)
+                            if da.dap_an_dung:
+                                dung = '(Đúng)'
+                            else:
+                                dung = ''
+                            result = re.search('<p>(.*)</p>', da.noi_dung)
+                            dap_an += '''<p>{0}: {2} {1}</p>'''.format(s, dung, result.group(1))
+            else:
+                ques = CauHoi.objects.get(id=int(id))
+                if "Trắc nhiệm" in ques.dang_cau_hoi:
+                    for k, da in enumerate(DapAn.objects.filter(cau_hoi_id=ques)):
+                        s = chr(ord(str(k)) + 17)
+                        if da.dap_an_dung:
+                            dung = '(Đúng)'
+                        else:
+                            dung = ''
+                        result = re.search('<p>(.*)</p>', da.noi_dung)
+                        dap_an += '''<p>{0}: {2} {1}</p>'''.format(s, dung, result.group(1))
+                elif "Điền từ" in ques.dang_cau_hoi:
+                    for k, da in enumerate(DapAn.objects.filter(cau_hoi_id=ques)):
+                        result = re.search('<p>(.*)</p>', da.noi_dung)
+                        dap_an += '''<p>({0}): {1}</p>'''.format(k + 1, result.group(1))
+            media = ''
+            if "Hình ảnh" in ques.dang_cau_hoi:
+                media = '<img style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src="/media/{}" alt="không tồn tại" />'.format(
+                    ques.dinh_kem)
+            elif "Âm thanh" in ques.dang_cau_hoi:
+                media = '<br><audio controls width="100%" src="/media/{}"></audio>'.format(ques.dinh_kem)
+            elif "Video" in ques.dang_cau_hoi:
+                media = '<video controls width="100%" src="/media/{}"></video>'.format(ques.dinh_kem)
+            content += '''
+            <label>Câu hỏi {0}:</label>
+            {3}
+            <ul class="list-unstyled msg_list">
+            <li><a>{1}{2}</a></li>
+            '''.format(i + 1, ques.noi_dung, dap_an, media)
         return HttpResponse(content)
 
 

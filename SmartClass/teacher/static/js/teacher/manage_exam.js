@@ -164,7 +164,6 @@ $(document).ready(function(){
         }
     });
 
-
     $("#r_tao_de").click(function(){
         var ten_de = $('input[name=r_ten_de]').val();
         if(ten_de == ''){
@@ -243,126 +242,7 @@ $(document).ready(function(){
                 return JSON.stringify(result);
             },
             "complete": function(){
-                $('#wizard').find('.buttonFinish').first().click(function(){
-                    if (chon_tn < max_tn){
-                        alert("Chưa đủ số lượng câu hỏi trắc nhiệm");
-                        return false;
-                    }
-                    else if (chon_tn > max_tn){
-                        alert("Quá số lượng câu hỏi trắc nhiệm");
-                        return false;
-                    }
 
-                    if (chon_dt < max_dt){
-                        alert("Chưa đủ số lượng câu hỏi điền từ");
-                        return false;
-                    }
-                    else if (chon_dt > max_dt){
-                        alert("Quá số lượng câu hỏi điền từ");
-                        return false;
-                    }
-
-                    if (chon_tl < max_tl){
-                        alert("Chưa đủ số lượng câu hỏi tự luận");
-                        return false;
-                    }
-                    else if (chon_tl > max_tl){
-                        alert("Quá số lượng câu hỏi tự luận");
-                        return false;
-                    }
-
-                    if (chon_ga < max_ga){
-                        alert("Chưa đủ số lượng câu hỏi ghi hình");
-                        return false;
-                    }
-                    else if (chon_ga > max_ga){
-                        alert("Quá số lượng câu hỏi ghi hình");
-                        return false;
-                    }
-
-                    if (chon_gh < max_gh){
-                        alert("Chưa đủ số lượng câu hỏi ghi âm");
-                        return false;
-                    }
-                    else if (chon_gh > max_gh){
-                        alert("Quá số lượng câu hỏi ghi âm");
-                        return false;
-                    }
-
-                    var token = $("input[name=csrfmiddlewaretoken]").val();
-                    var ten_de = $('input[name=ten_de]').val();
-                    if(ten_de == ''){
-                        alert("Chưa đặt tên");
-                        return false;
-                    }
-                    var mon = $('#gv_mon option:selected').val();
-                    var loai_de = $('#loai_de option:selected').val();
-                    var cau_truc = {};
-                    var pham_tram = 0;
-                    $(".phan_tram").each(function(){
-                        if(typeof($(this).attr("disabled")) == 'undefined'){
-                            cau_truc[$(this).attr('name')] = parseInt($(this).val());
-                            pham_tram += parseInt($(this).val());
-                        }
-                        else{
-                            cau_truc[$(this).attr('name')] = (-1);
-                        }
-                    });
-
-                    if(pham_tram != 100){
-                        alert("Tổng phần trăm điểm số phải đủ 100%");
-                        return false;
-                    }
-                    if(jQuery.inArray(0, cau_truc) != -1){
-                        alert("Chưa chọn phần trăm điểm số");
-                        return false;
-                    }
-                    var so_luong = 0;
-                    var chi_tiet_so_luong = {}
-                    $(".so_luong").each(function(){
-                        if(typeof($(this).attr("disabled")) == 'undefined'){
-                            chi_tiet_so_luong[$(this).attr('name')] = parseInt($(this).val());
-                            so_luong += parseInt($(this).val());
-                        }
-                        else{
-                            chi_tiet_so_luong[$(this).attr('name')] = (-1);
-                        }
-                    });
-                    if(jQuery.inArray(0, chi_tiet_so_luong) != -1){
-                        alert("Chưa chọn số lượng câu hỏi");
-                        return false;
-                    }
-                    var dict_ques = {};
-                    $('#list_ques_selected tbody tr').each(function(){
-                        dict_ques[$(this).find('p').first().attr('id').split('_')[1]] = $(this).find('input[name=don]').first().val()
-                    });
-                    $("#processing").modal({backdrop: 'static', keyboard: false});
-                    $.ajax({
-                        xhr: function() {
-                            var xhr = new window.XMLHttpRequest();
-                            xhr.upload.addEventListener("progress", function(event){
-                                var percent = Math.round((event.loaded / event.total) * 100) + '%';
-                                $("#progressBar").attr("style","width:"+percent);
-                                $("#progressBar").text(percent);
-            //                    $("#loaded_n_total").html("Tải lên " + event.loaded + " bytes của " + event.total);
-                            }, false);
-                            $("#cancel_upload").click(function(){
-                                xhr.abort();
-                            });
-                            return xhr;
-                          },
-                         type:'POST',
-                         url:location.href,
-                         data:{'csrfmiddlewaretoken': token, 'ten_de':ten_de, 'mon':mon, 'loai_de':loai_de,
-                         'dict_ques':JSON.stringify(dict_ques), 'cau_truc':JSON.stringify(cau_truc),
-                         'so_luong': so_luong, 'chi_tiet_so_luong':JSON.stringify(chi_tiet_so_luong),
-                         'thoi_gian': $('input[name=thoi_gian]').val()},
-                         success: function(){
-                            $("#processing").modal('hide');
-                            location.reload();
-                         },
-                    });
-                });
             }
         },
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -376,7 +256,6 @@ $(document).ready(function(){
         table_question.ajax.url(path).load();
         table_ques_selected.clear().draw();
     });
-
 
     $('#list_question tbody').on( 'click', 'tr', function () {
         if (table_question.data().count() == 0){
@@ -402,7 +281,7 @@ $(document).ready(function(){
             return false;
         }
         var id = $(this).find('p').first().attr('id').split("_")[1];
-        var don = $(this).find('p').first().data('don');
+        var don = $(this).find('input[name=don]').first().val();
         $('#question_title').html('Câu hỏi #'+id);
         $.ajax({
             type: "GET",
@@ -437,7 +316,7 @@ $(document).ready(function(){
             $("#max_tn").html("Trắc nhiệm: "+chon_tn+ "/" + max_tn);
         }
         else if(dang_cau_hoi.includes("Điền từ")){
-            if (chon_tn + so_cau_hoi > max_dt){
+            if (chon_dt + so_cau_hoi > max_dt){
                 alert("Vượt quá số lượng câu hỏi điền từ");
                 return false;
             }
@@ -445,29 +324,29 @@ $(document).ready(function(){
             $("#max_dt").html("Điền từ: "+chon_dt+ "/" + max_dt);
         }
         else if(dang_cau_hoi.includes("Tự luận")){
-            if (chon_tn + so_cau_hoi > max_tl){
+            if (chon_tl + so_cau_hoi > max_tl){
                 alert("Vượt quá số lượng câu hỏi tự luận");
                 return false;
             }
-            chon_tl = chon_tl + so_cau_hoi;
+            chon_tl += so_cau_hoi;
             $("#max_tl").html("Tự luận: "+chon_tl+ "/" + max_tl);
         }
-        else if(dang_cau_hoi.includes("Ghi âm")){
-            if (chon_tn + so_cau_hoi > max_ga){
-                alert("Vượt quá số lượng câu hỏi ghi âm");
-                return false;
-            }
-            chon_ga += so_cau_hoi;
-            $("#max_ga").html("Ghi âm: "+chon_ga+ "/" + max_ga);
-        }
-        else if(dang_cau_hoi.includes("Ghi hình")){
-            if (chon_tn + so_cau_hoi > max_gh){
-                alert("Vượt quá số lượng câu hỏi ghi hình");
-                return false;
-            }
-            chon_gh += so_cau_hoi;
-            $("#max_gh").html("Ghi hình: "+chon_gh+ "/" + max_gh);
-        }
+//        else if(dang_cau_hoi.includes("Ghi âm")){
+//            if (chon_tn + so_cau_hoi > max_ga){
+//                alert("Vượt quá số lượng câu hỏi ghi âm");
+//                return false;
+//            }
+//            chon_ga += so_cau_hoi;
+//            $("#max_ga").html("Ghi âm: "+chon_ga+ "/" + max_ga);
+//        }
+//        else if(dang_cau_hoi.includes("Ghi hình")){
+//            if (chon_tn + so_cau_hoi > max_gh){
+//                alert("Vượt quá số lượng câu hỏi ghi hình");
+//                return false;
+//            }
+//            chon_gh += so_cau_hoi;
+//            $("#max_gh").html("Ghi hình: "+chon_gh+ "/" + max_gh);
+//        }
 
         var content = `
         <p id="ch_${id}">(${id})</p>
@@ -499,16 +378,17 @@ $(document).ready(function(){
             chon_tl -= so_cau_hoi;
             $("#max_tl").html("Điền từ: "+chon_tl+ "/" + max_tl);
         }
-        else if(dang_cau_hoi.includes("Ghi âm")){
-            chon_ga -= so_cau_hoi;
-            $("#max_ga").html("Ghi âm: "+chon_ga+ "/" + max_ga);
-        }
-        else if(dang_cau_hoi.includes("Ghi hình")){
-            chon_gh -= so_cau_hoi;
-            $("#max_gh").html("Ghi hình: "+chon_gh+ "/" + max_gh);
-        }
+//        else if(dang_cau_hoi.includes("Ghi âm")){
+//            chon_ga -= so_cau_hoi;
+//            $("#max_ga").html("Ghi âm: "+chon_ga+ "/" + max_ga);
+//        }
+//        else if(dang_cau_hoi.includes("Ghi hình")){
+//            chon_gh -= so_cau_hoi;
+//            $("#max_gh").html("Ghi hình: "+chon_gh+ "/" + max_gh);
+//        }
 //        update_review();
     })
+
 
     var table_exam = $("#list_exam").DataTable({
         'ajax':{
@@ -524,7 +404,6 @@ $(document).ready(function(){
         },
     });
 
-
     $('#list_exam tbody').on( 'click', 'tr', function () {
         var id = $(this).find('p').first().data("id");
         $.ajax({
@@ -537,46 +416,167 @@ $(document).ready(function(){
         });
     });
 
-    function update_review(){
-        var content = '';
-        $('#list_ques_selected tbody tr').each(function(index){
-            var i = index+1;
-            var dang_cau_hoi = $(this).find("input[name=dang_cau_hoi]").first().val();
-            if(typeof(dang_cau_hoi) == 'undefined'){
+    setTimeout(function(){
+        $('#wizard').find('.buttonFinish').first().click(function(){
+            if (chon_tn < max_tn){
+                alert("Chưa đủ số lượng câu hỏi trắc nhiệm");
                 return false;
             }
-            var noi_dung = $(this).find("pre[name=noi_dung]").first().text();
-            var src = $(this).find("input[name=src]").first().val();
-            content +=`
-            <label>Câu hỏi ${i}:</label>
-            `;
-            if (dang_cau_hoi.includes("Hình ảnh")){
-                content += `<img style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src=${src} alt="không tồn tại" />`;
+            else if (chon_tn > max_tn){
+                alert("Quá số lượng câu hỏi trắc nhiệm");
+                return false;
             }
-
-            if ( dang_cau_hoi.includes("Âm thanh")){
-                content += `<br><audio controls width="100%" src=${src}></audio>`;
+            if (chon_dt < max_dt){
+                alert("Chưa đủ số lượng câu hỏi điền từ");
+                return false;
             }
-
-            if ( dang_cau_hoi.includes("Video")){
-                content += `<video controls width="100%" src=${src}></video>`;
+            else if (chon_dt > max_dt){
+                alert("Quá số lượng câu hỏi điền từ");
+                return false;
             }
-
-            if (dang_cau_hoi.includes("Trắc nhiệm")){
-                content +=`
-                <br>
-                <pre style="white-space: pre-wrap;" name="noi_dung">
-${noi_dung}
-                </pre>
-                `;
+            if (chon_tl < max_tl){
+                alert("Chưa đủ số lượng câu hỏi tự luận");
+                return false;
             }
+            else if (chon_tl > max_tl){
+                alert("Quá số lượng câu hỏi tự luận");
+                return false;
+            }
+            if (chon_ga < max_ga){
+                alert("Chưa đủ số lượng câu hỏi ghi hình");
+                return false;
+            }
+            else if (chon_ga > max_ga){
+                alert("Quá số lượng câu hỏi ghi hình");
+                return false;
+            }
+            if (chon_gh < max_gh){
+                alert("Chưa đủ số lượng câu hỏi ghi âm");
+                return false;
+            }
+            else if (chon_gh > max_gh){
+                alert("Quá số lượng câu hỏi ghi âm");
+                return false;
+            }
+            var token = $("input[name=csrfmiddlewaretoken]").val();
+            var ten_de = $('input[name=ten_de]').val();
+            if(ten_de == ''){
+                alert("Chưa đặt tên");
+                return false;
+            }
+            var mon = $('#gv_mon option:selected').val();
+            var loai_de = $('#loai_de option:selected').val();
+            var cau_truc = {};
+            var pham_tram = 0;
+            $(".phan_tram").each(function(){
+                if(typeof($(this).attr("disabled")) == 'undefined'){
+                    cau_truc[$(this).attr('name')] = parseInt($(this).val());
+                    pham_tram += parseInt($(this).val());
+                }
+                else{
+                    cau_truc[$(this).attr('name')] = (-1);
+                }
+            });
+            if(pham_tram != 100){
+                alert("Tổng phần trăm điểm số phải đủ 100%");
+                return false;
+            }
+            if(jQuery.inArray(0, cau_truc) != -1){
+                alert("Chưa chọn phần trăm điểm số");
+                return false;
+            }
+            var so_luong = 0;
+            var chi_tiet_so_luong = {}
+            $(".so_luong").each(function(){
+                if(typeof($(this).attr("disabled")) == 'undefined'){
+                    chi_tiet_so_luong[$(this).attr('name')] = parseInt($(this).val());
+                    so_luong += parseInt($(this).val());
+                }
+                else{
+                    chi_tiet_so_luong[$(this).attr('name')] = (-1);
+                }
+            });
+            if(jQuery.inArray(0, chi_tiet_so_luong) != -1){
+                alert("Chưa chọn số lượng câu hỏi");
+                return false;
+            }
+            var list_ques = [];
+            $('#list_ques_selected tbody tr').each(function(){
+                list_ques.push($(this).find('p').first().attr('id').split('_')[1]+'_'+$(this).find('input[name=don]').first().val());
+            });
+            $("#processing").modal({backdrop: 'static', keyboard: false});
+            var btn = $(this)
+            btn.prop('disabled', true);
+            $.ajax({
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(event){
+                        var percent = Math.round((event.loaded / event.total) * 100) + '%';
+                        $("#progressBar").attr("style","width:"+percent);
+                        $("#progressBar").text(percent);
+    //                    $("#loaded_n_total").html("Tải lên " + event.loaded + " bytes của " + event.total);
+                    }, false);
+                    $("#cancel_upload").click(function(){
+                        xhr.abort();
+                    });
+                    btn.prop('disabled', false);
+                    return xhr;
+                  },
+                 type:'POST',
+                 url:location.href,
+                 data:{'csrfmiddlewaretoken': token, 'ten_de':ten_de, 'mon':mon, 'loai_de':loai_de,
+                 'list_ques':JSON.stringify(list_ques), 'cau_truc':JSON.stringify(cau_truc),
+                 'so_luong': so_luong, 'chi_tiet_so_luong':JSON.stringify(chi_tiet_so_luong),
+                 'thoi_gian': $('input[name=thoi_gian]').val()},
+                 success: function(){
+                    $("#processing").modal('hide');
+                    location.reload();
+                    btn.prop('disabled', false);
+                 },
+            });
         });
-        $('#step-3').html(content);
-    }
+        $('#wizard').find('.buttonNext').first().click(function(){
+            if ($("#step-2").css('display') == 'block'){
+                if(table_ques_selected.data().count() > 0){
+                    var ds_ch = [];
+                    $('#list_ques_selected tbody tr').each(function(){
+                        ds_ch.push($(this).find('p').first().attr('id').split('_')[1]+'_'+$(this).find('input[name=don]').first().val());
+                    });
+                    $.ajax({
+                        type: "GET",
+                        url: "/question_data_detail_review_"+JSON.stringify(ds_ch),
+                        success: function(data){
+                            $("#3_con").html(data);
+                            setTimeout(function(){
+                                $("#tab_content1 .x_content .stepContainer").innerHeight($("#3_con").outerHeight(true));
+                            },500);
+                        },
+                    });
+                }
+            }
+//
+        });
+        $("a[href='#step-3']").click(function(){
+            if (table_ques_selected.data().count() > 0){
+                var ds_ch = [];
+                $('#list_ques_selected tbody tr').each(function(){
+                    ds_ch.push($(this).find('p').first().attr('id').split('_')[1]+'_'+$(this).find('input[name=don]').first().val());
+                });
+                $.ajax({
+                    type: "GET",
+                    url: "/question_data_detail_review_"+JSON.stringify(ds_ch),
+                    success: function(data){
+                        $("#3_con").html(data);
+                        setTimeout(function(){
+                            $("#tab_content1 .x_content .stepContainer").innerHeight($("#3_con").outerHeight(true));
+                        },500);
+                    },
+                });
+            };
+        });
+    }, 3000);
 
 });
 
-function load_trac_nhiem(){
 
-};
 

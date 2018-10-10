@@ -225,33 +225,167 @@ def exam(request):
             de = De.objects.get(id=request.POST['de_id'])
             ds_dap_an = json.loads(request.POST['ds_dap_an'])
             diem = 0
-            bai_lam = request.POST['bai_lam']
+            bai_lam = ''
             for i, ctd in enumerate(ChiTietDe.objects.filter(de_id=de)):
+                media = ''
+                dap_an = ''
                 if ctd.cau_hoi_id is not None:
+                    if "Hình ảnh" in ctd.cau_hoi_id.dang_cau_hoi:
+                        media = '<img style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src="/media/{}" alt="không tồn tại" /><br>'.format(
+                            ctd.cau_hoi_id.dinh_kem)
+                    elif "Âm thanh" in ctd.cau_hoi_id.dang_cau_hoi:
+                        media = '<br><audio controls width="100%" src="/media/{}"></audio>'.format(
+                            ctd.cau_hoi_id.dinh_kem)
+                    elif "Video" in ctd.cau_hoi_id.dang_cau_hoi:
+                        media = '<video controls width="100%" src="/media/{}"></video>'.format(ctd.cau_hoi_id.dinh_kem)
                     if "Trắc nhiệm" in ctd.cau_hoi_id.dang_cau_hoi:
                         da_dung = []
                         da_chon = []
-                        for da in DapAn.objects.filter(cau_hoi_id=ctd.cau_hoi_id):
-                            da_dung.append(da.dap_an_dung)
+                        for k, da in enumerate(DapAn.objects.filter(cau_hoi_id=ctd.cau_hoi_id)):
+                            check = ''
+                            color = ''
+                            if ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)]:
+                                check = 'checked'
+                            if da.dap_an_dung:
+                                color = 'style="color:red;font-weight: bold;font-size: 120%;"'
+                            s = chr(ord(str(k)) + 17)
+                            dap_an += '''
+                            <div class="row div_tn">
+                                <input type="checkbox" style="transform:scale(1.3);" {2} disabled>
+                                <p {3} >{0}</p><p>:</p>
+                                {1}
+                            </div>'''.format(s, da.noi_dung, check, color)
                             da_chon.append(ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)])
+                            da_dung.append(da.dap_an_dung)
+                        plus = ''
                         if da_chon == da_dung:
                             diem += ctd.diem
+                            plus = '<font style="color:red;font-weight: bold;">+{}</font>'.format(ctd.diem)
+                        bai_lam += '''
+                        <div id="cau_{0}">
+                            <label>Câu hỏi {0} ({4} điểm): {5}</label>
+                            <div class="row">{3}</div>
+                            <div class="row div_ch">{1}</div>
+                            {2}
+                        </div>
+                        '''.format(i + 1, ctd.cau_hoi_id.noi_dung, dap_an, media, ctd.diem, plus)
                     elif "Điền từ" in ctd.cau_hoi_id.dang_cau_hoi:
                         ds_da = DapAn.objects.filter(cau_hoi_id=ctd.cau_hoi_id)
-                        for da in ds_da:
-                            if da.noi_dung.lower() == '<p>{}</p>'.format(ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)].lower()):
+                        plus_score = 0
+                        plus = ''
+                        for k, da in enumerate(ds_da):
+                            temp = re.search('<p>(.*)</p',da.noi_dung)
+                            dap_an += '''
+                            <div class="row div_dt">
+                                <p>({0}):</p> 
+                                <input type="text" value="{1}" disabled>
+                                <p style="color:red;font-weight: bold;">{2}</p>
+                            </div>'''.format(k+1, ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)], temp.group(1))
+                            if da.noi_dung.replace(" ", '').lower() == '<p>{}</p>'.format(ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)].replace(" ", '').lower()):
                                 diem += ctd.diem / len(ds_da)
+                                plus_score += ctd.diem / len(ds_da)
+                            if plus_score != 0:
+                                plus = '<font style="color:red;font-weight: bold;">+{}</font>'.format(plus_score)
+                        bai_lam += '''
+                            <div id="cau_{0}">
+                                <label>Câu hỏi {0} ({4} điểm): {5}</label>
+                                <div class="row">{2}</div>
+                                <div class="row div_ch">{1}</div>
+                                {3}
+                            </div>
+                        '''.format(i + 1, ctd.cau_hoi_id.noi_dung, media, dap_an, ctd.diem, plus)
+                    elif "Tự luận" in ctd.cau_hoi_id.dang_cau_hoi:
+                        bai_lam += '''
+                            <div id="cau_{0}">
+                                <label>Câu hỏi {0} ({3} điểm): <input placeholder="chưa chấm" type="number" min='0' max='{3}' style="color:red;" data-start_d="0_{5}" data-value_d="0" data-end_d="0_{5}" disabled class="diem_tu_luan" data-id="0_{5}"></label>
+                                <div class="row">{2}</div>
+                                <div class="row div_ch">{1}</div>
+                                <div class="row div_tl">
+                                    <textarea class="form-control dap_an" disabled>{4}</textarea>
+                                </div>
+                                <div class="row div_dt">
+                                    <p><font style="color:red;font-weight: bold;">*Nhận xét của giáo viên*</font></p>
+                                </div>
+                                <div class="row div_tl">
+                                    <textarea class="form-control nhan_xet" rows="5" style="color:red" disabled data-id="0_{5}" data-start_nx="0_{5}" data-value_nx="0" data-end_nx="0_{5}"></textarea>
+                                </div>
+                            </div>
+                        '''.format(i + 1, ctd.cau_hoi_id.noi_dung, media, ctd.diem,
+                                   ds_dap_an["0_{}_undefined".format(ctd.cau_hoi_id.id)], ctd.cau_hoi_id.id)
                 else:
+                    if "Hình ảnh" in ctd.cau_hoi_da_id.dang_cau_hoi:
+                        media = '<img style="max-height:600px;max-width:600px; display: block; margin-left: auto;margin-right: auto;" src="/media/{}" alt="không tồn tại" /><br>'.format(
+                            ctd.cau_hoi_da_id.dinh_kem)
+                    elif "Âm thanh" in ctd.cau_hoi_da_id.dang_cau_hoi:
+                        media = '<br><audio controls width="100%" src="/media/{}"></audio>'.format(
+                            ctd.cau_hoi_da_id.dinh_kem)
+                    elif "Video" in ctd.cau_hoi_da_id.dang_cau_hoi:
+                        media = '<video controls width="100%" src="/media/{}"></video>'.format(
+                            ctd.cau_hoi_da_id.dinh_kem)
                     if "Trắc nhiệm" in ctd.cau_hoi_da_id.dang_cau_hoi:
-                        for ch in ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ctd.cau_hoi_da_id):
+                        plus = ''
+                        plus_score = 0
+                        for index, ch in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ctd.cau_hoi_da_id)):
                             da_dung = []
                             da_chon = []
-                            for da in DapAn.objects.filter(cau_hoi_id=ch.cau_hoi_id):
+                            dap_an += '''
+                            <div class="row div_sub">{0}.{1} ({3} điểm): {2}</div>
+                            '''.format(i + 1, index + 1, ch.cau_hoi_id.noi_dung,
+                                       round(ctd.diem / ctd.cau_hoi_da_id.so_cau_hoi, 2))
+                            for k, da in enumerate(DapAn.objects.filter(cau_hoi_id=ch.cau_hoi_id)):
+                                check = ''
+                                color = ''
+                                if ds_dap_an["{}_{}_{}".format(ctd.cau_hoi_da_id.id, ch.cau_hoi_id.id, da.id)]:
+                                    check = 'checked'
+                                if da.dap_an_dung:
+                                    color = 'style="color:red;font-weight: bold;font-size: 120%;"'
+                                s = chr(ord(str(k)) + 17)
+                                dap_an += '''
+                                <div class="row div_tn">
+                                    <input type="checkbox" style="transform:scale(1.3);" {2} disabled>
+                                    <p {3} >{0}</p><p>:</p>
+                                    {1}
+                                </div>'''.format(s, da.noi_dung, check, color)
                                 da_dung.append(da.dap_an_dung)
                                 da_chon.append(ds_dap_an["{}_{}_{}".format(ctd.cau_hoi_da_id.id, ch.cau_hoi_id.id, da.id)])
                             if da_chon == da_dung:
                                 diem += ctd.diem / ctd.cau_hoi_da_id.so_cau_hoi
-            DiemSo.objects.create(de_id=de, myuser_id=user, mon_id=de.mon_id, loai_diem=de.loai_de,
+                                plus_score += ctd.diem / ctd.cau_hoi_da_id.so_cau_hoi
+                        if plus_score != 0:
+                            plus = '<font style="color:red;font-weight: bold;">+{}</font>'.format(plus_score)
+                        bai_lam += '''
+                        <div id="cau_{0}">
+                            <label>Câu hỏi {0} ({4} điểm): {5}</label>
+                            <div class="row">{3}</div>
+                            <div class="row div_ch">{1}</div>
+                            {2}
+                        </div>
+                        '''.format(i + 1, ctd.cau_hoi_da_id.noi_dung, dap_an, media, ctd.diem, plus)
+                    elif "Tự luận" in ctd.cau_hoi_da_id.dang_cau_hoi:
+                        for index, ch in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ctd.cau_hoi_da_id)):
+                            dap_an += '''
+                            <div class="row div_sub">{0}.{1} ({2} điểm): {3}</div>
+                            <div class="row div_tl">
+                                <textarea class="form-control dap_an" disabled>{4}</textarea>
+                            </div>
+                            '''.format(i + 1, index + 1, round(ctd.diem / ctd.cau_hoi_da_id.so_cau_hoi, 2),
+                                       ch.cau_hoi_id.noi_dung, ds_dap_an["{}_{}_undefined".format(ctd.cau_hoi_da_id.id, ch.cau_hoi_id.id)])
+                        bai_lam += '''
+                        <div id="cau_{0}">
+                            <label>Câu hỏi {0} ({1} điểm):<input placeholder="chưa chấm" type="number" min='0' max='{1}' style="color:red;" data-start_d="{2}_{3}" data-value_d="0" data-end_d="{2}_{3}" disabled class="diem_tu_luan" data-id="{2}_{3}"></label>
+                            <div class="row">{4}</div>
+                            <div class="row div_ch">{5}</div>
+                            {6}
+                            <div class="row div_dt">
+                                <p><font style="color:red;font-weight: bold;">*Nhận xét của giáo viên*</font></p>
+                            </div>
+                            <div class="row div_tl">
+                                <textarea class="form-control nhan_xet" rows="5" style="color:red" disabled data-id="{2}_{3}" data-start_nx="{2}_{3}" data-value_nx="0" data-end_nx="{2}_{3}"></textarea>
+                            </div>
+                        </div>
+                        '''.format(i + 1, ctd.diem, ctd.cau_hoi_da_id.id, ch.cau_hoi_id.id, media,
+                                   ctd.cau_hoi_da_id.noi_dung, dap_an)
+            DiemSo.objects.create(de_id=de, myuser_id=user, mon_id=de.mon_id, loai_diem="{} - {} phút".format(de.dung_lam, de.thoi_gian),
                                   bai_lam=bai_lam, diem=round(diem, 2))
         content = {'mon': lop_mon(user),
                    'lop': ChiTietLop.objects.get(myuser_id=user)}
@@ -265,7 +399,14 @@ def exam_data(request, id):
     if user.is_authenticated and user.position == 0:
         left_content = ''
         right_content = ''
-        for i, ques in enumerate(ChiTietDe.objects.filter(de_id=De.objects.get(id=id))):
+        de_id = De.objects.get(id=id)
+        ctd = ChiTietDe.objects.filter(de_id=de_id)
+        nd_de = []
+        while len(nd_de) < len(ctd):
+            temp = random.choice(ctd)
+            if temp not in nd_de:
+                nd_de.append(temp)
+        for i, ques in enumerate(nd_de):
             dap_an = ''
             left_content += '''
             <div class="mail_list">
@@ -326,7 +467,6 @@ def exam_data(request, id):
                                 <textarea class="form-control dap_an" cols="100" rows="10" data-id="{0}" data-ch_id="0_{4}" data-kind="tl" name="dap_an_0_{4}" ></textarea>
                             </div>
                         </div>
-                    <div>
                     '''.format(i + 1, ques.cau_hoi_id.noi_dung, media, ques.diem, ques.cau_hoi_id.id)
             else:
                 if "Hình ảnh" in ques.cau_hoi_da_id.dang_cau_hoi:
@@ -384,27 +524,15 @@ def exam_data(request, id):
             <div class="inbox-body">
                 <div class="mywrap">{1}</div>
             </div>
-        </div></div>
+        </div>
         <div class="col-sm-3">
-            <h3><i class="fa fa-clock-o"></i> 00:00</h3>
+            <h3><i class="fa fa-clock-o"></i> <p style="display:inline;" id="tg_lam">{8}:00</p></h3>
             <h5>Thời gian làm bài</h5>
             <table class="mytable" >
-                <tr>
-                    <td>Họ và tên</td>
-                    <td><b>{3}</b></td>
-                </tr>
-                <tr>
-                    <td>Lớp</td>
-                    <td>{4}</td>
-                </tr>
-                <tr>
-                    <td>Khoa</td>
-                    <td>{5}</td>
-                </tr>
-                <tr>
-                    <td>Khóa</td>
-                    <td>{6} - {7}</td>
-                </tr>
+                <tr><td>Họ và tên</td><td><b>{3}</b></td></tr>
+                <tr><td>Lớp</td><td>{4}</td></tr>
+                <tr><td>Khoa</td><td>{5}</td></tr>
+                <tr><td>Khóa</td><td>{6} - {7}</td></tr>
             </table>
             <hr>
             <div class="row">
@@ -422,5 +550,5 @@ def exam_data(request, id):
             </font>
         </div>
         '''.format(left_content, right_content, id, user.fullname, lop.lop_id.ten, lop.lop_id.khoa_id.ten_khoa,
-                   lop.lop_id.nien_khoa_id.ten_nien_khoa, lop.lop_id.nien_khoa_id.nam_hoc)
+                   lop.lop_id.nien_khoa_id.ten_nien_khoa, lop.lop_id.nien_khoa_id.nam_hoc, de_id.thoi_gian)
         return HttpResponse(content)
