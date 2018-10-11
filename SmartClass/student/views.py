@@ -137,31 +137,23 @@ def score_data(request):
             if len(list_score) == 0:
                 continue
             mon_data = ' <h5>{} - {}</h5>'.format(mon.ten, mon.lop)
-            kiem_tra_15p = '<h4>'
-            kiem_tra_1_tiet = '<h4>'
             diem_thi = '<h4>'
             for diem in list_score:
-                if diem.diem < 5.0:
+                tong_diem = diem.diem_auto + diem.diem_cham_tay
+                if tong_diem < 5.0:
                     loai = "danger"
-                elif diem.diem >= 5.0 and diem.diem < 6.5:
+                elif tong_diem >= 5.0 and tong_diem < 6.5:
                     loai = "warning"
-                elif diem.diem >= 6.5 and diem.diem < 8.0:
+                elif tong_diem >= 6.5 and tong_diem < 8.0:
                     loai = "info"
                 else:
                     loai = "success"
                 temp = '''
-                    <span class="label label-{2}" data-id="{0}" data-toggle="modal" data-target="#point" >{1}</span>
-                    '''.format(diem.id, diem.diem, loai)
-                if diem.loai_diem == "kiểm tra 15'":
-                    kiem_tra_15p += temp
-                elif diem.loai_diem == 'kiểm tra 1 tiết':
-                    kiem_tra_1_tiet += temp
-                elif diem.loai_diem == 'thi':
-                    diem_thi += temp
-            kiem_tra_15p += '</h4>'
-            kiem_tra_1_tiet += '</h4>'
+                <span class="label label-{2}" data-id="{0}" data-toggle="modal" data-target="#point" >{1}</span>
+                '''.format(diem.id, tong_diem, loai)
+                diem_thi += temp
             diem_thi += '</h4>'
-            data.append([mon_data, kiem_tra_15p, kiem_tra_1_tiet, diem_thi])
+            data.append([mon_data, diem_thi])
         big_data = {"data": data}
         json_data = json.loads(json.dumps(big_data))
         return JsonResponse(json_data)
@@ -172,27 +164,37 @@ def score_data_detail(request, id):
     if user.is_authenticated and user.position == 0:
         diem = DiemSo.objects.get(id=id)
         content = '''
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-          <input type="text" class="form-control has-feedback-left" value="{0}" disabled>
-          <span class="fa fa-book form-control-feedback left" aria-hidden="true"></span>
-        </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-          <input type="number" class="form-control has-feedback-left" value="{1}" disabled>
-          <span class="fa fa-edit form-control-feedback left" aria-hidden="true"></span>
-        </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-          <input type="date" class="form-control has-feedback-left" value="{2}" disabled>
-          <span class="fa fa-calendar form-control-feedback left" aria-hidden="true"></span>
-        </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
-          <input type="text" class="form-control has-feedback-left" value="{3}" disabled>
-          <span class="fa fa-book form-control-feedback left" aria-hidden="true"></span>
+        <div class="row">
+            <div class="col-md-2" style="text-align:center">
+                <p style="color:red; font-size: 50px;border: 2px solid gray; border-radius: 5px;">{5}</p>
+            </div>
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" value="{0}" readonly>
+                      <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" value="{1}" readonly>
+                      <span class="fa fa-book form-control-feedback left" aria-hidden="true"></span>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                      <input type="date" class="form-control has-feedback-left" value="{2}" readonly>
+                      <span class="fa fa-calendar form-control-feedback left" aria-hidden="true"></span>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                      <input type="text" class="form-control has-feedback-left" value="{3}" readonly>
+                      <span class="fa fa-clock-o form-control-feedback left" aria-hidden="true"></span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-12 col-sm-12 col-xs-12">
             {4}
         </div>
         <div class="clearfix"></div>
-        '''.format('{} - {}'.format(diem.mon_id.ten, diem.mon_id.lop), diem.diem, str(diem.ngay_lam), diem.loai_diem, diem.bai_lam)
+        '''.format(user.fullname, '{0} - {1}'.format(diem.mon_id.ten, diem.mon_id.lop), str(diem.ngay_lam),
+                   diem.loai_diem, diem.bai_lam, diem.diem_auto + diem.diem_cham_tay)
         return HttpResponse(content)
 
 
@@ -247,7 +249,7 @@ def exam(request):
                             if ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)]:
                                 check = 'checked'
                             if da.dap_an_dung:
-                                color = 'style="color:red;font-weight: bold;font-size: 120%;"'
+                                color = 'class="plus"'
                             s = chr(ord(str(k)) + 17)
                             dap_an += '''
                             <div class="row div_tn">
@@ -257,13 +259,13 @@ def exam(request):
                             </div>'''.format(s, da.noi_dung, check, color)
                             da_chon.append(ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)])
                             da_dung.append(da.dap_an_dung)
-                        plus = ''
+                        plus = '<input type="number" value="0" readonly>'
                         if da_chon == da_dung:
                             diem += ctd.diem
-                            plus = '<font style="color:red;font-weight: bold;">+{}</font>'.format(ctd.diem)
+                            plus = '<input type="number" value="{}" readonly>'.format(ctd.diem)
                         bai_lam += '''
                         <div id="cau_{0}">
-                            <label>Câu hỏi {0} ({4} điểm): {5}</label>
+                            <h4 class="head_ch"><p>Câu hỏi {0} ({4} điểm):</p> {5}</h4>
                             <div class="row">{3}</div>
                             <div class="row div_ch">{1}</div>
                             {2}
@@ -272,23 +274,21 @@ def exam(request):
                     elif "Điền từ" in ctd.cau_hoi_id.dang_cau_hoi:
                         ds_da = DapAn.objects.filter(cau_hoi_id=ctd.cau_hoi_id)
                         plus_score = 0
-                        plus = ''
                         for k, da in enumerate(ds_da):
                             temp = re.search('<p>(.*)</p',da.noi_dung)
                             dap_an += '''
                             <div class="row div_dt">
                                 <p>({0}):</p> 
                                 <input type="text" value="{1}" disabled>
-                                <p style="color:red;font-weight: bold;">{2}</p>
+                                <p class="plus">{2}</p>
                             </div>'''.format(k+1, ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)], temp.group(1))
                             if da.noi_dung.replace(" ", '').lower() == '<p>{}</p>'.format(ds_dap_an["0_{}_{}".format(ctd.cau_hoi_id.id, da.id)].replace(" ", '').lower()):
                                 diem += ctd.diem / len(ds_da)
                                 plus_score += ctd.diem / len(ds_da)
-                            if plus_score != 0:
-                                plus = '<font style="color:red;font-weight: bold;">+{}</font>'.format(plus_score)
+                        plus = '<input type="number" value="{}" readonly>'.format(plus_score)
                         bai_lam += '''
                             <div id="cau_{0}">
-                                <label>Câu hỏi {0} ({4} điểm): {5}</label>
+                                <h4 class="head_ch"><p>Câu hỏi {0} ({4} điểm):</p> {5}</h4>
                                 <div class="row">{2}</div>
                                 <div class="row div_ch">{1}</div>
                                 {3}
@@ -297,17 +297,17 @@ def exam(request):
                     elif "Tự luận" in ctd.cau_hoi_id.dang_cau_hoi:
                         bai_lam += '''
                             <div id="cau_{0}">
-                                <label>Câu hỏi {0} ({3} điểm): <input placeholder="chưa chấm" type="number" min='0' max='{3}' style="color:red;" data-start_d="0_{5}" data-value_d="0" data-end_d="0_{5}" disabled class="diem_tu_luan" data-id="0_{5}"></label>
+                                <h4 class="head_ch"><p>Câu hỏi {0} ({3} điểm):</p><input type="number" min='0' max='{3}' step='0.01' data-start_d="0_{5}" data-value_d="0" data-end_d="0_{5}" readonly class="diem_tu_luan" data-id="0_{5}"></h4>
                                 <div class="row">{2}</div>
                                 <div class="row div_ch">{1}</div>
                                 <div class="row div_tl">
-                                    <textarea class="form-control dap_an" disabled>{4}</textarea>
+                                    <textarea class="form-control dap_an" readonly>{4}</textarea>
                                 </div>
                                 <div class="row div_dt">
-                                    <p><font style="color:red;font-weight: bold;">*Nhận xét của giáo viên*</font></p>
+                                    <p><font class="plus">*Nhận xét của giáo viên*</font></p>
                                 </div>
                                 <div class="row div_tl">
-                                    <textarea class="form-control nhan_xet" rows="5" style="color:red" disabled data-id="0_{5}" data-start_nx="0_{5}" data-value_nx="0" data-end_nx="0_{5}"></textarea>
+                                    <textarea class="form-control nhan_xet" rows="5" style="color:red" readonly data-id="0_{5}" data-start_nx="0_{5}" data-value_nx="0" data-end_nx="0_{5}"></textarea>
                                 </div>
                             </div>
                         '''.format(i + 1, ctd.cau_hoi_id.noi_dung, media, ctd.diem,
@@ -323,7 +323,6 @@ def exam(request):
                         media = '<video controls width="100%" src="/media/{}"></video>'.format(
                             ctd.cau_hoi_da_id.dinh_kem)
                     if "Trắc nhiệm" in ctd.cau_hoi_da_id.dang_cau_hoi:
-                        plus = ''
                         plus_score = 0
                         for index, ch in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ctd.cau_hoi_da_id)):
                             da_dung = []
@@ -338,7 +337,7 @@ def exam(request):
                                 if ds_dap_an["{}_{}_{}".format(ctd.cau_hoi_da_id.id, ch.cau_hoi_id.id, da.id)]:
                                     check = 'checked'
                                 if da.dap_an_dung:
-                                    color = 'style="color:red;font-weight: bold;font-size: 120%;"'
+                                    color = 'class="plus"'
                                 s = chr(ord(str(k)) + 17)
                                 dap_an += '''
                                 <div class="row div_tn">
@@ -351,11 +350,10 @@ def exam(request):
                             if da_chon == da_dung:
                                 diem += ctd.diem / ctd.cau_hoi_da_id.so_cau_hoi
                                 plus_score += ctd.diem / ctd.cau_hoi_da_id.so_cau_hoi
-                        if plus_score != 0:
-                            plus = '<font style="color:red;font-weight: bold;">+{}</font>'.format(plus_score)
+                        plus = '<input type="number" value="{}" readonly>'.format(plus_score)
                         bai_lam += '''
                         <div id="cau_{0}">
-                            <label>Câu hỏi {0} ({4} điểm): {5}</label>
+                            <h4 class="head_ch"><p>Câu hỏi {0} ({4} điểm):</p> {5}</h4>
                             <div class="row">{3}</div>
                             <div class="row div_ch">{1}</div>
                             {2}
@@ -366,30 +364,30 @@ def exam(request):
                             dap_an += '''
                             <div class="row div_sub">{0}.{1} ({2} điểm): {3}</div>
                             <div class="row div_tl">
-                                <textarea class="form-control dap_an" disabled>{4}</textarea>
+                                <textarea class="form-control dap_an" readonly>{4}</textarea>
                             </div>
                             '''.format(i + 1, index + 1, round(ctd.diem / ctd.cau_hoi_da_id.so_cau_hoi, 2),
                                        ch.cau_hoi_id.noi_dung, ds_dap_an["{}_{}_undefined".format(ctd.cau_hoi_da_id.id, ch.cau_hoi_id.id)])
                         bai_lam += '''
                         <div id="cau_{0}">
-                            <label>Câu hỏi {0} ({1} điểm):<input placeholder="chưa chấm" type="number" min='0' max='{1}' style="color:red;" data-start_d="{2}_{3}" data-value_d="0" data-end_d="{2}_{3}" disabled class="diem_tu_luan" data-id="{2}_{3}"></label>
+                            <h4 class="head_ch"><p>Câu hỏi {0} ({1} điểm):</p><input type="number" min='0' max='{1}' step='0.01' data-start_d="{2}_{3}" data-value_d="0" data-end_d="{2}_{3}" readonly class="diem_tu_luan" data-id="{2}_{3}"></h4>
                             <div class="row">{4}</div>
                             <div class="row div_ch">{5}</div>
                             {6}
                             <div class="row div_dt">
-                                <p><font style="color:red;font-weight: bold;">*Nhận xét của giáo viên*</font></p>
+                                <p><font class="plus">*Nhận xét của giáo viên*</font></p>
                             </div>
                             <div class="row div_tl">
-                                <textarea class="form-control nhan_xet" rows="5" style="color:red" disabled data-id="{2}_{3}" data-start_nx="{2}_{3}" data-value_nx="0" data-end_nx="{2}_{3}"></textarea>
+                                <textarea class="form-control nhan_xet" rows="5" style="color:red" readonly data-id="{2}_{3}" data-start_nx="{2}_{3}" data-value_nx="0" data-end_nx="{2}_{3}"></textarea>
                             </div>
                         </div>
                         '''.format(i + 1, ctd.diem, ctd.cau_hoi_da_id.id, ch.cau_hoi_id.id, media,
                                    ctd.cau_hoi_da_id.noi_dung, dap_an)
             DiemSo.objects.create(de_id=de, myuser_id=user, mon_id=de.mon_id, loai_diem="{} - {} phút".format(de.dung_lam, de.thoi_gian),
-                                  bai_lam=bai_lam, diem=round(diem, 2))
+                                  bai_lam=bai_lam, diem_auto=round(diem, 2))
         content = {'mon': lop_mon(user),
                    'lop': ChiTietLop.objects.get(myuser_id=user)}
-        return render(request, 'student/exam2.html', content)
+        return render(request, 'student/exam.html', content)
     else:
         return redirect("/")
 

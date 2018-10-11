@@ -252,8 +252,9 @@ class DiemSo(models.Model):
     ngay_lam = models.DateField(default=timezone.now)
     mon_id = models.ForeignKey('Mon', models.CASCADE, db_column='mon_id')
     loai_diem = models.CharField(max_length=255)
-    diem = models.FloatField()
-    bai_lam = models.TextField(null=True)
+    diem_auto = models.FloatField(null=True)
+    diem_cham_tay = models.FloatField(default=0)
+    bai_lam = models.TextField(default=0)
 
     class Meta:
         managed = True
