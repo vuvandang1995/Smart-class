@@ -13,7 +13,9 @@ $(document).ready(function(){
         var time = data['time'];
         if (time == 'key'){
             $("#videocall"+who).attr("name", message); 
-        }else if ((time != 'None') && time != 'call_time'){
+        }else if (time == 'giotay'){
+            $('#giotay_'+who).show();
+        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_call') && (time != 'teacher_audio_all') && (time != 'enable_mic')){
             insertChat(who, message, time);
         }
         
@@ -49,11 +51,15 @@ $(document).ready(function(){
         $('#btn_random_group').show();
         $('#btn_manual_group').show();
         $('#btn_audiocall').show();
+        $('#btn_audio_all').hide();
+        $('#audio_all').hide();
     });
     $('body #home-tab').on('click',function(){
 		$('#btn_random_group').hide();
         $('#btn_manual_group').hide();
         $('#btn_audiocall').hide();
+        $('#btn_audio_all').show();
+        $('#audio_all').show();
     });
 
     function countdowntime(dateend){
@@ -83,7 +89,7 @@ $(document).ready(function(){
         // });
     }
 
-    function makeOrJoinRoom(roomid) {
+    function makeOrJoinRoom(roomid, gr_chat_name) {
         connection.videosContainer = document.getElementById('videos-container'+roomid);
         connection.onstream = function(event) {
             var existing = document.getElementById(event.streamid);
@@ -125,12 +131,25 @@ $(document).ready(function(){
             }, 5000);
             mediaElement.id = event.streamid;
         };
+
+
         var group_name = roomid+'_'+class_+'_'+userName;
         connection.checkPresence(group_name, function(roomExist, group_name) {
             if (roomExist === true) {
                 connection.join(group_name);
             } else {
                 connection.open(group_name);
+                var xxx = new WebSocket(
+                    'ws://' + window.location.host +
+                    '/ws/' + gr_chat_name + 'chatgroup/');
+
+                xxx.onopen = function (event) {
+                    xxx.send(JSON.stringify({
+                        'message' : 'teacher_call',
+                        'who' : userName,
+                        'time' : 'teacher_call'
+                    }));
+                };
             }
         });
     }
@@ -171,8 +190,38 @@ $(document).ready(function(){
                     event.stopPropagation();
                     var gr_name = $(this).attr("name");
                     $('#videos-container'+gr_name).show();
-                    makeOrJoinRoom(gr_name, class_, userName);
-                    // $('#chinhsua').modal('show');
+                    var gr_chat_name = $(this).parent().parent().parent().parent().children('p').first().text();
+                    makeOrJoinRoom(gr_name, gr_chat_name);
+                    $('body .join_gr').each(function(){
+                        $(this).hide();
+                    });
+                    var done = $(this).next();
+
+                    done.show();
+                    done.click(function(){
+                        // connection.attachStreams.forEach(function(localStream) {
+                        //     localStream.stop();
+                        // });
+                    
+                        // // close socket.io connection
+                        // connection.close();
+
+                        if (connection.isInitiator) {
+                            connection.closeEntireSession(function() {
+                                console.log('close');
+                            });
+                        } else {
+                            connection.leave();
+                            connection.attachStreams.forEach(function(localStream) {
+                                localStream.stop();
+                            });
+                        }
+                        $('.done_gr').hide();
+                        $('body .join_gr').each(function(){
+                            $(this).show();
+                        });
+                    });
+
 
                 });
                 
@@ -182,6 +231,18 @@ $(document).ready(function(){
         });
     }
     reload();
+
+    $(".giotay_std").click(function(event){
+        event.stopPropagation();
+        $(this).hide();
+        chatallSocket.send(JSON.stringify({
+            'message' : 'enable_mic',
+            'who' : userName,
+            'time' : 'enable_mic'
+        }));
+
+    });
+
 
     $("#save_audiocall").click(function() {
         var call_time = $("input[name=call_time]").val();
@@ -215,6 +276,77 @@ $(document).ready(function(){
 
     $('body #btn_random_group').on('click',function(){
 		$('#group_random').modal('show');
+    });
+
+    $('body #btn_audio_all').on('click',function(){
+        connection.videosContainer = document.getElementById('videos-container');
+        connection.onstream = function(event) {
+            var existing = document.getElementById(event.streamid);
+            if(existing && existing.parentNode) {
+              existing.parentNode.removeChild(existing);
+            }
+            event.mediaElement.removeAttribute('src');
+            event.mediaElement.removeAttribute('srcObject');
+            //event.mediaElement.muted = true;
+            //event.mediaElement.volume = 0;
+            var video = document.createElement('audio');
+            try {
+                video.setAttributeNode(document.createAttribute('autoplay'));
+                video.setAttributeNode(document.createAttribute('playsinline'));
+            } catch (e) {
+                video.setAttribute('autoplay', true);
+                video.setAttribute('playsinline', true);
+            }
+            if(event.type === 'local') {
+              video.volume = 0;
+              try {
+                  video.setAttributeNode(document.createAttribute('muted'));
+              } catch (e) {
+                  video.setAttribute('muted', true);
+              }
+            }
+            video.srcObject = event.stream;
+            var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
+            var mediaElement = getHTMLMediaElement(video, {
+                title: event.userid,
+                // buttons: ['full-screen'],
+                width: 'auto',
+                height: 'auto',
+                // showOnMouseEnter: false
+            });
+            connection.videosContainer.appendChild(mediaElement);
+            setTimeout(function() {
+                mediaElement.media.play();
+            }, 5000);
+            mediaElement.id = event.streamid;
+            $('#videos-container .media-container ').each(function(){
+                if ($(this).find('h2').first().text() != (userName+'_'+class_)){
+                    $(this).hide();
+                }
+            });
+            $('#videos-container .media-container .media-controls').next().attr("style", "height: 36px;");
+        };
+		connection.open(userName+'_'+class_);
+        chatallSocket.send(JSON.stringify({
+            'message' : 'teacher_audio_all',
+            'who' : userName,
+            'time' : 'teacher_audio_all'
+        }));
+        $('#done_audio_all').show();
+    });
+
+    $('body #done_audio_all').on('click',function(){
+        if (connection.isInitiator) {
+            connection.closeEntireSession(function() {
+                console.log('close');
+            });
+        } else {
+            connection.leave();
+            connection.attachStreams.forEach(function(localStream) {
+                localStream.stop();
+            });
+        }
+        $(this).hide();
     });
 
     $('body #btn_manual_group').on('click',function(){
@@ -257,7 +389,9 @@ $(document).ready(function(){
     })
 
 	$('.mail_list').on('click',function(){
-		var std_username = $(this).children('p').text();
+        var std_username = $(this).children('p').text();
+        var std_fullname = $(this).data("fullname");
+        register_popup_teacher(std_username, std_fullname);
         //  $("body .noti_chat"+std_username).hide();
          $('body #'+std_username).children('.frame_std').show();
         //  if (typeof(Storage) !== "undefined") {

@@ -2588,6 +2588,22 @@ ul.bar_tabs>li a {
     margin: 0;
     border-top-right-radius: 0
 }
+
+#btn_audio_all{
+    padding: 9px 17px;
+    margin: 0;
+    border-top-right-radius: 0
+}
+#done_audio_all{
+    padding: 9px 17px;
+    margin: 0;
+    border-top-right-radius: 0
+}
+#giotay{
+    padding: 9px 17px;
+    margin: 0;
+    border-top-right-radius: 0
+}
 ul.bar_tabs>li a:hover {
     border: 1px solid transparent
 }

@@ -41,10 +41,81 @@ $(document).ready(function(){
                     makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                 }, time);
             }
+        }else if (time === 'enable_mic'){
+            connection.attachStreams.forEach(function(localStream) {
+                console.log(localStream)
+            });
+        }else if (time === 'teacher_audio_all'){
+            if ($('#audiocall').length){
+                $('#audiocall').show();
+                // connection.mediaConstraints.audio = false;
+                connection.videosContainer = document.getElementById('videos-container');
+                connection.onstream = function(event) {
+                    var existing = document.getElementById(event.streamid);
+                    if(existing && existing.parentNode) {
+                    existing.parentNode.removeChild(existing);
+                    }
+                    event.mediaElement.removeAttribute('src');
+                    event.mediaElement.removeAttribute('srcObject');
+                    //event.mediaElement.muted = true;
+                    //event.mediaElement.volume = 0;
+                    var video = document.createElement('audio');
+                    try {
+                        video.setAttributeNode(document.createAttribute('autoplay'));
+                        video.setAttributeNode(document.createAttribute('playsinline'));
+                    } catch (e) {
+                        video.setAttribute('autoplay', true);
+                        video.setAttribute('playsinline', true);
+                    }
+                    if(event.type === 'local') {
+                    video.volume = 0;
+                    try {
+                        video.setAttributeNode(document.createAttribute('muted'));
+                    } catch (e) {
+                        video.setAttribute('muted', true);
+                    }
+                    }
+                    video.srcObject = event.stream;
+                    var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
+                    var mediaElement = getHTMLMediaElement(video, {
+                        title: event.userid,
+                        // buttons: ['full-screen'],
+                        width: 'auto',
+                        height: 'auto',
+                        // showOnMouseEnter: false
+                    });
+                    connection.videosContainer.appendChild(mediaElement);
+                    setTimeout(function() {
+                        mediaElement.media.play();
+                    }, 5000);
+                    mediaElement.id = event.streamid;
+                    $('#videos-container .media-container ').each(function(){
+                        if ($(this).find('h2').first().text() != (teacher_name+'_'+lop)){
+                            $(this).hide();
+                        }
+                    });
+                    $('#videos-container .media-container .media-controls').next().attr("style", "height: 36px;");
+                };
+                
+                connection.join(teacher_name+'_'+lop);
+
+                connection.attachStreams.forEach(function(localStream) {
+                    localStream.stop();
+                });
+
+                $('#giotay').show();
+                $('body').on('click', '#giotay', function(){
+                    chatallSocket.send(JSON.stringify({
+                        'message' : 'giotay',
+                        'who' : userName,
+                        'time' : 'giotay'
+                    }));
+                });
+            }    
         }else if (time != 'key'){
-            insertChat(who, message, time);
-        }
-    };
+                insertChat(who, message, time);
+            }
+        };
 
     function makeOrJoinRoom(roomid) {
         connection.videosContainer = document.getElementById('videos-container');
@@ -122,12 +193,22 @@ $(document).ready(function(){
             if (distance < 0) {
                 clearInterval(x);
                 document.getElementById("demo").innerHTML = "Hết giờ!";
-                connection.attachStreams.forEach(function(localStream) {
-                    localStream.stop();
-                });
+                // connection.attachStreams.forEach(function(localStream) {
+                //     localStream.stop();
+                // });
             
-                // close socket.io connection
-                connection.close();
+                // // close socket.io connection
+                // connection.close();
+
+
+
+                if (connection.isInitiator) {
+                    connection.closeEntireSession(function() {
+                        console.log('close');
+                    });
+                } else {
+                    connection.leave();
+                }
                 $('#audiocall').hide();
             }
         }, 1000);
@@ -141,7 +222,7 @@ $(document).ready(function(){
             success: function(data){
                 $('body .list_group_all').prepend(data);
                 if ($('#group_class').length){
-                    var group_chat_name = $('#group_class').children('p').text();
+                    var group_chat_name = $('#group_class').children('p').first().text();
                     var chatgroup = new WebSocket(
                     'ws://' + window.location.host +
                     '/ws/' + group_chat_name + 'chatgroup/');
@@ -190,11 +271,29 @@ $(document).ready(function(){
 
                     
                     chatgroup.onmessage = function(e) {
-                    var data = JSON.parse(e.data);
-                    var message = data['message'];
-                    var who = data['who'];
-                    var time = data['time'];
-                    insertChat2(who, message, time);
+                        var data = JSON.parse(e.data);
+                        var message = data['message'];
+                        var who = data['who'];
+                        var time = data['time'];
+                        if (time === 'teacher_call'){
+                            if ($('#audiocall').length){
+                                $('#audiocall').show();
+                                $("#demo").show();
+                                var time = 1;
+                                $('#group_class .right').children('p').each(function(index){
+                                    if (userName == $(this).attr("name")){
+                                        time = index*1000;
+                                        return false;
+                                    }
+                                });
+                                // alert(time)
+                                setTimeout(function(){
+                                    makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
+                                }, time);
+                            }    
+                        }else{
+                            insertChat2(who, message, time);
+                        }
                     };
 
                     $('body').on('click', '.zzz', function(){
@@ -229,6 +328,24 @@ $(document).ready(function(){
     }
     reload();
 
+//     else if (time === 'teacher_call'){
+//         if ($('#audiocall').length){
+//             $('#audiocall').show();
+//             $("#demo").show();
+//             var time = 1;
+//             $('#group_class .right').children('p').each(function(index){
+//                 if (userName == $(this).attr("name")){
+//                     time = index*1000;
+//                     return false;
+//                 }
+//             });
+//             // alert(time)
+//             setTimeout(function(){
+//                 makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
+//             }, time);
+//         }    
+// }
+
 
     $('body').on('click', '.xxx', function(){
         $("body .mytext").trigger({type: 'keydown', which: 13, keyCode: 13});
@@ -244,7 +361,7 @@ $(document).ready(function(){
         message = escapeHtml(message);
         var date = formatAMPM(new Date());
         if (message != ''){
-          chatallSocket.send(JSON.stringify({
+            chatallSocket.send(JSON.stringify({
                 'message' : message,
                 'who' : userName,
                 'time' : date
@@ -252,8 +369,6 @@ $(document).ready(function(){
         }
         $(this).parent().parent().children().children().children('input').val(''); 
     })
-
-
 
     var socket_teacher;
     $('.mail_list').on('click',function(){
@@ -339,7 +454,6 @@ $(document).ready(function(){
         $(this).parent().parent().next().children('.yyy').click();
     }
     })
-    
 
     $('body').on('click', '.yyy', function(){
     var message = $(this).parent().parent().children().children().children('.mytext1').val();
@@ -354,8 +468,6 @@ $(document).ready(function(){
     }
     $(this).parent().parent().children().children().children('input').val('');
     })
-
-
 
     $('body').on('click', '.chat-close', function(){
     var teacher_name = $(this).attr('id');

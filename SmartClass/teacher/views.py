@@ -184,6 +184,7 @@ def group_data(request, lop):
                             <h3>'''+lsg.ten_nhom+'''<small>
                                 <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
                                 <button type="button" class="btn btn-primary btn-xs join_gr" name="'''+lsg.ten_nhom+'''">Audio</button>
+                                <button style="display:none;" type="button" class="btn btn-primary btn-xs done_gr" name="'''+lsg.ten_nhom+'''">Kết thúc</button>
                                 </small></h3>
                 '''
                 for std in ChiTietNhom.objects.filter(nhom_id=lsg):

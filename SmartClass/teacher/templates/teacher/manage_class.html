@@ -27,6 +27,18 @@
                   </li>
                   <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Nhóm</a>
                   </li>
+
+                  <li><button class="btn btn-primary" id="btn_audio_all" >Audio Cả Lớp</button>
+                  </li>
+                  <li id="all_audio">
+                    <section class="make-center">
+                      <div id="videos-container">
+
+                      </div>
+                    </section>
+                  </li>
+                  <li><button style="display:none;" class="btn btn-danger" id="done_audio_all" >Kết thúc</button>
+                  </li>
                   
                   <li><button style="display:none;" class="btn btn-primary" id="btn_random_group" >Tạo nhóm Random</button>
                   </li>
@@ -45,13 +57,16 @@
                       <div class="row">
                         <div class="col-sm-3 mail_list_column" style="overflow-y: scroll; height:600px;">
                           {% for student in ls_student %}
-                          <a href="javascript:register_popup_teacher('{{student.username}}', '{{student.fullname}}');">
-                            <div class="mail_list">
+                          {% comment %} <a href="javascript:register_popup_teacher('{{student.username}}', '{{student.fullname}}');"> {% endcomment %}
+                            <div class="mail_list" data-fullname="{{student.fullname}}">
                               <!-- <div class="left">
                               </div> -->
                               <p hidden>{{student.username}}</p>
                               <div class="right">
-                                <h3>{{ student.fullname }} 
+                                <h3>{{ student.fullname }}
+                                    <small style="display:none;" id="giotay_{{student.username}}" class="giotay_std">
+                                      <i class="fa fa-hand-paper-o" style="font-size: 20px;color:red"></i>
+                                    </small>
                                   {%if student.online == True%}
                                     <small style="background: rgb(66, 183, 42);border-radius: 50%;display: inline-block;height: 6px;margin-left: 4px;width: 6px;"></small>
                                   {% endif %}
@@ -64,7 +79,7 @@
                                 <p><b>Email:</b> {{student.email}}</p>
                               </div>
                             </div>
-                          </a>
+                          {% comment %} </a> {% endcomment %}
                           {% endfor %}
 
                         </div>
