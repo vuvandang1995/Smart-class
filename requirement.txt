@@ -4,3 +4,4 @@ channels
 channels_redis
 simplejson
 mysqlclient
+python-memcached
