@@ -1,47 +1,28 @@
-// ......................................................
-// .......................UI Code........................
-// ......................................................
-document.getElementById('open-room').onclick = function() {
-    document.getElementById('open-room').disabled = true;
-    document.getElementById('close-room').disabled = false;
-    document.getElementById('room-id').disabled = true;
-    connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExists, roomid) {
-        if(!isRoomExists) {
-            showRoomURL(roomid);
-        }
-    });
-};
+if($("#position").val() == 'teacher'){
+    document.getElementById('close-room').onclick = function() {
+        document.location.href = "/manage_class/"+location.href.split('_')[1];
+    };
 
-document.getElementById('close-room').onclick = function() {
-    location.reload();
-};
+    document.getElementById('reopen-room').onclick = function() {
+        location.reload();
+    };
+}
 
-//document.getElementById('join-room').onclick = function() {
-//    disableInputButtons();
-//    connection.join(document.getElementById('room-id').value);
-//};
-//document.getElementById('open-or-join-room').onclick = function() {
-//    disableInputButtons();
-//    connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExists, roomid) {
-//        if(!isRoomExists) {
-//            showRoomURL(roomid);
-//        }
-//    });
-//};
-// ......................................................
-// ..................RTCMultiConnection Code.............
-// ......................................................
+
+$('#room-id').html(" "+location.href.split('_')[1]);
+
 var connection = new RTCMultiConnection();
-// by default, socket.io server is assumed to be deployed on your own URL
+
 connection.socketURL = "http://192.168.100.22:9002/";
-// comment-out below line if you do not have your own socket.io server
-// connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
+
 connection.socketMessageEvent = 'audio-plus-screen-sharing-demo';
+
 connection.session = {
     audio: 'two-way',
     screen: true,
     oneway: true
 };
+
 connection.sdpConstraints.mandatory = {
     OfferToReceiveAudio: true,
     OfferToReceiveVideo: true
@@ -49,19 +30,19 @@ connection.sdpConstraints.mandatory = {
 
 connection.mediaConstraints.video = false;
 
-connection.videosContainer = document.getElementById('videos-container');
+connection.videosContainer = $('#videos-container');
+
 connection.audiosContainer = document.getElementById('audios-container');
+
 connection.onstream = function(event) {
 
-    var width = event.mediaElement.clientWidth || connection.videosContainer.clientWidth;
     var mediaElement = getMediaElement(event.mediaElement, {
         title: event.userid,
         buttons: ['full-screen'],
-        width: width,
         showOnMouseEnter: false
     });
     if(event.stream.isScreen) {
-        connection.videosContainer.appendChild(mediaElement);
+        connection.videosContainer.html(mediaElement);
     }
     else {
         connection.audiosContainer.appendChild(mediaElement);
@@ -70,11 +51,12 @@ connection.onstream = function(event) {
         mediaElement.media.play();
     }, 5000);
     mediaElement.id = event.streamid;
-//    if($('.media-container').length == 3){
-//        $('#audios-container div:last-child').hide();
-//        $('#audios-container div:first-child').remove();
-//    }
+    $('#videos-container .media-container').attr('style','width:100%');
+    if($("#position").val() == 'teacher'){
+        $('#videos-container .media-controls div:first-child').attr('style','opacity:0');
+    };
 };
+
 
 connection.onstreamended = function(event) {
     var mediaElement = document.getElementById(event.streamid);
@@ -93,26 +75,19 @@ connection.getScreenConstraints = function(callback) {
         throw error;
     });
 };
-function disableInputButtons() {
-//    document.getElementById('open-or-join-room').disabled = true;
-    document.getElementById('open-room').disabled = true;
-//    document.getElementById('join-room').disabled = true;
-    document.getElementById('room-id').disabled = true;
-}
-// ......................................................
-// ......................Handling Room-ID................
-// ......................................................
-function showRoomURL(roomid) {
-    var roomHashURL = '#' + roomid;
-    var roomQueryStringURL = '?roomid=' + roomid;
-    var html = '<h2>Unique URL for your room:</h2><br>';
-    html += 'Hash URL: <a href="' + roomHashURL + '" target="_blank">' + roomHashURL + '</a>';
-    html += '<br>';
-    html += 'QueryString URL: <a href="' + roomQueryStringURL + '" target="_blank">' + roomQueryStringURL + '</a>';
-    var roomURLsDiv = document.getElementById('room-urls');
-    roomURLsDiv.innerHTML = html;
-    roomURLsDiv.style.display = 'block';
-}
+
+//function showRoomURL(roomid) {
+//    var roomHashURL = '#' + roomid;
+//    var roomQueryStringURL = '?roomid=' + roomid;
+//    var html = '<h2>Unique URL for your room:</h2><br>';
+//    html += 'Hash URL: <a href="' + roomHashURL + '" target="_blank">' + roomHashURL + '</a>';
+//    html += '<br>';
+//    html += 'QueryString URL: <a href="' + roomQueryStringURL + '" target="_blank">' + roomQueryStringURL + '</a>';
+//    var roomURLsDiv = document.getElementById('room-urls');
+//    roomURLsDiv.innerHTML = html;
+//    roomURLsDiv.style.display = 'block';
+//}
+
 (function() {
     var params = {},
         r = /([^&=]+)=?([^&]*)/g;
@@ -124,6 +99,7 @@ function showRoomURL(roomid) {
         params[d(match[1])] = d(match[2]);
     window.params = params;
 })();
+
 var roomid = '';
 if (localStorage.getItem(connection.socketMessageEvent)) {
     roomid = localStorage.getItem(connection.socketMessageEvent);
@@ -131,6 +107,7 @@ if (localStorage.getItem(connection.socketMessageEvent)) {
     roomid = connection.token();
 }
 document.getElementById('room-id').value = roomid;
+
 document.getElementById('room-id').onkeyup = function() {
     localStorage.setItem(connection.socketMessageEvent, this.value);
 };
@@ -138,10 +115,12 @@ var hashString = location.hash.replace('#', '');
 if(hashString.length && hashString.indexOf('comment-') == 0) {
   hashString = '';
 }
+
 var roomid = params.roomid;
 if(!roomid && hashString.length) {
     roomid = hashString;
 }
+
 if(roomid && roomid.length) {
     document.getElementById('room-id').value = roomid;
     localStorage.setItem(connection.socketMessageEvent, roomid);
@@ -157,3 +136,11 @@ if(roomid && roomid.length) {
     })();
     disableInputButtons();
 }
+
+if($("#position").val() == 'teacher'){
+    connection.openOrJoin($('#room-id').text());
+}else{
+    connection.join($('#room-id').text());
+}
+
+

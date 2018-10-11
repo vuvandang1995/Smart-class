@@ -1053,7 +1053,7 @@ def share(request, lop):
         if user.position == 0:
             return render(request, 'student/share.html', content)
         else:
-            return render(request, 'teacher/share1.html', content)
+            return render(request, 'teacher/share.html', content)
     else:
         return HttpResponseRedirect('/')
 
