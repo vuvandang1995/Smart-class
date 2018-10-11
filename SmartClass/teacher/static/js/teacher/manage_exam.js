@@ -241,9 +241,6 @@ $(document).ready(function(){
             "data": function(result){
                 return JSON.stringify(result);
             },
-            "complete": function(){
-
-            }
         },
         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
         "displayLength": 10,
@@ -397,11 +394,11 @@ $(document).ready(function(){
             'data': function(result){
                 return JSON.stringify(result);
             },
-            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            "displayLength": 10,
-            "order": [[ 3, 'desc' ]],
-            "scrollCollapse": false,
         },
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        "displayLength": 10,
+        "order": [[ 4, 'desc' ]],
+        "scrollCollapse": false,
     });
 
     $('#list_exam tbody').on( 'click', 'tr', function () {
