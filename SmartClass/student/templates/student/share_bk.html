@@ -11,8 +11,7 @@
             word-wrap:break-word;
         }
         video {
-            object-fit: fill;
-            width: 30%;
+            width: 100%;
         }
         button,
         input,
@@ -47,21 +46,18 @@
         <div class="col-md-12">
           <div class="x_panel">
             <div class="x_title">
-                <input type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
-                <button id="open-room">Open Room</button>
-                <button id="join-room">Join Room</button>
-                <button id="open-or-join-room">Auto Open Or Join Room</button>
-
-                <hr>
-                    <button id="share-screen" disabled>Share Screen</button>
-                <hr>
-
-                <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
-
+                <h2>Lớp </h2>
+                <h2 id="room-id"></h2>
+                <button class="btn btn-success" style="float:right">
+                    <i class="fa fa-thumbs-o-up"></i>
+                    Xin phát biểu
+                </button>
+                <input type="hidden" value="student" id="position">
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                <div id="videos-container" style="width:100%"></div>
+                <div id="videos-container" style="width:100%">
+                </div>
                 <div id="audios-container"></div>
             </div>
           </div>

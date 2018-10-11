@@ -42,6 +42,7 @@ def randomNhom(myList,number):
             list_group.append(group)
     return list_group
 
+
 class EmailThread(threading.Thread):
     def __init__(self, email):
         threading.Thread.__init__(self)
@@ -326,18 +327,22 @@ def manage_de(request):
                                                       dang_cau_hoi__contains="Trắc nhiệm")
                 if chi_tiet_so_luong['r_tn_d'] > len(trac_nhiem_de):
                     return HttpResponse("Không đủ số lượng câu hỏi trắc nhiệm dễ trong ngân hàng câu hỏi")
+
                 trac_nhiem_tb = CauHoi.objects.filter(do_kho=1, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                       dang_cau_hoi__contains="Trắc nhiệm")
                 if chi_tiet_so_luong['r_tn_tb'] > len(trac_nhiem_tb):
                     return HttpResponse("Không đủ số lượng câu hỏi trắc nhiệm trung bình trong ngân hàng câu hỏi")
+
                 trac_nhiem_kho = CauHoi.objects.filter(do_kho=2, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                        dang_cau_hoi__contains="Trắc nhiệm")
                 if chi_tiet_so_luong['r_tn_k'] > len(trac_nhiem_kho):
                     return HttpResponse("Không đủ số lượng câu hỏi trắc nhiệm khó trong ngân hàng câu hỏi")
+
                 dien_tu_de = CauHoi.objects.filter(do_kho=0, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                    dang_cau_hoi__contains="Điền từ")
                 if chi_tiet_so_luong['r_dt_d'] > len(dien_tu_de):
                     return HttpResponse("Không đủ số lượng câu hỏi điền từ dễ trong ngân hàng câu hỏi")
+
                 dien_tu_tb = CauHoi.objects.filter(do_kho=1, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                    dang_cau_hoi__contains="Điền từ")
                 if chi_tiet_so_luong['r_dt_tb'] > len(dien_tu_tb):
@@ -346,18 +351,22 @@ def manage_de(request):
                                                     dang_cau_hoi__contains="Điền từ")
                 if chi_tiet_so_luong['r_dt_k'] > len(dien_tu_kho):
                     return HttpResponse("Không đủ số lượng câu hỏi điền từ khó trong ngân hàng câu hỏi")
+
                 tu_luan_de = CauHoi.objects.filter(do_kho=0, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                    dang_cau_hoi__contains="Tự luận")
-                if chi_tiet_so_luong['r_dt_d'] > len(tu_luan_de):
+                if chi_tiet_so_luong['r_tl_d'] > len(tu_luan_de):
                     return HttpResponse("Không đủ số lượng câu hỏi tự luận dễ trong ngân hàng câu hỏi")
+
                 tu_luan_tb = CauHoi.objects.filter(do_kho=1, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                    dang_cau_hoi__contains="Tự luận")
-                if chi_tiet_so_luong['r_dt_tb'] > len(tu_luan_tb):
+                if chi_tiet_so_luong['r_tl_tb'] > len(tu_luan_tb):
                     return HttpResponse("Không đủ số lượng câu hỏi tự luận trung bình trong ngân hàng câu hỏi")
+
                 tu_luan_kho = CauHoi.objects.filter(do_kho=2, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                     dang_cau_hoi__contains="Tự luận")
-                if chi_tiet_so_luong['r_dt_k'] > len(tu_luan_kho):
+                if chi_tiet_so_luong['r_tl_k'] > len(tu_luan_kho):
                     return HttpResponse("Không đủ số lượng câu hỏi tự luận khó trong ngân hàng câu hỏi")
+
                 de = De.objects.create(ten=request.POST['ten_de'], dung_lam=request.POST['loai_de'],
                                        thoi_gian=request.POST['thoi_gian'], cau_truc=request.POST['cau_truc'],
                                        so_luong=request.POST['so_luong'],
@@ -551,7 +560,22 @@ def manage_question(request):
                         ch.save()
                         handle_uploaded_file(request.FILES['dinh_kem'])
                     ch.save()
-                    DapAn.objects.filter(cau_hoi_id=ch).delete()
+                    if "Trắc nhiệm" in ch.dang_cau_hoi:
+                        DapAn.objects.filter(cau_hoi_id=ch).delete()
+                        dap_an = json.loads(request.POST['dap_an'])
+                        nd_dap_an = json.loads(request.POST['nd_dap_an'])
+                        for i in range(len(dap_an)):
+                            if dap_an[i] == 0:
+                                dung = False
+                            else:
+                                dung = True
+                            DapAn.objects.create(cau_hoi_id=ch, mon_id=ch.mon_id, noi_dung=nd_dap_an[i],
+                                                 dap_an_dung=dung)
+                    elif "Điền từ" in ch.dang_cau_hoi:
+                        DapAn.objects.filter(cau_hoi_id=ch).delete()
+                        nd_dap_an = json.loads(request.POST['nd_dap_an'])
+                        for nd in nd_dap_an:
+                            DapAn.objects.create(cau_hoi_id=ch, mon_id=ch.mon_id, noi_dung=nd, dap_an_dung=True)
             else:
                 ten_mon, lop_mon = request.POST['mon'].split(" - ")
                 mon = Mon.objects.get(ten=ten_mon, lop=lop_mon)
@@ -576,18 +600,14 @@ def manage_question(request):
                         if "Trắc nhiệm" in ch.dang_cau_hoi:
                             dap_an = json.loads(request.POST['dap_an'])
                             nd_dap_an = json.loads(request.POST['nd_dap_an'])
-                            so_dap_an_dung = 0
                             for k in range(i, i + int(request.POST['so_dap_an'])):
                                 if dap_an[k] == 0:
                                     dung = False
                                 else:
                                     dung = True
-                                    so_dap_an_dung += 1
                                 DapAn.objects.create(cau_hoi_id=cht, mon_id=ch.mon_id, noi_dung=nd_dap_an[k],
                                                      dap_an_dung=dung)
                             i += int(request.POST['so_dap_an'])
-                            cht.so_dap_an_dung = so_dap_an_dung
-                            cht.save()
                 else:
                     ch = CauHoi.objects.create(myuser_id=user, mon_id=mon, noi_dung=request.POST['noi_dung'],
                                                do_kho=do_kho, chu_de=request.POST['chu_de'], don=True,
@@ -596,16 +616,13 @@ def manage_question(request):
                     if "Trắc nhiệm" in ch.dang_cau_hoi:
                         dap_an = json.loads(request.POST['dap_an'])
                         nd_dap_an = json.loads(request.POST['nd_dap_an'])
-                        so_dap_an_dung = 0
                         for i in range(len(dap_an)):
                             if dap_an[i] == 0:
                                 dung = False
                             else:
                                 dung = True
-                                so_dap_an_dung += 1
                             DapAn.objects.create(cau_hoi_id=ch, mon_id=ch.mon_id, noi_dung=nd_dap_an[i],
                                                  dap_an_dung=dung)
-                            ch.so_dap_an_dung = so_dap_an_dung
                     elif "Điền từ" in ch.dang_cau_hoi:
                         nd_dap_an = json.loads(request.POST['nd_dap_an'])
                         for nd in nd_dap_an:
@@ -1017,7 +1034,7 @@ def user_profile(request):
                     messages.success(request, "Cập nhật thành công")
                 else:
                     messages.warning(request, 'Mật khẩu không đúng')
-            return HttpResponseRedirect("profile")
+            return HttpResponseRedirect("/profile")
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user)}
         return render(request, 'teacher/profile.html', content)
@@ -1036,7 +1053,7 @@ def share(request, lop):
         if user.position == 0:
             return render(request, 'student/share.html', content)
         else:
-            return render(request, 'teacher/share1.html', content)
+            return render(request, 'teacher/share.html', content)
     else:
         return HttpResponseRedirect('/')
 
