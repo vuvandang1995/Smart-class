@@ -643,5 +643,20 @@ $(document).ready(function(){
         }
     });
 
+    $("#phat_de").click(function(){
+        $("#de_thi option").each(function(){
+            if($(this).val()== $("input[name=de_thi]").val()){
+                id = $(this).data('id');
+                var date = formatAMPM(new Date());
+                chatallSocket.send(JSON.stringify({
+                  'message' : id,
+                  'who' : userName,
+                  'time' : date
+                }));
+                return false;
+            }
+        });
+    });
+
     
 });

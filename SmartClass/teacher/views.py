@@ -64,15 +64,20 @@ def home(request):
 
 
 def manage_class(request, lop):
-    print(request.user.username)
     user = request.user
     if user.is_authenticated and user.position == 1:
         ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+        try:
+            so_lop = int(lop[:2])
+        except:
+            so_lop = int(lop[0])
+        gvm = GiaoVienMon.objects.filter(myuser_id=user).values('mon_id')
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user),
                    'lop_ht': lop,
-                   'ls_student': ls_student}
+                   'ls_student': ls_student,
+                   'ds_de': De.objects.filter(myuser_id=user, mon_id__in=Mon.objects.filter(id__in=gvm, lop=so_lop))}
         list_std = []
         for std in ls_student:
             list_std.append(std)
