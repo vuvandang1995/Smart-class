@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    get_de(36);
+    get_de(50);
     function get_de(de_id){
         $.ajax({
             type: 'GET',
@@ -100,7 +100,7 @@ function nopBai(){
             type: 'POST',
             url: location.href,
             data:{'csrfmiddlewaretoken':$("input[name=csrfmiddlewaretoken]").val(),'de_id':$("input[name=de_id]").val(),
-            'ds_dap_an':JSON.stringify(ds_dap_an),'bai_lam':$("#bai_lam").html()},
+            'ds_dap_an':JSON.stringify(ds_dap_an)},
             success:function(){
                 $("#processing").modal('hide');
                 location.reload();

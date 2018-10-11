@@ -71,12 +71,34 @@
     display: inline;
     margin-left: 30px;
     margin-right: 15px;
-
 }
 
 .div_tl{
-     margin-left: 20px;
-     margin-right: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     padding: 5px;
     width: 95%;
+}
+
+.plus {
+    color:red;
+    font-weight: bold;
+    font-size:120%;
+}
+
+.head_ch {
+
+}
+
+.head_ch input {
+    float:right;
+    width: 54px;
+    margin-bottom:5px;
+    margin-right:20px;
+    color:red;
+    font-weight: bold;
+}
+
+.head_ch p {
+    float:left;
 }

@@ -32,6 +32,21 @@
       <!-- Custom Theme Style -->
       <link href="{% static 'css/chat.css' %}" rel="stylesheet">
       <link href="/static/build/css/custom.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/my_css.css' %}" />
+    <style>
+      ::placeholder {
+          color: red;
+          opacity: 1; /* Firefox */
+      }
+
+      :-ms-input-placeholder { /* Internet Explorer 10-11 */
+         color: red;
+      }
+
+      ::-ms-input-placeholder { /* Microsoft Edge */
+         color: red;
+      }
+    </style>
     {% endblock head %}
   </head>
 

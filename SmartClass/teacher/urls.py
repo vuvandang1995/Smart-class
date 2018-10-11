@@ -18,6 +18,7 @@ urlpatterns = [
     path('manage_question', views.manage_question, name='manage_question'),
     path('question_data_<int:id_mon>_<int:all>_<str:dung_lam>', views.question_data, name='question_data'),
     path('question_data_detail_<int:id>_<str:bien>', views.question_data_detail, name='question_data_detail'),
+    path('question_data_detail_review_<str:ds_ch>', views.question_data_detail_review, name='question_data_detail_review'),
     path('profile/', views.user_profile, name='profile'),
     path('logout/', views.user_logout, name='logout'),
     path(r'^resetpassword/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',

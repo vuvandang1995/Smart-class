@@ -25,6 +25,64 @@
             </div>
             <div class="x_content" >
                 <div class="row" id="load_de">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-8 baithi" id="bai_lam">
+                        <input type="hidden" value="{2}" name="de_id">
+                        <div class="inbox-body">
+                            <div class="mywrap">
+
+                                    <div class="row">
+                                        <div class="col-md-2" style="text-align:center">
+                                            <p style="color:red; font-size: 50px;border: 2px solid gray; border-radius: 5px;">10,95</p>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="row">
+                                                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                                                  <input type="text" class="form-control has-feedback-left" value="{0}" readonly>
+                                                  <span class="fa fa-book form-control-feedback left" aria-hidden="true"></span>
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                                                  <input type="number" class="form-control has-feedback-left" value="{1}" readonly>
+                                                  <span class="fa fa-edit form-control-feedback left" aria-hidden="true"></span>
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                                                  <input type="date" class="form-control has-feedback-left" value="{2}" readonly>
+                                                  <span class="fa fa-calendar form-control-feedback left" aria-hidden="true"></span>
+                                                </div>
+                                                <div class="col-md-6 col-sm-6 col-xs-12 form-group has-feedback">
+                                                  <input type="text" class="form-control has-feedback-left" value="{3}" readonly>
+                                                  <span class="fa fa-book form-control-feedback left" aria-hidden="true"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <h3><i class="fa fa-clock-o"></i> <p style="display:inline;" id="tg_lam">{8}:00</p></h3>
+                        <h5>Thời gian làm bài</h5>
+                        <table class="mytable" >
+                            <tr><td>Họ và tên</td><td><b>{3}</b></td></tr>
+                            <tr><td>Lớp</td><td>{4}</td></tr>
+                            <tr><td>Khoa</td><td>{5}</td></tr>
+                            <tr><td>Khóa</td><td>{6} - {7}</td></tr>
+                        </table>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                <button class="btn btn-primary btn-lg" id="submit" onclick="nopBai();">Nộp bài <i class="fa fa-send"></i> </button>
+                            </div>
+                            <div class="col-sm-4"></div>
+                        </div>
+                        <hr>
+                        <font color="red">*Chú ý: Điểm lẻ của môn thi tự luận được làm tròn đến 2 chữ số thập phân thay vì lấy đến
+                        0,25 điểm như trước; thay đổi hình thức xử lý thí sinh vi phạm quy chế thi,… là những thay đổi nổi bật
+                        nhất trong Quy chế thi THPT quốc gia và xét công nhận tốt nghiệp THPT năm 2018 mà Bộ GD&ĐT vừa công bố
+                        chính thức.
+                        </font>
+                    </div>
                 </div>
               </div>
             </div>

@@ -12,6 +12,20 @@
     <!--<link href="{% static 'css/easy-autocomplete.min.css' %}" rel="stylesheet">-->
     <!--<link href="{% static 'css/easy-autocomplete.themes.css' %}" rel="stylesheet">-->
     <!--<link href="{% static 'css/easy-autocomplete.themes.min.css' %}" rel="stylesheet">-->
+    <style>
+        ::placeholder {
+          color: red;
+          opacity: 1; /* Firefox */
+        }
+
+        :-ms-input-placeholder { /* Internet Explorer 10-11 */
+         color: red;
+        }
+
+        ::-ms-input-placeholder { /* Microsoft Edge */
+         color: red;
+        }
+    </style>
  {% endblock stylesheets %}
 {% block content %}
   <div class="right_col" role="main">
@@ -31,9 +45,7 @@
                     <thead>
                       <tr>
                         <th>Môn</th>
-                        <th>Điểm kiểm tra 15'</th>
-                        <th>Điểm kiểm tra 1 tiết</th>
-                        <th>Điểm thi</th>
+                        <th>Điểm</th>
                       </tr>
                     </thead>
                     <tbody>
