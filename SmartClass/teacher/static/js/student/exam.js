@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    get_de(54);
+//    get_de(54);
     function get_de(de_id){
         $.ajax({
             type: 'GET',

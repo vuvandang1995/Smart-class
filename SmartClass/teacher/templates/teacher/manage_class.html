@@ -17,6 +17,7 @@
           <div class="x_panel">
             <div class="x_title">
               <h2>Lớp {{lop_ht}}  </h2>
+                <button class="btn btn-info" style="float:right;" id="tao_ky_thi" data-toggle="modal" data-target="#ky_thi" >Tạo kỳ thi <i class="fa fa-edit"></i> </button>
                 <button class="btn btn-primary" style="float:right;" onclick="document.location.href = '/share_{{lop_ht}}';">Trình chiếu <i class="fa fa-video-camera"></i> </button>
               <div class="clearfix"></div>
             </div>
@@ -164,9 +165,32 @@
     </div>
   </div>
 
+    <div class="modal" id="ky_thi" role="dialog">
+      <div  class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Tạo kỳ thi</h4>
+            </div>
+            <div class="modal-body">
+                <label>Chọn đề thi</label>
+                <input class="form-control" list="de_thi" name="de_thi">
+                <datalist id="de_thi">
+                    {% for de in ds_de %}
+                    <option data-id="{{de.id}}">{{de.ten}}: {{de.dung_lam}} - {{ de.thoi_gian}} phút</option>
+                    {% endfor %}
+                </datalist>
+            </div>
+            <div class="modal-footer">
+               <button type="submit" class="btn btn-primary"  id="phat_de">Phát đề</button>
+               <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+      </div>
+    </div>
 
-
-  <div class="modal" id="chinhsua" role="dialog">
+    <div class="modal" id="chinhsua" role="dialog">
       <div  class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
@@ -193,7 +217,6 @@
         </div>
       </div>
     </div>
-
   
     <div class="modal" id="group_random" role="dialog">
       <div  class="modal-dialog" style="width:250px;">
@@ -252,7 +275,6 @@
       </div>
     </div>
 
-
     <div class="modal" id="audiocall" role="dialog">
       <div class="modal-dialog">
         <!-- Modal content-->
@@ -277,7 +299,6 @@
         </div>
       </div>
     </div>
-
 
     <script src="{% static 'js/teacher/peerjs/jquery.js' %}"></script>
 
