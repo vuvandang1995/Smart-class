@@ -13,7 +13,9 @@ $(document).ready(function(){
         var time = data['time'];
         if (time == 'key'){
             $("#videocall"+who).attr("name", message); 
-        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_call') && (time != 'teacher_audio_all')){
+        }else if (time == 'giotay'){
+            $('#giotay_'+who).show();
+        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_call') && (time != 'teacher_audio_all') && (time != 'enable_mic')){
             insertChat(who, message, time);
         }
         
@@ -87,7 +89,7 @@ $(document).ready(function(){
         // });
     }
 
-    function makeOrJoinRoom(roomid) {
+    function makeOrJoinRoom(roomid, gr_chat_name) {
         connection.videosContainer = document.getElementById('videos-container'+roomid);
         connection.onstream = function(event) {
             var existing = document.getElementById(event.streamid);
@@ -133,36 +135,21 @@ $(document).ready(function(){
 
         var group_name = roomid+'_'+class_+'_'+userName;
         connection.checkPresence(group_name, function(roomExist, group_name) {
-            $('.done_gr').show();
-            $('.done_gr').click(function(){
-                // connection.attachStreams.forEach(function(localStream) {
-                //     localStream.stop();
-                // });
-            
-                // // close socket.io connection
-                // connection.close();
-
-                if (connection.isInitiator) {
-                    connection.closeEntireSession(function() {
-                        console.log('close');
-                    });
-                } else {
-                    connection.leave();
-                    connection.attachStreams.forEach(function(localStream) {
-                        localStream.stop();
-                    });
-                }
-                $('.done_gr').hide();
-            });
             if (roomExist === true) {
                 connection.join(group_name);
             } else {
                 connection.open(group_name);
-                chatallSocket.send(JSON.stringify({
-                    'message' : 'teacher_call',
-                    'who' : userName,
-                    'time' : 'teacher_call'
-                }));
+                var xxx = new WebSocket(
+                    'ws://' + window.location.host +
+                    '/ws/' + gr_chat_name + 'chatgroup/');
+
+                xxx.onopen = function (event) {
+                    xxx.send(JSON.stringify({
+                        'message' : 'teacher_call',
+                        'who' : userName,
+                        'time' : 'teacher_call'
+                    }));
+                };
             }
         });
     }
@@ -203,8 +190,38 @@ $(document).ready(function(){
                     event.stopPropagation();
                     var gr_name = $(this).attr("name");
                     $('#videos-container'+gr_name).show();
-                    makeOrJoinRoom(gr_name, class_, userName);
-                    // $('#chinhsua').modal('show');
+                    var gr_chat_name = $(this).parent().parent().parent().parent().children('p').first().text();
+                    makeOrJoinRoom(gr_name, gr_chat_name);
+                    $('body .join_gr').each(function(){
+                        $(this).hide();
+                    });
+                    var done = $(this).next();
+
+                    done.show();
+                    done.click(function(){
+                        // connection.attachStreams.forEach(function(localStream) {
+                        //     localStream.stop();
+                        // });
+                    
+                        // // close socket.io connection
+                        // connection.close();
+
+                        if (connection.isInitiator) {
+                            connection.closeEntireSession(function() {
+                                console.log('close');
+                            });
+                        } else {
+                            connection.leave();
+                            connection.attachStreams.forEach(function(localStream) {
+                                localStream.stop();
+                            });
+                        }
+                        $('.done_gr').hide();
+                        $('body .join_gr').each(function(){
+                            $(this).show();
+                        });
+                    });
+
 
                 });
                 
@@ -214,6 +231,18 @@ $(document).ready(function(){
         });
     }
     reload();
+
+    $(".giotay_std").click(function(event){
+        event.stopPropagation();
+        $(this).hide();
+        chatallSocket.send(JSON.stringify({
+            'message' : 'enable_mic',
+            'who' : userName,
+            'time' : 'enable_mic'
+        }));
+
+    });
+
 
     $("#save_audiocall").click(function() {
         var call_time = $("input[name=call_time]").val();
@@ -295,6 +324,7 @@ $(document).ready(function(){
                     $(this).hide();
                 }
             });
+            $('#videos-container .media-container .media-controls').next().attr("style", "height: 36px;");
         };
 		connection.open(userName+'_'+class_);
         chatallSocket.send(JSON.stringify({
@@ -302,6 +332,21 @@ $(document).ready(function(){
             'who' : userName,
             'time' : 'teacher_audio_all'
         }));
+        $('#done_audio_all').show();
+    });
+
+    $('body #done_audio_all').on('click',function(){
+        if (connection.isInitiator) {
+            connection.closeEntireSession(function() {
+                console.log('close');
+            });
+        } else {
+            connection.leave();
+            connection.attachStreams.forEach(function(localStream) {
+                localStream.stop();
+            });
+        }
+        $(this).hide();
     });
 
     $('body #btn_manual_group').on('click',function(){
@@ -344,7 +389,9 @@ $(document).ready(function(){
     })
 
 	$('.mail_list').on('click',function(){
-		var std_username = $(this).children('p').text();
+        var std_username = $(this).children('p').text();
+        var std_fullname = $(this).data("fullname");
+        register_popup_teacher(std_username, std_fullname);
         //  $("body .noti_chat"+std_username).hide();
          $('body #'+std_username).children('.frame_std').show();
         //  if (typeof(Storage) !== "undefined") {

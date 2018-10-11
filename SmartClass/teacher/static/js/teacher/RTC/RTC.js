@@ -86,6 +86,7 @@ connection.onEntireSessionClosed = function(event) {
     connection.attachStreams.forEach(function(stream) {
         stream.stop();
     });
+    $('#giotay').hide();
     // don't display alert for moderator
     if (connection.userid === event.userid) return;
         console.log('close');

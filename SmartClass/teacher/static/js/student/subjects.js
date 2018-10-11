@@ -41,25 +41,14 @@ $(document).ready(function(){
                     makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                 }, time);
             }
-        }else if (time === 'teacher_call'){
-                if ($('#audiocall').length){
-                    $('#audiocall').show();
-                    $("#demo").show();
-                    var time = 1;
-                    $('#group_class .right').children('p').each(function(index){
-                        if (userName == $(this).attr("name")){
-                            time = index*1000;
-                            return false;
-                        }
-                    });
-                    // alert(time)
-                    setTimeout(function(){
-                        makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
-                    }, time);
-                }    
+        }else if (time === 'enable_mic'){
+            connection.attachStreams.forEach(function(localStream) {
+                console.log(localStream)
+            });
         }else if (time === 'teacher_audio_all'){
             if ($('#audiocall').length){
                 $('#audiocall').show();
+                // connection.mediaConstraints.audio = false;
                 connection.videosContainer = document.getElementById('videos-container');
                 connection.onstream = function(event) {
                     var existing = document.getElementById(event.streamid);
@@ -105,9 +94,23 @@ $(document).ready(function(){
                             $(this).hide();
                         }
                     });
+                    $('#videos-container .media-container .media-controls').next().attr("style", "height: 36px;");
                 };
-
+                
                 connection.join(teacher_name+'_'+lop);
+
+                connection.attachStreams.forEach(function(localStream) {
+                    localStream.stop();
+                });
+
+                $('#giotay').show();
+                $('body').on('click', '#giotay', function(){
+                    chatallSocket.send(JSON.stringify({
+                        'message' : 'giotay',
+                        'who' : userName,
+                        'time' : 'giotay'
+                    }));
+                });
             }    
         }else if (time != 'key'){
                 insertChat(who, message, time);
@@ -219,7 +222,7 @@ $(document).ready(function(){
             success: function(data){
                 $('body .list_group_all').prepend(data);
                 if ($('#group_class').length){
-                    var group_chat_name = $('#group_class').children('p').text();
+                    var group_chat_name = $('#group_class').children('p').first().text();
                     var chatgroup = new WebSocket(
                     'ws://' + window.location.host +
                     '/ws/' + group_chat_name + 'chatgroup/');
@@ -268,11 +271,29 @@ $(document).ready(function(){
 
                     
                     chatgroup.onmessage = function(e) {
-                    var data = JSON.parse(e.data);
-                    var message = data['message'];
-                    var who = data['who'];
-                    var time = data['time'];
-                    insertChat2(who, message, time);
+                        var data = JSON.parse(e.data);
+                        var message = data['message'];
+                        var who = data['who'];
+                        var time = data['time'];
+                        if (time === 'teacher_call'){
+                            if ($('#audiocall').length){
+                                $('#audiocall').show();
+                                $("#demo").show();
+                                var time = 1;
+                                $('#group_class .right').children('p').each(function(index){
+                                    if (userName == $(this).attr("name")){
+                                        time = index*1000;
+                                        return false;
+                                    }
+                                });
+                                // alert(time)
+                                setTimeout(function(){
+                                    makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
+                                }, time);
+                            }    
+                        }else{
+                            insertChat2(who, message, time);
+                        }
                     };
 
                     $('body').on('click', '.zzz', function(){
@@ -307,6 +328,24 @@ $(document).ready(function(){
     }
     reload();
 
+//     else if (time === 'teacher_call'){
+//         if ($('#audiocall').length){
+//             $('#audiocall').show();
+//             $("#demo").show();
+//             var time = 1;
+//             $('#group_class .right').children('p').each(function(index){
+//                 if (userName == $(this).attr("name")){
+//                     time = index*1000;
+//                     return false;
+//                 }
+//             });
+//             // alert(time)
+//             setTimeout(function(){
+//                 makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
+//             }, time);
+//         }    
+// }
+
 
     $('body').on('click', '.xxx', function(){
         $("body .mytext").trigger({type: 'keydown', which: 13, keyCode: 13});
@@ -322,7 +361,7 @@ $(document).ready(function(){
         message = escapeHtml(message);
         var date = formatAMPM(new Date());
         if (message != ''){
-          chatallSocket.send(JSON.stringify({
+            chatallSocket.send(JSON.stringify({
                 'message' : message,
                 'who' : userName,
                 'time' : date
@@ -330,8 +369,6 @@ $(document).ready(function(){
         }
         $(this).parent().parent().children().children().children('input').val(''); 
     })
-
-
 
     var socket_teacher;
     $('.mail_list').on('click',function(){
@@ -417,7 +454,6 @@ $(document).ready(function(){
         $(this).parent().parent().next().children('.yyy').click();
     }
     })
-    
 
     $('body').on('click', '.yyy', function(){
     var message = $(this).parent().parent().children().children().children('.mytext1').val();
@@ -432,8 +468,6 @@ $(document).ready(function(){
     }
     $(this).parent().parent().children().children().children('input').val('');
     })
-
-
 
     $('body').on('click', '.chat-close', function(){
     var teacher_name = $(this).attr('id');
