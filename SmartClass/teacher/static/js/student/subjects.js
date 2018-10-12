@@ -41,77 +41,38 @@ $(document).ready(function(){
                     makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                 }, time);
             }
-        }else if (time === 'enable_mic'){
-            connection.attachStreams.forEach(function(localStream) {
-                console.log(localStream)
-            });
+        }else if ((time === 'enable_mic') && (userName == who)){
+            $('#out_gr').click();
+            audio_broad();
+            setTimeout(function(){
+                $("input[name=broadcaster]").prop('checked', true);
+                $('#room-id').val(teacher_name+'_'+lop);
+                $('#join-broadcast').click();
+                $('#videos-container111').show();
+            }, 1000);
+            // $("input[name=broadcaster]").prop('checked', true);
+            // $('#room-id').val(teacher_name+'_'+lop);
+            // $('#open-broadcast').click();
+            // $('#videos-container111').show();
         }else if (time === 'teacher_audio_all'){
-            if ($('#audiocall').length){
-                $('#audiocall').show();
-                // connection.mediaConstraints.audio = false;
-                connection.videosContainer = document.getElementById('videos-container');
-                connection.onstream = function(event) {
-                    var existing = document.getElementById(event.streamid);
-                    if(existing && existing.parentNode) {
-                    existing.parentNode.removeChild(existing);
-                    }
-                    event.mediaElement.removeAttribute('src');
-                    event.mediaElement.removeAttribute('srcObject');
-                    //event.mediaElement.muted = true;
-                    //event.mediaElement.volume = 0;
-                    var video = document.createElement('audio');
-                    try {
-                        video.setAttributeNode(document.createAttribute('autoplay'));
-                        video.setAttributeNode(document.createAttribute('playsinline'));
-                    } catch (e) {
-                        video.setAttribute('autoplay', true);
-                        video.setAttribute('playsinline', true);
-                    }
-                    if(event.type === 'local') {
-                    video.volume = 0;
-                    try {
-                        video.setAttributeNode(document.createAttribute('muted'));
-                    } catch (e) {
-                        video.setAttribute('muted', true);
-                    }
-                    }
-                    video.srcObject = event.stream;
-                    var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
-                    var mediaElement = getHTMLMediaElement(video, {
-                        title: event.userid,
-                        // buttons: ['full-screen'],
-                        width: 'auto',
-                        height: 'auto',
-                        // showOnMouseEnter: false
-                    });
-                    connection.videosContainer.appendChild(mediaElement);
-                    setTimeout(function() {
-                        mediaElement.media.play();
-                    }, 5000);
-                    mediaElement.id = event.streamid;
-                    $('#videos-container .media-container ').each(function(){
-                        if ($(this).find('h2').first().text() != (teacher_name+'_'+lop)){
-                            $(this).hide();
-                        }
-                    });
-                    $('#videos-container .media-container .media-controls').next().attr("style", "height: 36px;");
-                };
+            $("input[name=broadcaster]").prop('checked', false);
+            $('#room-id').val(teacher_name+'_'+lop);
+            setTimeout(function(){ 
+                $('#join-broadcast').click();
+            }, 2000);
+            $('#videos-container111').show();
+            
+
+            $('#giotay').show();
+            $('body').on('click', '#giotay', function(){
+                chatallSocket.send(JSON.stringify({
+                    'message' : 'giotay',
+                    'who' : userName,
+                    'time' : 'giotay'
+                }));
                 
-                connection.join(teacher_name+'_'+lop);
-
-                connection.attachStreams.forEach(function(localStream) {
-                    localStream.stop();
-                });
-
-                $('#giotay').show();
-                $('body').on('click', '#giotay', function(){
-                    chatallSocket.send(JSON.stringify({
-                        'message' : 'giotay',
-                        'who' : userName,
-                        'time' : 'giotay'
-                    }));
-                });
-            }    
+            });
+                
         }else if (time != 'key'){
                 insertChat(who, message, time);
             }
@@ -475,5 +436,8 @@ $(document).ready(function(){
     // sessionStorage.removeItem(tk_id);
     $("body #chat"+teacher_name+" .frame > ul").empty();
     })
+
+
+    audio_broad();
 
 });

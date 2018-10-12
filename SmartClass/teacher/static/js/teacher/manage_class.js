@@ -150,6 +150,9 @@ $(document).ready(function(){
                         'time' : 'teacher_call'
                     }));
                 };
+                setTimeout(function(){
+                    xxx.close();
+                 }, 3000);
             }
         });
     }
@@ -237,7 +240,7 @@ $(document).ready(function(){
         $(this).hide();
         chatallSocket.send(JSON.stringify({
             'message' : 'enable_mic',
-            'who' : userName,
+            'who' : $(this).attr('id').split('_')[1],
             'time' : 'enable_mic'
         }));
 
@@ -279,75 +282,30 @@ $(document).ready(function(){
     });
 
     $('body #btn_audio_all').on('click',function(){
-        connection.videosContainer = document.getElementById('videos-container');
-        connection.onstream = function(event) {
-            var existing = document.getElementById(event.streamid);
-            if(existing && existing.parentNode) {
-              existing.parentNode.removeChild(existing);
-            }
-            event.mediaElement.removeAttribute('src');
-            event.mediaElement.removeAttribute('srcObject');
-            //event.mediaElement.muted = true;
-            //event.mediaElement.volume = 0;
-            var video = document.createElement('audio');
-            try {
-                video.setAttributeNode(document.createAttribute('autoplay'));
-                video.setAttributeNode(document.createAttribute('playsinline'));
-            } catch (e) {
-                video.setAttribute('autoplay', true);
-                video.setAttribute('playsinline', true);
-            }
-            if(event.type === 'local') {
-              video.volume = 0;
-              try {
-                  video.setAttributeNode(document.createAttribute('muted'));
-              } catch (e) {
-                  video.setAttribute('muted', true);
-              }
-            }
-            video.srcObject = event.stream;
-            var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
-            var mediaElement = getHTMLMediaElement(video, {
-                title: event.userid,
-                // buttons: ['full-screen'],
-                width: 'auto',
-                height: 'auto',
-                // showOnMouseEnter: false
+
+        audio_broad.onEntireSessionClosed = function(event) {
+            audio_broad.attachStreams.forEach(function(stream) {
+                stream.stop();
             });
-            connection.videosContainer.appendChild(mediaElement);
-            setTimeout(function() {
-                mediaElement.media.play();
-            }, 5000);
-            mediaElement.id = event.streamid;
-            $('#videos-container .media-container ').each(function(){
-                if ($(this).find('h2').first().text() != (userName+'_'+class_)){
-                    $(this).hide();
-                }
-            });
-            $('#videos-container .media-container .media-controls').next().attr("style", "height: 36px;");
+            $('#giotay').hide();
+            // don't display alert for moderator
+            if (audio_broad.userid === event.userid) return;
+                console.log('close');
         };
-		connection.open(userName+'_'+class_);
+        $("input[name=broadcaster]").prop('checked', true);
+        $('#room-id').val(userName+'_'+class_);
+        $('#open-broadcast').click();
+        $('#videos-container111').show();
+        
         chatallSocket.send(JSON.stringify({
             'message' : 'teacher_audio_all',
             'who' : userName,
             'time' : 'teacher_audio_all'
         }));
-        $('#done_audio_all').show();
+        $('#done_video').show();
     });
 
-    $('body #done_audio_all').on('click',function(){
-        if (connection.isInitiator) {
-            connection.closeEntireSession(function() {
-                console.log('close');
-            });
-        } else {
-            connection.leave();
-            connection.attachStreams.forEach(function(localStream) {
-                localStream.stop();
-            });
-        }
-        $(this).hide();
-    });
+    
 
     $('body #btn_manual_group').on('click',function(){
 		$('#group_manual').modal('show');
@@ -488,7 +446,7 @@ $(document).ready(function(){
     var dict_group_chat = {};
     function click_group_chat(){
         $('.group_class').on('click',function(){
-            var group_chat_name = $(this).children('p').text();
+            var group_chat_name = $(this).children('p').first().text();
             if (dict_group_chat[group_chat_name] == undefined){
                 dict_group_chat[group_chat_name] = new WebSocket(
                 'ws://' + window.location.host +
@@ -657,6 +615,10 @@ $(document).ready(function(){
             }
         });
     });
+
+
+
+audio_broad();
 
     
 });
