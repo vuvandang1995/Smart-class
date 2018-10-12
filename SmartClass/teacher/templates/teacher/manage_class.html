@@ -178,7 +178,7 @@
                 <input class="form-control" list="de_thi" name="de_thi">
                 <datalist id="de_thi">
                     {% for de in ds_de %}
-                    <option data-id="{{de.id}}">{{de.ten}}: {{de.dung_lam}} - {{ de.thoi_gian}} phút</option>
+                        <option data-id="{{de.id}}" data-thoi_gian="{{de.thoi_gian}}">{{de.ten}}: {{de.dung_lam}} - {{ de.thoi_gian}} phút</option>
                     {% endfor %}
                 </datalist>
             </div>

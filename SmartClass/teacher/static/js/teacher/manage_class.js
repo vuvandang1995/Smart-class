@@ -646,10 +646,15 @@ $(document).ready(function(){
     $("#phat_de").click(function(){
         $("#de_thi option").each(function(){
             if($(this).val()== $("input[name=de_thi]").val()){
-                id = $(this).data('id');
+                var id = $(this).data('id');
+                var thoi_gian = $(this).data('thoi_gian');
+                var currentdate = new Date();
+                var now = `${currentdate.getHours()}:${currentdate.getMinutes()}:${currentdate.getSeconds()}`
+                var data = window.btoa(id+"_"+now);
                 var date = formatAMPM(new Date());
+                var href = location.href.split('/')[0]+location.href.split('/')[1]+location.href.split('/')[2]+"/student/exam_"+data
                 chatallSocket.send(JSON.stringify({
-                  'message' : id,
+                  'message' : `<a href="/student/exam_${data}">${href}</a>`,
                   'who' : userName,
                   'time' : date
                 }));

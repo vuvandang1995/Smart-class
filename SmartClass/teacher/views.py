@@ -25,6 +25,7 @@ import os
 from django.conf import settings
 import re
 from itertools import chain
+import base64
 
 
 def randomNhom(myList,number):
@@ -73,11 +74,9 @@ def manage_class(request, lop):
         except:
             so_lop = int(lop[0])
         gvm = GiaoVienMon.objects.filter(myuser_id=user).values('mon_id')
-        content = {'username': mark_safe(json.dumps(user.username)),
-                   'list_lop': ChiTietLop.objects.filter(myuser_id=user),
-                   'lop_ht': lop,
-                   'ls_student': ls_student,
-                   'ds_de': De.objects.filter(myuser_id=user, mon_id__in=Mon.objects.filter(id__in=gvm, lop=so_lop))}
+        ds_de = De.objects.filter(myuser_id=user, mon_id__in=Mon.objects.filter(id__in=gvm, lop=so_lop))
+        content = {'username': mark_safe(json.dumps(user.username)), 'list_lop': ChiTietLop.objects.filter(myuser_id=user),
+                   'lop_ht': lop, 'ls_student': ls_student, 'ds_de': ds_de}
         list_std = []
         for std in ls_student:
             list_std.append(std)
@@ -1092,4 +1091,5 @@ def randomCauHoi(my_list, number, de, diem):
             if temp not in list_sel:
                 list_sel.append(temp)
                 ChiTietDe.objects.create(cau_hoi_id=temp, de_id=de, diem=diem)
+
 

@@ -111,7 +111,14 @@ $(document).ready(function(){
                         'time' : 'giotay'
                     }));
                 });
-            }    
+            }
+//        }else if (time == 'phat_de'){
+//            var currentdate = new Date();
+//            var now = `${currentdate.getHours()}:${currentdate.getMinutes()}:${currentdate.getSeconds()}`
+//            var data = window.btoa(message+"_"+now);
+//            console.log(data);
+//            document.location.href = "/student/exam_"+data;
+
         }else if (time != 'key'){
                 insertChat(who, message, time);
             }
