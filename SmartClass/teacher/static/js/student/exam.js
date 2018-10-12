@@ -1,9 +1,10 @@
 $(document).ready(function(){
-//    get_de(54);
+
+
     function get_de(de_id){
         $.ajax({
             type: 'GET',
-            url: '/student/exam_data_'+ de_id,
+            url: '/student/exam/data_'+ de_id,
             success: function(data){
                 $("#load_de").html(data);
                 $('input[type=checkbox]').change(function(){
@@ -28,28 +29,38 @@ $(document).ready(function(){
             },
         });
     };
-
-
-
+    time_remain = window.atob(time_remain);
+    de_id = window.atob(de_id);
+    if(parseInt(time_remain) > 0){
+        get_de(de_id);
+        setTimeout(function(){
+            countdowntime(time_remain);
+        },500)
+    }
+    else if (parseInt(time_remain) == 0){
+        $("#load_de").html(`<div style="text-align:center"><h1>Thời gian làm bài đã hết</h1></div>`);
+    }else{
+        $("#load_de").html(`<div style="text-align:center"><h1>Bạn đã nộp bài</h1></div>`);
+    }
 });
 
 function check_checked(id,ch_id){
-        var ar = []
-        $("input[name=dap_an_"+ch_id+"]").each(function(){
-            if($(this).is(":checked")){
-                ar.push(1);
-            }else{
-                ar.push(0);
-            }
-        });
-        if (jQuery.inArray(1, ar) == -1){
-            $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
-            $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
+    var ar = []
+    $("input[name=dap_an_"+ch_id+"]").each(function(){
+        if($(this).is(":checked")){
+            ar.push(1);
         }else{
-            $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
-            $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
+            ar.push(0);
         }
+    });
+    if (jQuery.inArray(1, ar) == -1){
+        $("#stt_"+id).find('span').first().removeClass("label-success").addClass("label-danger");
+        $("#stt_"+id).find('i').first().removeClass('fa-check').addClass('fa-close');
+    }else{
+        $("#stt_"+id).find('span').first().removeClass("label-danger").addClass("label-success");
+        $("#stt_"+id).find('i').first().removeClass('fa-close').addClass('fa-check');
     }
+}
 
 function check_empty(id,ch_id){
     var ar = []
@@ -108,4 +119,30 @@ function nopBai(){
         });
     }
 };
+
+function countdowntime(dateend){
+    // $('.demo').each(function(){
+        var countDownDate = new Date().getTime() + dateend*1000;
+        // var p = $(this);
+        // Update the count down every 1 second
+        var x = setInterval(function() {
+
+            // Get todays date and time
+            var now = new Date().getTime();
+
+            // Find the distance between now and the count down date
+            var distance = countDownDate - now;
+
+            // Time calculations for days, hours, minutes and seconds
+            var minutes = Math.floor(distance / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById("tg_lam").innerHTML = minutes + ":" + seconds;
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("tg_lam").innerHTML = "Hết giờ!";
+                document.getElementById("load_de").innerHTML = `<div style="text-align:center"><h1>Thời gian làm bài đã hết</h1></div>`;
+            }
+        }, 1000);
+    // });
+}
 

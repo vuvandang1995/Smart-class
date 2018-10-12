@@ -62,7 +62,6 @@ $(document).ready(function(){
             }, 2000);
             $('#videos-container111').show();
             
-
             $('#giotay').show();
             $('body').on('click', '#giotay', function(){
                 chatallSocket.send(JSON.stringify({
@@ -73,6 +72,7 @@ $(document).ready(function(){
                 
             });
                 
+
         }else if (time != 'key'){
                 insertChat(who, message, time);
             }
