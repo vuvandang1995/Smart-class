@@ -20,6 +20,9 @@ sudo apt-get install python3.6-dev libmysqlclient-dev
 
 `sudo apt-get install git`
 
+## install
+`sudo apt install memcached`
+
 ## Install docker
 - Sau đó chạy lệnh sau để bật redis server
 `docker run -p 6379:6379 -d redis:2.8`
