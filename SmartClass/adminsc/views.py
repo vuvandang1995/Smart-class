@@ -37,7 +37,7 @@ def home(request):
     user = request.user
     if user.is_authenticated and user.position == 2:
         content = {'username': mark_safe(json.dumps(user.username)),}
-        return render(request, 'adminsc/index.html', content)
+        return render(request, 'adminsc/base.html', content)
     else:
         return HttpResponseRedirect('/')
 
