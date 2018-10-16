@@ -54,6 +54,15 @@ $(document).ready(function(){
             // $('#room-id').val(teacher_name+'_'+lop);
             // $('#open-broadcast').click();
             // $('#videos-container111').show();
+        }else if ((time === 'disable_mic') && (userName == who)){
+            $('#out_gr').click();
+            audio_broad();
+            setTimeout(function(){
+                $("input[name=broadcaster]").prop('checked', false);
+                $('#room-id').val(teacher_name+'_'+lop);
+                $('#join-broadcast').click();
+                $('#videos-container111').show();
+            }, 1000);
         }else if (time === 'teacher_audio_all'){
             $("input[name=broadcaster]").prop('checked', false);
             $('#room-id').val(teacher_name+'_'+lop);
