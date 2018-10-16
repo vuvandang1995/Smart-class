@@ -23,6 +23,11 @@ $(document).ready(function(){
             url: "/student/score_data_detail_"+ id_diem,
             success: function(data){
                 $("#point_data").html(data);
+                setTimeout(function(){
+                    $(".nhan_xet").each(function(){
+                        $(this).val($(this).attr('placeholder'));
+                    });
+                },500);
             },
         });
     });

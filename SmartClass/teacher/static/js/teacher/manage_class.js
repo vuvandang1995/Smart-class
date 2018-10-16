@@ -622,8 +622,7 @@ $(document).ready(function(){
     });
 
 
-
-audio_broad();
+    audio_broad();
 
     
 });

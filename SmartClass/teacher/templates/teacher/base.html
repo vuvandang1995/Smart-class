@@ -74,7 +74,7 @@
                         <a><i class="fa fa-home"></i>Quản lý lớp <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             {% for lop in list_lop %}
-                            <li><a href="{% url 'teacher:manage_class' lop.lop_id.ten %}">{{lop.lop_id.ten}}</a></li>
+                            <li><a href="{% url 'teacher:manage_class' lop.lop_id.id %}">{{lop.lop_id.ten}}</a></li>
                             {% endfor %}
                         </ul>
                       </li>
