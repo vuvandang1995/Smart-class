@@ -1,5 +1,7 @@
+from django.views import defaults
+
 from .tokens import account_activation_token
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.contrib.auth import login, logout
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
@@ -64,15 +66,16 @@ def home(request):
         return HttpResponseRedirect('/')
 
 
-def manage_class(request, lop):
+def manage_class(request, id):
     user = request.user
     if user.is_authenticated and user.position == 1:
-        ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
+        lop = Lop.objects.get(id=id)
+        ls_chi_tiet = ChiTietLop.objects.filter(lop_id=lop).values('myuser_id')
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
         try:
-            so_lop = int(lop[:2])
+            so_lop = int(lop.ten[:2])
         except:
-            so_lop = int(lop[0])
+            so_lop = int(lop.ten[0])
         gvm = GiaoVienMon.objects.filter(myuser_id=user).values('mon_id')
         ds_de = De.objects.filter(myuser_id=user, mon_id__in=Mon.objects.filter(id__in=gvm, lop=so_lop))
         content = {'username': mark_safe(json.dumps(user.username)), 'list_lop': ChiTietLop.objects.filter(myuser_id=user),
@@ -85,12 +88,12 @@ def manage_class(request, lop):
                 number_mem = request.POST['number_mem']
                 list_group = randomNhom(list_std, int(number_mem))
                 try:
-                    Nhom.objects.filter(myuser_id=user, lop_id=Lop.objects.get(ten=lop)).delete()
+                    Nhom.objects.filter(myuser_id=user, lop_id=lop).delete()
                 except:
                     pass
                 for lg in list_group:
                     ten_nhom = 'Group' +str(list_group.index(lg))
-                    nhom = Nhom.objects.create(ten_nhom=ten_nhom, myuser_id=user, lop_id=Lop.objects.get(ten=lop))
+                    nhom = Nhom.objects.create(ten_nhom=ten_nhom, myuser_id=user, lop_id=lop)
                     for std in lg:
                         ChiTietNhom.objects.create(nhom_id=nhom, myuser_id=std)
             elif 'delete_group' in request.POST:
@@ -104,7 +107,7 @@ def manage_class(request, lop):
                 list_std = json.loads(list_std) 
                 ten_nhom = request.POST['groupname']
                 try:
-                    nhom = Nhom.objects.create(ten_nhom=ten_nhom, myuser_id=user, lop_id=Lop.objects.get(ten=lop))
+                    nhom = Nhom.objects.create(ten_nhom=ten_nhom, myuser_id=user, lop_id=lop)
                     for std in list_std:
                         ChiTietNhom.objects.create(nhom_id=nhom, myuser_id=MyUser.objects.get(username=std))
                 except:
@@ -214,6 +217,7 @@ def manage_point(request, lop):
         except ObjectDoesNotExist:
             return HttpResponseRedirect('/')
         if request.method == "POST":
+            da_cham_diem = True
             diem_tu_luan = json.loads(request.POST['diem_tu_luan'])
             nhan_xet = json.loads(request.POST['nhan_xet'])
             diem = DiemSo.objects.get(id=request.POST['diem_id'])
@@ -228,6 +232,7 @@ def manage_point(request, lop):
                 temp = re.search(search, diem.bai_lam)
                 diem.bai_lam = diem.bai_lam.replace(temp.group(1), ' placeholder="{}" '.format(value))
             diem.diem_cham_tay = round(diem_cham_tay, 2)
+            diem.da_cham_diem = True
             diem.save()
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user),
@@ -260,7 +265,9 @@ def manage_point_data(request, lop):
                 diem_thi = '<h4>'
                 for diem in DiemSo.objects.filter(myuser_id=student, mon_id=mon):
                     tong_diem = diem.diem_auto + diem.diem_cham_tay
-                    if tong_diem < 5.0:
+                    if not diem.da_cham_diem:
+                        loai = 'default'
+                    elif tong_diem < 5.0:
                         loai = "danger"
                     elif tong_diem >= 5.0 and tong_diem < 6.5:
                         loai = "warning"
@@ -1048,12 +1055,14 @@ def user_profile(request):
 
 def share(request, lop):
     user = request.user
+    temp = giaiMa(lop)
+    lop, khoa, nien_khoa, gvid = temp.split("_")
     if user.is_authenticated:
         ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user),
-                   'ls_student': ls_student}
+                   'ls_student': ls_student, 'gvht': MyUser.objects.get(id=gvid), 'lopht': lop}
         if user.position == 0:
             return render(request, 'student/share.html', content)
         else:
@@ -1093,3 +1102,11 @@ def randomCauHoi(my_list, number, de, diem):
                 ChiTietDe.objects.create(cau_hoi_id=temp, de_id=de, diem=diem)
 
 
+def maHoa(string):
+    temp = base64.b64encode(str(string).encode('utf-8', errors='strict'))
+    return temp.decode('utf-8', errors='strict')
+
+
+def giaiMa(string):
+    temp = base64.b64decode(str(string).encode('utf-8', errors='strict'))
+    return temp.decode('utf-8', errors='strict')

@@ -1,35 +1,40 @@
+function share_connect(){
+    var checkbox = document.querySelector('input[name=broadcaster]');
+
+    function beforeJoiningARoom(callback) {
+
+        if (checkbox.checked === false) {
+            connection.extra.broadcaster = false;
+            connection.dontCaptureUserMedia = true;
+//            connection.session.oneway = true;
+        } else {
+            connection.extra.broadcaster = true;
+        }
+        callback();
+    }
+
     document.getElementById('share-screen').onclick = function() {
-        this.disabled = true;
         connection.addStream({
             screen: true,
-            oneway: true
+//            oneway:true
         });
+
     };
+
     document.getElementById('open-room').onclick = function() {
-        disableInputButtons();
-        connection.open(document.getElementById('room-id').value, function() {
-            showRoomURL(connection.sessionid);
+        beforeJoiningARoom(function() {
+            connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExist, roomid) {
+                afterConnectingSocket();
+            });
         });
     };
+
     document.getElementById('join-room').onclick = function() {
-        disableInputButtons();
-        connection.join(document.getElementById('room-id').value);
+        joinBroadcastLooper(document.getElementById('room-id').value);
     };
-    document.getElementById('open-or-join-room').onclick = function() {
-        disableInputButtons();
-        connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExists, roomid) {
-            if(!isRoomExists) {
-                showRoomURL(roomid);
-            }
-        });
-    };
-    // ......................................................
-    // ..................RTCMultiConnection Code.............
-    // ......................................................
+
     var connection = new RTCMultiConnection();
 
-    // Using getScreenId.js to capture screen from any domain
-    // You do NOT need to deploy Chrome Extension YOUR-Self!!
     connection.getScreenConstraints = function(callback) {
         getScreenConstraints(function(error, screen_constraints) {
             if (!error) {
@@ -40,13 +45,12 @@
             throw error;
         });
     };
-    // by default, socket.io server is assumed to be deployed on your own URL
     connection.socketURL = "http://192.168.100.22:9002/";
-    // comment-out below line if you do not have your own socket.io server
     // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
     connection.socketMessageEvent = 'audio-video-screen-demo';
     connection.session = {
         audio: true,
+        broadcast: true
     };
     connection.sdpConstraints.mandatory = {
         OfferToReceiveAudio: true,
@@ -58,6 +62,10 @@
         if(document.getElementById(event.streamid)) {
             var existing = document.getElementById(event.streamid);
             existing.parentNode.removeChild(existing);
+            if(!connection.extra.broadcaster){
+                $("#open-room").click();
+                return false;
+            }
         }
 
         var width = parseInt(connection.videosContainer.clientWidth / 2) - 20;
@@ -76,35 +84,56 @@
         setTimeout(function() {
             mediaElement.media.play();
         }, 5000);
+
         mediaElement.id = event.streamid;
+        if (event.type === 'remote' && connection.isInitiator) {
+            var participants = [];
+            connection.getAllParticipants().forEach(function(pid) {
+                participants.push({
+                    pid: pid,
+                    broadcaster: connection.peers[pid].extra.broadcaster === true
+                });
+            });
+            connection.socket.emit(connection.socketCustomEvent, {
+                participants: participants
+            });
+        } else if (event.type === 'remote' && checkbox.checked === false) {
+            connection.socket.emit(connection.socketCustomEvent, {
+                giveAllParticipants: true
+            });
+        }
     };
+    function afterConnectingSocket() {
+        connection.socket.on(connection.socketCustomEvent, function(message) {
+            if (message.participants && !connection.isInitiator) {
+                message.participants.forEach(function(participant) {
+                    if (participant.pid === connection.userid) return;
+                    if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
+                    if (checkbox.checked === true && participant.broadcaster === false) return;
+                    connection.join(participant.pid);
+                });
+            }
+            if (message.giveAllParticipants && connection.isInitiator) {
+                var participants = [];
+                connection.getAllParticipants().forEach(function(pid) {
+                    participants.push({
+                        pid: pid,
+                        broadcaster: connection.peers[pid].extra.broadcaster === true
+                    });
+                });
+                connection.socket.emit(connection.socketCustomEvent, {
+                    participants: participants
+                });
+            }
+        });
+    }
     connection.onstreamended = function(event) {
         var mediaElement = document.getElementById(event.streamid);
         if(mediaElement) {
             mediaElement.parentNode.removeChild(mediaElement);
         }
     };
-    function disableInputButtons() {
-        document.getElementById('open-or-join-room').disabled = true;
-        document.getElementById('open-room').disabled = true;
-        document.getElementById('join-room').disabled = true;
-        document.getElementById('room-id').disabled = true;
-        document.getElementById('share-screen').disabled = false;
-    }
-    // ......................................................
-    // ......................Handling Room-ID................
-    // ......................................................
-    function showRoomURL(roomid) {
-        var roomHashURL = '#' + roomid;
-        var roomQueryStringURL = '?roomid=' + roomid;
-        var html = '<h2>Unique URL for your room:</h2><br>';
-        html += 'Hash URL: <a href="' + roomHashURL + '" target="_blank">' + roomHashURL + '</a>';
-        html += '<br>';
-        html += 'QueryString URL: <a href="' + roomQueryStringURL + '" target="_blank">' + roomQueryStringURL + '</a>';
-        var roomURLsDiv = document.getElementById('room-urls');
-        roomURLsDiv.innerHTML = html;
-        roomURLsDiv.style.display = 'block';
-    }
+
     (function() {
         var params = {},
             r = /([^&=]+)=?([^&]*)/g;
@@ -134,18 +163,28 @@
     if(!roomid && hashString.length) {
         roomid = hashString;
     }
-    if(roomid && roomid.length) {
-        document.getElementById('room-id').value = roomid;
-        localStorage.setItem(connection.socketMessageEvent, roomid);
-        // auto-join-room
+    function joinBroadcastLooper(roomid) {
         (function reCheckRoomPresence() {
-            connection.checkPresence(roomid, function(isRoomExists) {
-                if(isRoomExists) {
-                    connection.join(roomid);
+            connection.checkPresence(roomid, function(isRoomExist) {
+                if (isRoomExist) {
+                    beforeJoiningARoom(function() {
+                        connection.join(roomid, function() {
+                            afterConnectingSocket();
+                        });
+                    });
                     return;
                 }
                 setTimeout(reCheckRoomPresence, 5000);
             });
         })();
-        disableInputButtons();
     }
+    if (roomid && roomid.length) {
+        document.getElementById('room-id').value = roomid;
+        localStorage.setItem(connection.socketMessageEvent, roomid);
+        joinBroadcastLooper(roomid);
+    }
+
+    $('body #out_gr').on('click',function(){
+        connection.closeEntireSession();
+    });
+};

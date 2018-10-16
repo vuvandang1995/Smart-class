@@ -200,6 +200,18 @@ $(document).ready(function(){
                 chi_tiet_so_luong[$(this).attr('name')] = (-1);
             }
         });
+        if(chi_tiet_so_luong['r_tn_d']+chi_tiet_so_luong['r_tn_tb']+chi_tiet_so_luong['r_tn_k'] =='000'){
+            alert("Chưa chọn số lượng câu hỏi");
+            return false;
+        }
+        if(chi_tiet_so_luong['r_dt_d']+chi_tiet_so_luong['r_dt_tb']+chi_tiet_so_luong['r_dt_k'] =='000'){
+            alert("Chưa chọn số lượng câu hỏi");
+            return false;
+        }
+        if(chi_tiet_so_luong['r_tl_d']+chi_tiet_so_luong['r_tl_tb']+chi_tiet_so_luong['r_tl_k'] =='000'){
+            alert("Chưa chọn số lượng câu hỏi");
+            return false;
+        }
         $("#processing").modal({backdrop: 'static', keyboard: false});
         $.ajax({
             xhr: function() {

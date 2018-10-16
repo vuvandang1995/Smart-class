@@ -101,7 +101,8 @@ def mon(request, id):
         ls_teacher = MyUser.objects.filter(id__in=ls_chi_tiet, position=1)
         teacher_ht = GiaoVienMon.objects.get(myuser_id__in=ls_teacher, mon_id=monOb)
         content = {'lop': mark_safe(json.dumps(lopOb.lop_id.ten)), 'mon': lop_mon(user), 'mon_ht': monOb,
-                   'ls_student': ls_student, 'teacher_ht': teacher_ht, 'username': mark_safe(json.dumps(user.username))}
+                   'lop_ht': lopOb.lop_id, 'ls_student': ls_student, 'teacher_ht': teacher_ht,
+                   'username': mark_safe(json.dumps(user.username))}
         return render(request, 'student/subjects.html', content)
     else:
         return redirect("/")
@@ -141,6 +142,8 @@ def score_data(request):
             mon_data = ' <h5>{} - {}</h5>'.format(mon.ten, mon.lop)
             diem_thi = '<h4>'
             for diem in list_score:
+                if not diem.da_cham_diem:
+                    break
                 tong_diem = diem.diem_auto + diem.diem_cham_tay
                 if tong_diem < 5.0:
                     loai = "danger"
@@ -403,10 +406,11 @@ def exam(request, data):
             DiemSo.objects.get(de_id=de, myuser_id=user, ngay_lam=timezone.now().date())
         except:
             if request.method == "POST":
-                de = De.objects.get(id=request.POST['de_id'])
+                # de = De.objects.get(id=request.POST['de_id'])
                 ds_dap_an = json.loads(request.POST['ds_dap_an'])
                 diem = 0
                 bai_lam = ''
+                da_cham_diem = True
                 for i, ctd in enumerate(ChiTietDe.objects.filter(de_id=de)):
                     media = ''
                     dap_an = ''
@@ -477,6 +481,7 @@ def exam(request, data):
                                 </div>
                             '''.format(i + 1, ctd.cau_hoi_id.noi_dung, media, dap_an, ctd.diem, plus)
                         elif "Tự luận" in ctd.cau_hoi_id.dang_cau_hoi:
+                            da_cham_diem = False
                             bai_lam += '''
                                 <div id="cau_{0}">
                                     <h4 class="head_ch"><p>Câu hỏi {0} ({3} điểm):</p><input type="number" min='0' max='{3}' step='0.01' data-start_d="0_{5}" data-value_d="0" data-end_d="0_{5}" readonly class="diem_tu_luan" data-id="0_{5}"></h4>
@@ -543,6 +548,7 @@ def exam(request, data):
                             </div>
                             '''.format(i + 1, ctd.cau_hoi_da_id.noi_dung, dap_an, media, ctd.diem, plus)
                         elif "Tự luận" in ctd.cau_hoi_da_id.dang_cau_hoi:
+                            da_cham_diem = False
                             for index, ch in enumerate(ChiTietCauHoiDa.objects.filter(cau_hoi_da_id=ctd.cau_hoi_da_id)):
                                 dap_an += '''
                                 <div class="row div_sub">{0}.{1} ({2} điểm): {3}</div>
@@ -567,7 +573,7 @@ def exam(request, data):
                             </div>
                             '''.format(i + 1, ctd.diem, ctd.cau_hoi_da_id.id, ch.cau_hoi_id.id, media,
                                        ctd.cau_hoi_da_id.noi_dung, dap_an)
-                DiemSo.objects.create(de_id=de, myuser_id=user, mon_id=de.mon_id,
+                DiemSo.objects.create(de_id=de, myuser_id=user, mon_id=de.mon_id, da_cham_diem=da_cham_diem,
                                       loai_diem="{} - {} phút".format(de.dung_lam, de.thoi_gian),
                                       bai_lam=bai_lam, diem_auto=round(diem, 2))
                 time_remain = 0
