@@ -16,9 +16,10 @@ $(document).ready(function(){
     document.getElementById('join-room').onclick = function() {
         joinBroadcastLooper(document.getElementById('room-id').value);
     };
-    var checkbox = document.querySelector('input[name=broadcaster]');
+
 
     function beforeJoiningARoom(callback) {
+        var checkbox = document.querySelector('input[name=broadcaster]');
         if (checkbox.checked === false) {
             connection.extra.broadcaster = false;
             connection.dontCaptureUserMedia = true;
@@ -28,21 +29,9 @@ $(document).ready(function(){
         }
         callback();
     }
-//    document.getElementById('open-or-join-room').onclick = function() {
-//        disableInputButtons();
-//        connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExists, roomid) {
-//            if(!isRoomExists) {
-//                showRoomURL(roomid);
-//            }
-//        });
-//    };
-    // ......................................................
-    // ..................RTCMultiConnection Code.............
-    // ......................................................
+
     var connection = new RTCMultiConnection();
 
-    // Using getScreenId.js to capture screen from any domain
-    // You do NOT need to deploy Chrome Extension YOUR-Self!!
     connection.getScreenConstraints = function(callback) {
         getScreenConstraints(function(error, screen_constraints) {
             if (!error) {
@@ -53,9 +42,7 @@ $(document).ready(function(){
             throw error;
         });
     };
-    // by default, socket.io server is assumed to be deployed on your own URL
     connection.socketURL = "http://192.168.100.22:9002/";
-    // comment-out below line if you do not have your own socket.io server
     // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
     connection.socketMessageEvent = 'audio-video-screen-demo';
     connection.session = {
@@ -70,10 +57,12 @@ $(document).ready(function(){
     connection.videosContainer = document.getElementById('videos-container');
     connection.onstream = function(event) {
         if(document.getElementById(event.streamid)) {
-            alert(event.streamid);
             var existing = document.getElementById(event.streamid);
             existing.parentNode.removeChild(existing);
-            console.log('remove');
+            if(!connection.extra.broadcaster){
+                $("#open-room").click();
+                return false;
+            }
         }
 
         var width = parseInt(connection.videosContainer.clientWidth / 2) - 20;
@@ -89,7 +78,6 @@ $(document).ready(function(){
             showOnMouseEnter: false
         });
         connection.videosContainer.appendChild(mediaElement);
-        console.log("addpend");
         setTimeout(function() {
             mediaElement.media.play();
         }, 5000);
@@ -105,7 +93,7 @@ $(document).ready(function(){
             connection.socket.emit(connection.socketCustomEvent, {
                 participants: participants
             });
-        } else if (event.type === 'remote' && checkbox.checked === false) {
+        } else if (event.type === 'remote' && connection.extra.broadcaster === false) {
             connection.socket.emit(connection.socketCustomEvent, {
                 giveAllParticipants: true
             });
@@ -113,13 +101,11 @@ $(document).ready(function(){
     };
     function afterConnectingSocket() {
         connection.socket.on(connection.socketCustomEvent, function(message) {
-//            console.error('custom message', message);
             if (message.participants && !connection.isInitiator) {
                 message.participants.forEach(function(participant) {
                     if (participant.pid === connection.userid) return;
                     if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
-                    if (checkbox.checked === true && participant.broadcaster === false) return;
-                    console.error('I am joining:', participant.pid);
+                    if (connection.extra.broadcaster.checked === true && participant.broadcaster === false) return;
                     connection.join(participant.pid);
                 });
             }
@@ -143,27 +129,7 @@ $(document).ready(function(){
             mediaElement.parentNode.removeChild(mediaElement);
         }
     };
-//    function disableInputButtons() {
-////        document.getElementById('open-or-join-room').disabled = true;
-//        document.getElementById('open-room').disabled = true;
-//        document.getElementById('join-room').disabled = true;
-//        document.getElementById('room-id').disabled = true;
-//        document.getElementById('share-screen').disabled = false;
-//    }
-    // ......................................................
-    // ......................Handling Room-ID................
-    // ......................................................
-    function showRoomURL(roomid) {
-        var roomHashURL = '#' + roomid;
-        var roomQueryStringURL = '?roomid=' + roomid;
-        var html = '<h2>Unique URL for your room:</h2><br>';
-        html += 'Hash URL: <a href="' + roomHashURL + '" target="_blank">' + roomHashURL + '</a>';
-        html += '<br>';
-        html += 'QueryString URL: <a href="' + roomQueryStringURL + '" target="_blank">' + roomQueryStringURL + '</a>';
-        var roomURLsDiv = document.getElementById('room-urls');
-        roomURLsDiv.innerHTML = html;
-        roomURLsDiv.style.display = 'block';
-    }
+
     (function() {
         var params = {},
             r = /([^&=]+)=?([^&]*)/g;
@@ -194,7 +160,6 @@ $(document).ready(function(){
         roomid = hashString;
     }
     function joinBroadcastLooper(roomid) {
-        // join-broadcast looper
         (function reCheckRoomPresence() {
             connection.checkPresence(roomid, function(isRoomExist) {
                 if (isRoomExist) {
@@ -221,4 +186,10 @@ $(document).ready(function(){
     }else{
         $("#join-room").click();
     }
+
+    $(".mail_list").click(function(){
+        if(confirm("Cho phép "+$(this).data('fullname') + " chia sẻ màn hình")){
+            alert("send socket");
+        };
+    })
 });

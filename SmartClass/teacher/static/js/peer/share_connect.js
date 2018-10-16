@@ -1,24 +1,8 @@
-$(document).ready(function(){
-    document.getElementById('share-screen').onclick = function() {
-        connection.addStream({
-            screen: true,
-//            oneway:true
-        });
-
-    };
-    document.getElementById('open-room').onclick = function() {
-        beforeJoiningARoom(function() {
-            connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExist, roomid) {
-                afterConnectingSocket();
-            });
-        });
-    };
-    document.getElementById('join-room').onclick = function() {
-        joinBroadcastLooper(document.getElementById('room-id').value);
-    };
+function share_connect(){
     var checkbox = document.querySelector('input[name=broadcaster]');
 
     function beforeJoiningARoom(callback) {
+
         if (checkbox.checked === false) {
             connection.extra.broadcaster = false;
             connection.dontCaptureUserMedia = true;
@@ -29,10 +13,28 @@ $(document).ready(function(){
         callback();
     }
 
+    document.getElementById('share-screen').onclick = function() {
+        connection.addStream({
+            screen: true,
+//            oneway:true
+        });
+
+    };
+
+    document.getElementById('open-room').onclick = function() {
+        beforeJoiningARoom(function() {
+            connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExist, roomid) {
+                afterConnectingSocket();
+            });
+        });
+    };
+
+    document.getElementById('join-room').onclick = function() {
+        joinBroadcastLooper(document.getElementById('room-id').value);
+    };
+
     var connection = new RTCMultiConnection();
 
-    // Using getScreenId.js to capture screen from any domain
-    // You do NOT need to deploy Chrome Extension YOUR-Self!!
     connection.getScreenConstraints = function(callback) {
         getScreenConstraints(function(error, screen_constraints) {
             if (!error) {
@@ -43,9 +45,7 @@ $(document).ready(function(){
             throw error;
         });
     };
-    // by default, socket.io server is assumed to be deployed on your own URL
     connection.socketURL = "http://192.168.100.22:9002/";
-    // comment-out below line if you do not have your own socket.io server
     // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
     connection.socketMessageEvent = 'audio-video-screen-demo';
     connection.session = {
@@ -62,8 +62,10 @@ $(document).ready(function(){
         if(document.getElementById(event.streamid)) {
             var existing = document.getElementById(event.streamid);
             existing.parentNode.removeChild(existing);
-            $("#open-room").click();
-            return false;
+            if(!connection.extra.broadcaster){
+                $("#open-room").click();
+                return false;
+            }
         }
 
         var width = parseInt(connection.videosContainer.clientWidth / 2) - 20;
@@ -79,10 +81,10 @@ $(document).ready(function(){
             showOnMouseEnter: false
         });
         connection.videosContainer.appendChild(mediaElement);
-        console.log("addpend");
         setTimeout(function() {
             mediaElement.media.play();
         }, 5000);
+
         mediaElement.id = event.streamid;
         if (event.type === 'remote' && connection.isInitiator) {
             var participants = [];
@@ -103,13 +105,11 @@ $(document).ready(function(){
     };
     function afterConnectingSocket() {
         connection.socket.on(connection.socketCustomEvent, function(message) {
-//            console.error('custom message', message);
             if (message.participants && !connection.isInitiator) {
                 message.participants.forEach(function(participant) {
                     if (participant.pid === connection.userid) return;
                     if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
                     if (checkbox.checked === true && participant.broadcaster === false) return;
-                    console.error('I am joining:', participant.pid);
                     connection.join(participant.pid);
                 });
             }
@@ -164,7 +164,6 @@ $(document).ready(function(){
         roomid = hashString;
     }
     function joinBroadcastLooper(roomid) {
-        // join-broadcast looper
         (function reCheckRoomPresence() {
             connection.checkPresence(roomid, function(isRoomExist) {
                 if (isRoomExist) {
@@ -185,11 +184,7 @@ $(document).ready(function(){
         joinBroadcastLooper(roomid);
     }
 
-    $("#room-id").val(window.atob(location.href.split("_")[1]));
-    if($("#giao_vien").val() == 1){
-        $("#open-room").click();
-    }else{
-        $("#join-room").click();
-    }
-
-});
+    $('body #out_gr').on('click',function(){
+        connection.closeEntireSession();
+    });
+};
