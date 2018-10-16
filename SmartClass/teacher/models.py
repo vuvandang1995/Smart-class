@@ -255,6 +255,7 @@ class DiemSo(models.Model):
     diem_auto = models.FloatField(null=True)
     diem_cham_tay = models.FloatField(default=0)
     bai_lam = models.TextField(default=0)
+    da_cham_diem = models.BooleanField(default=True)
 
     class Meta:
         managed = True

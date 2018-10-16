@@ -28,7 +28,17 @@ $(document).ready(function(){
         }
         callback();
     }
-
+//    document.getElementById('open-or-join-room').onclick = function() {
+//        disableInputButtons();
+//        connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExists, roomid) {
+//            if(!isRoomExists) {
+//                showRoomURL(roomid);
+//            }
+//        });
+//    };
+    // ......................................................
+    // ..................RTCMultiConnection Code.............
+    // ......................................................
     var connection = new RTCMultiConnection();
 
     // Using getScreenId.js to capture screen from any domain
@@ -60,10 +70,10 @@ $(document).ready(function(){
     connection.videosContainer = document.getElementById('videos-container');
     connection.onstream = function(event) {
         if(document.getElementById(event.streamid)) {
+            alert(event.streamid);
             var existing = document.getElementById(event.streamid);
             existing.parentNode.removeChild(existing);
-            $("#open-room").click();
-            return false;
+            console.log('remove');
         }
 
         var width = parseInt(connection.videosContainer.clientWidth / 2) - 20;
@@ -133,7 +143,27 @@ $(document).ready(function(){
             mediaElement.parentNode.removeChild(mediaElement);
         }
     };
-
+//    function disableInputButtons() {
+////        document.getElementById('open-or-join-room').disabled = true;
+//        document.getElementById('open-room').disabled = true;
+//        document.getElementById('join-room').disabled = true;
+//        document.getElementById('room-id').disabled = true;
+//        document.getElementById('share-screen').disabled = false;
+//    }
+    // ......................................................
+    // ......................Handling Room-ID................
+    // ......................................................
+    function showRoomURL(roomid) {
+        var roomHashURL = '#' + roomid;
+        var roomQueryStringURL = '?roomid=' + roomid;
+        var html = '<h2>Unique URL for your room:</h2><br>';
+        html += 'Hash URL: <a href="' + roomHashURL + '" target="_blank">' + roomHashURL + '</a>';
+        html += '<br>';
+        html += 'QueryString URL: <a href="' + roomQueryStringURL + '" target="_blank">' + roomQueryStringURL + '</a>';
+        var roomURLsDiv = document.getElementById('room-urls');
+        roomURLsDiv.innerHTML = html;
+        roomURLsDiv.style.display = 'block';
+    }
     (function() {
         var params = {},
             r = /([^&=]+)=?([^&]*)/g;
@@ -191,5 +221,4 @@ $(document).ready(function(){
     }else{
         $("#join-room").click();
     }
-
 });

@@ -6,7 +6,7 @@ app_name = 'teacher'
 urlpatterns = [
     path('', views.user_login),
     path('teacher', views.home, name='home'),
-    path('manage_class/<str:lop>', views.manage_class, name='manage_class'),
+    path('manage_class/<int:id>', views.manage_class, name='manage_class'),
     path('std/<str:lop>', views.fullname_std_data, name='fullname_std_data'),
     path('group_data/<str:lop>', views.group_data, name='group_data'),
     path('manage_point/<str:lop>', views.manage_point, name='manage_point'),
@@ -25,5 +25,4 @@ urlpatterns = [
         views.resetpwd, name='resetpassword'),
     path('share_<str:lop>', views.share, name='share'),
     path('videocall/', views.call11, name='call11'),
-
 ]

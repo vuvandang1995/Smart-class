@@ -46,38 +46,46 @@
       <div class="row">
         <div class="col-md-12">
           <div class="x_panel">
-            <div class="x_title">
-                <input type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
-                <button id="open-room">Open Room</button>
-                <button id="join-room">Join Room</button>
-                <button id="open-or-join-room">Auto Open Or Join Room</button>
-
-                <hr>
-                    <button id="share-screen" disabled>Share Screen</button>
-                <hr>
-
+            <div class="x_title" style="text-align:center">
+                <input type="checkbox" name="broadcaster" hidden checked>
+                <input  type="hidden" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
+                <input type="hidden" id="giao_vien" value="{{user.position}}">
+                <button  id="open-room" hidden>Open Broadcast</button>
+                <button  id="join-room" hidden>Join Broadcast</button>
+                <button id="share-screen" class="btn btn-primary"><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
                 <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
-
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
               <div class="row">
                 <div class="col-sm-3 mail_list_column" style="overflow-y: scroll; height:600px;">
-                  {% for student in ls_student %}
-                  <a href="#">
-                    <div class="mail_list">
-                      <div class="left">
-                        <i class="fa fa-circle"></i> <i class="fa fa-edit"></i>
-                      </div>
-                      <div class="right">
-                        <h3>{{ student.fullname }} <small>{{ student.last_login }}</small></h3>
-                        <p>Ut enim ad minim veniam, quis nostrud exercitation enim ad minim veniam, quis nostrud exercitation...</p>
-                      </div>
-                    </div>
-                  </a>
-                  {% endfor %}
+                          {% for student in ls_student %}
+                          {% comment %} <a href="javascript:register_popup_teacher('{{student.username}}', '{{student.fullname}}');"> {% endcomment %}
+                            <div class="mail_list" data-fullname="{{student.fullname}}">
+                              <!-- <div class="left">
+                              </div> -->
+                              <p hidden>{{student.username}}</p>
+                              <div class="right">
+                                <h3>{{ student.fullname }}
+                                    <small style="display:none;" id="giotay_{{student.username}}" class="giotay_std">
+                                      <i class="fa fa-hand-paper-o" style="font-size: 20px;color:red"></i>
+                                    </small>
+                                  {%if student.online == True%}
+                                    <small style="background: rgb(66, 183, 42);border-radius: 50%;display: inline-block;height: 6px;margin-left: 4px;width: 6px;"></small>
+                                  {% endif %}
+                                  </h3>
+                                {% if student.gioi_tinh == 1%}
+                                  <p><b>Giới tính:</b> Nam</p>
+                                {% else%}
+                                  <p><b>Giới tính:</b> Nữ</p>
+                                {% endif%}
+                                <p><b>Email:</b> {{student.email}}</p>
+                              </div>
+                            </div>
+                          {% comment %} </a> {% endcomment %}
+                          {% endfor %}
 
-                </div>
+                        </div>
                 <div class="col-sm-9 mail_view">
                   <div class="inbox-body">
                     <div id="videos-container" style="width:100%"></div>
@@ -121,6 +129,7 @@
     <script src="http://192.168.100.22:9002/socket.io/socket.io.js"></script>
     <script src="{% static 'js/peer/getScreenId.js' %}"></script>
     <script src="{% static 'js/peer/getMediaElement.js' %}"></script>
+    <script src="{% static 'js/teacher/RTC/videocall/FileBufferReader.js' %}"></script>
     <script src="{% static 'js/peer/screen.js' %}"></script>
 {% endblock javascripts %}
 

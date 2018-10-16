@@ -16,10 +16,12 @@
         <div class="col-md-12">
           <div class="x_panel">
             <div class="x_title">
-              <h2>Lớp {{lop_ht}}  </h2>
+                <h2>Lớp {{lop_ht.ten}}</h2>
+                <!--<small> {{lop_ht.khoa_id.ten_khoa}} - {{lop_ht.nien_khoa_id.ten_nien_khoa}} -  {{lop_ht.nien_khoa_id.nam_hoc}}</small>-->
                 <button class="btn btn-info" style="float:right;" id="tao_ky_thi" data-toggle="modal" data-target="#ky_thi" >Tạo kỳ thi <i class="fa fa-edit"></i> </button>
-                <button class="btn btn-primary" style="float:right;" onclick="document.location.href = '/share_{{lop_ht}}';">Trình chiếu <i class="fa fa-video-camera"></i> </button>
-              <div class="clearfix"></div>
+                <button class="btn btn-primary" style="float:right;" id="share" >Trình chiếu <i class="fa fa-video-camera"></i> </button>
+
+                <div class="clearfix"></div>
             </div>
             <div class="x_content">
               <div class="" role="tabpanel" data-example-id="togglable-tabs">
@@ -44,7 +46,7 @@
                       <input style="display:none;" type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
                       <button style="display:none;" id="open-broadcast" disabled>Open Broadcast</button>
                       <button style="display:none;" id="join-broadcast">Join Broadcast</button>
-                      
+
                     </section>
                   </li>
 
@@ -336,6 +338,12 @@
 
 {% block javascripts %}
   {{ block.super }}
+<script>
+    $("#share").click(function(){
+        var link = '{{lop_ht.ten}}'+'_'+'{{lop_ht.khoa_id.id}}'+'_'+'{{lop_ht.nien_khoa_id.id}}';
+        document.location.href = '/share_'+ window.btoa(link);
+    });
+</script>
   <script src="{% static 'js/teacher/manage_class.js' %}"></script>
   <script src="{% static 'js/teacher/peerjs/peer.js' %}"></script>
   

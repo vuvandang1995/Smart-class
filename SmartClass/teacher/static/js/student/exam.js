@@ -38,9 +38,13 @@ $(document).ready(function(){
         },500)
     }
     else if (parseInt(time_remain) == 0){
-        $("#load_de").html(`<div style="text-align:center"><h1>Thời gian làm bài đã hết</h1></div>`);
+        $("#load_de").html(`<div style="text-align:center">
+        <h1>Thời gian làm bài đã hết</h1><a href="/" class="btn btn-lg btn-primary">
+        <i class="fa fa-mail-reply"> Thoát</a></div>`);
     }else{
-        $("#load_de").html(`<div style="text-align:center"><h1>Bạn đã nộp bài</h1></div>`);
+        $("#load_de").html(`<div style="text-align:center">
+        <h1>Bạn đã nộp bài</h1><a href="/" class="btn btn-lg btn-primary">
+        <i class="fa fa-mail-reply"> Thoát</a></div>`);
     }
 });
 
@@ -140,7 +144,9 @@ function countdowntime(dateend){
             if (distance < 0) {
                 clearInterval(x);
                 document.getElementById("tg_lam").innerHTML = "Hết giờ!";
-                document.getElementById("load_de").innerHTML = `<div style="text-align:center"><h1>Thời gian làm bài đã hết</h1></div>`;
+                document.getElementById("load_de").innerHTML = `
+                <div style="text-align:center"><h1>Thời gian làm bài đã hết</h1>
+                <a href="/" class="btn btn-lg btn-primary"><i class="fa fa-mail-reply"> Thoát</a></div>`;
             }
         }, 1000);
     // });

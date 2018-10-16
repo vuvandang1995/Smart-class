@@ -46,18 +46,14 @@
       <div class="row">
         <div class="col-md-12">
           <div class="x_panel">
-            <div class="x_title">
-                <input type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
-                <button id="open-room">Open Room</button>
-                <button id="join-room">Join Room</button>
-                <button id="open-or-join-room">Auto Open Or Join Room</button>
-
-                <hr>
-                    <button id="share-screen" disabled>Share Screen</button>
-                <hr>
-
+            <div class="x_title" style="text-align:center">
+                <input type="checkbox" name="broadcaster" hidden checked>
+                <input  type="hidden" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
+                <input type="hidden" id="giao_vien" value="{{user.position}}">
+                <button  id="open-room" hidden>Open Broadcast</button>
+                <button  id="join-room" hidden>Join Broadcast</button>
+                <button id="share-screen" style="display:none;" class="btn btn-primary" ><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
                 <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
-
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -73,6 +69,12 @@
     <script src="{% static 'vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'build/js/custom.js' %}"></script>
     <script src="{% static 'js/teacher/chat_student.js' %}"></script>
+    <script src="{% static 'js/peer/RTCMultiConnection.min.js' %}"></script>
+    <script src="http://192.168.100.22:9002/socket.io/socket.io.js"></script>
+    <script src="{% static 'js/peer/getScreenId.js' %}"></script>
+    <script src="{% static 'js/peer/getMediaElement.js' %}"></script>
+    <script src="{% static 'js/teacher/RTC/videocall/FileBufferReader.js' %}"></script>
+    <script src="{% static 'js/peer/screen.js' %}"></script>
     <script>
       var userName = {{ username }};
       var userSocket = new WebSocket(
@@ -161,9 +163,15 @@
                     'time' : 'key'
                   }));
                 }
+              }else if (time == 'share'){
+                console.log("alo");
+                <!--setTimeout(function(){-->
+                    <!--$("#open-room").click();-->
+                <!--}, 2000);-->
               }else if (time != 'key'){
                 insertChat(who, message, time);
               }
+
           };
 
 
@@ -304,11 +312,7 @@
 
 
     </script>
-    <script src="{% static 'js/peer/RTCMultiConnection.min.js' %}"></script>
-    <script src="http://192.168.100.22:9002/socket.io/socket.io.js"></script>
-    <script src="{% static 'js/peer/getScreenId.js' %}"></script>
-    <script src="{% static 'js/peer/getMediaElement.js' %}"></script>
-    <script src="{% static 'js/peer/screen.js' %}"></script>
+
 </body>
 </html>
 

@@ -24,10 +24,10 @@ connection.autoCloseEntireSession = true;
 
 // connection.onUserStatusChanged = function(event) {
 //     if (event.status === 'offline') {
-//       // Is the room owner here?	
+//       // Is the room owner here?
 //       var remoteUserId = connection.sessionid; // chat_room is the room name, set higher in the script.
 //       var chatters = [connection.userid] // initialize array of users with me.
-//       var isUserConnectedWithYou = connection.getAllParticipants().indexOf(remoteUserId) !== -1;	
+//       var isUserConnectedWithYou = connection.getAllParticipants().indexOf(remoteUserId) !== -1;
 //       if (isUserConnectedWithYou) {
 //         // The owner is here...
 //         console.log('Primary user is here. Nothing to do.');
@@ -36,7 +36,7 @@ connection.autoCloseEntireSession = true;
 //         connection.attachStreams.forEach(function(localStream) {
 //             localStream.stop();
 //         });
-    
+
 //         // close socket.io connection
 //         connection.close();
 //       }
@@ -223,11 +223,11 @@ function audio_broad(){
             mediaElement.parentNode.removeChild(mediaElement);
         }
     };
-    
+
     // ......................................................
     // ......................Handling Room-ID................
     // ......................................................
-    
+
     (function() {
         var params = {},
             r = /([^&=]+)=?([^&]*)/g;
@@ -298,5 +298,5 @@ function audio_broad(){
         audio_broad.closeEntireSession();
     });
 
-    
+
 };
