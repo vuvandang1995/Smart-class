@@ -446,6 +446,13 @@ $(document).ready(function(){
     var dict_group_chat = {};
     function click_group_chat(){
         $('.group_class').on('click',function(){
+            for(var key in dict_group_chat) {
+                if (dict_group_chat[key]){
+                    dict_group_chat[key].close();
+                    delete dict_group_chat[key];
+                }
+                
+            }
             var group_chat_name = $(this).children('p').first().text();
             if (dict_group_chat[group_chat_name] == undefined){
                 dict_group_chat[group_chat_name] = new WebSocket(
@@ -508,7 +515,7 @@ $(document).ready(function(){
                 var who = data['who'];
                 var time = data['time'];
                 insertChat2(who, message, time);
-             };
+            };
 
             $('body').on('click', '.zzz', function(){
                 $("body .mytext2").trigger({type: 'keydown', which: 13, keyCode: 13});
@@ -519,22 +526,24 @@ $(document).ready(function(){
                     $(this).parent().parent().next().children('span').click();
                 }
             })
-            $('body').on('click', '.zzz', function(){
-                var message = $(this).parent().parent().children().children().children('input').val();
-                message = escapeHtml(message);
-                var date = formatAMPM(new Date());
-                if (message != ''){
-                    dict_group_chat[group_chat_name].send(JSON.stringify({
-                        'message' : message,
-                        'who' : userName,
-                        'time' : date
-                    }));
-                }
-                $(this).parent().parent().children().children().children('input').val('');
-                
-            })
     
         });
+
+        $('body').on('click', '.zzz', function(){
+            var message = $(this).parent().parent().children().children().children('input').val();
+            var group_chat_name =  class_+userName+ $('#title-chat').text();
+            message = escapeHtml(message);
+            var date = formatAMPM(new Date());
+            if (message != ''){
+                dict_group_chat[group_chat_name].send(JSON.stringify({
+                    'message' : message,
+                    'who' : userName,
+                    'time' : date
+                }));
+            }
+            $(this).parent().parent().children().children().children('input').val('');
+            
+        })
     
     }
     
