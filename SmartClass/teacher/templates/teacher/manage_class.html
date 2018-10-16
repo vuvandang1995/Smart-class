@@ -340,7 +340,7 @@
   {{ block.super }}
 <script>
     $("#share").click(function(){
-        var link = '{{lop_ht.ten}}'+'_'+'{{lop_ht.khoa_id.id}}'+'_'+'{{lop_ht.nien_khoa_id.id}}';
+        var link = '{{lop_ht.ten}}'+'_'+'{{lop_ht.khoa_id.id}}'+'_'+'{{lop_ht.nien_khoa_id.id}}'+'_'+'{{user.id}}';
         document.location.href = '/share_'+ window.btoa(link);
     });
 </script>

@@ -1056,13 +1056,13 @@ def user_profile(request):
 def share(request, lop):
     user = request.user
     temp = giaiMa(lop)
-    lop, khoa, nien_khoa = temp.split("_")
+    lop, khoa, nien_khoa, gvid = temp.split("_")
     if user.is_authenticated:
         ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
         content = {'username': mark_safe(json.dumps(user.username)),
                    'list_lop': ChiTietLop.objects.filter(myuser_id=user),
-                   'ls_student': ls_student}
+                   'ls_student': ls_student, 'gvht': MyUser.objects.get(id=gvid), 'lopht': lop}
         if user.position == 0:
             return render(request, 'student/share.html', content)
         else:

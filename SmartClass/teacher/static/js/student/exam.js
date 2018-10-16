@@ -1,6 +1,4 @@
 $(document).ready(function(){
-
-
     function get_de(de_id){
         $.ajax({
             type: 'GET',
