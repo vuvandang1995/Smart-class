@@ -279,6 +279,16 @@ function audio_broad(){
         joinBroadcastLooper(roomid);
     }
 
+    audio_broad.onEntireSessionClosed = function(event) {
+        if (audio_broad.isInitiator) {
+            audio_broad.attachStreams.forEach(function(stream) {
+                stream.stop();
+            });
+        } else {
+            $('#giotay').hide();
+            $('#bogiotay').hide();
+        }
+    };
 
     $('body #done_video').on('click',function(){
         if (audio_broad.isInitiator) {

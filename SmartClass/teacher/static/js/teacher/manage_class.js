@@ -15,6 +15,8 @@ $(document).ready(function(){
             $("#videocall"+who).attr("name", message); 
         }else if (time == 'giotay'){
             $('#giotay_'+who).show();
+        }else if (time == 'bogiotay'){
+            $('#giotay_'+who).hide();
         }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_call') && (time != 'teacher_audio_all') && (time != 'enable_mic')){
             insertChat(who, message, time);
         }
@@ -130,6 +132,7 @@ $(document).ready(function(){
                 mediaElement.media.play();
             }, 5000);
             mediaElement.id = event.streamid;
+            $('#videos-container'+roomid+' .media-container .media-controls').hide();
         };
 
 
@@ -202,6 +205,7 @@ $(document).ready(function(){
 
                     done.show();
                     done.click(function(){
+                        event.stopPropagation();
                         // connection.attachStreams.forEach(function(localStream) {
                         //     localStream.stop();
                         // });
@@ -242,6 +246,17 @@ $(document).ready(function(){
             'message' : 'enable_mic',
             'who' : $(this).attr('id').split('_')[1],
             'time' : 'enable_mic'
+        }));
+        $(this).next().show();
+
+    });
+    $(".bogiotay_std").click(function(event){
+        event.stopPropagation();
+        $(this).hide();
+        chatallSocket.send(JSON.stringify({
+            'message' : 'disable_mic',
+            'who' : $(this).attr('id').split('_')[1],
+            'time' : 'disable_mic'
         }));
 
     });
