@@ -64,16 +64,33 @@ $(document).ready(function(){
             
             $('#giotay').show();
             $('body').on('click', '#giotay', function(){
-                chatallSocket.send(JSON.stringify({
-                    'message' : 'giotay',
-                    'who' : userName,
-                    'time' : 'giotay'
-                }));
+                setTimeout(function(){
+                    chatallSocket.send(JSON.stringify({
+                        'message' : 'giotay',
+                        'who' : userName,
+                        'time' : 'giotay'
+                    }));
+                }, 2000);
+                $('#giotay').hide();
+                $('#bogiotay').show();
+                
+            });
+
+            $('body').on('click', '#bogiotay', function(){
+                setTimeout(function(){
+                    chatallSocket.send(JSON.stringify({
+                        'message' : 'bogiotay',
+                        'who' : userName,
+                        'time' : 'bogiotay'
+                    }));
+                }, 2000);
+                $('#giotay').show();
+                $('#bogiotay').hide();
                 
             });
                 
 
-        }else if (time != 'key'){
+        }else if ((time != 'key') && (time != 'giotay') && (time != 'bogiotay')){
                 insertChat(who, message, time);
             }
         };
@@ -119,6 +136,7 @@ $(document).ready(function(){
                 mediaElement.media.play();
             }, 5000);
             mediaElement.id = event.streamid;
+            $('#videos-container .media-container .media-controls').hide();
         };
         connection.checkPresence(roomid, function(roomExist, roomid) {
             if (roomExist === true) {
