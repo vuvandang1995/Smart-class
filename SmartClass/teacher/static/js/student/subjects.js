@@ -50,10 +50,7 @@ $(document).ready(function(){
                 $('#join-broadcast').click();
                 $('#videos-container111').show();
             }, 1000);
-            // $("input[name=broadcaster]").prop('checked', true);
-            // $('#room-id').val(teacher_name+'_'+lop);
-            // $('#open-broadcast').click();
-            // $('#videos-container111').show();
+            $('#bogiotay').hide();
         }else if ((time === 'disable_mic') && (userName == who)){
             $('#out_gr').click();
             audio_broad();
@@ -63,6 +60,7 @@ $(document).ready(function(){
                 $('#join-broadcast').click();
                 $('#videos-container111').show();
             }, 1000);
+            $('#giotay').show();
         }else if (time === 'teacher_audio_all'){
             $("input[name=broadcaster]").prop('checked', false);
             $('#room-id').val(teacher_name+'_'+lop);
@@ -279,7 +277,7 @@ $(document).ready(function(){
                                     makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                                 }, time);
                             }    
-                        }else{
+                        }else if (time != 'teacher_call'){
                             insertChat2(who, message, time);
                         }
                     };
