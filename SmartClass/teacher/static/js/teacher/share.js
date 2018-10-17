@@ -4,9 +4,6 @@ $(document).ready(function(){
         '/ws/' + userName + 'chatall'+lopht+'/');
 
     share_connect();
-    $('input[name=broadcaster]').prop('checked',true);
-    $("#room-id").val(window.atob(location.href.split("_")[1]));
-    $("#open-room").click();
 
     chatallSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
@@ -17,6 +14,27 @@ $(document).ready(function(){
             $('#giotay_'+who).show();
         }
     };
+
+    $("#start-screen").click(function(){
+        $('input[name=broadcaster]').prop('checked',true);
+        $("#room-id").val(window.atob(location.href.split("_")[1]));
+        $("#open-room").click();
+        chatallSocket.send(JSON.stringify({
+            'message' : 'start_screen',
+            'who' : $(this).parent().parent().parent().find('p').first().text(),
+            'time' : 'start_screen'
+        }));
+        $("#start-screen").hide();
+        $("#share-screen").show();
+        $("#stop-screen").show();
+    });
+
+    $("#stop-screen").click(function(){
+        $("#done_video").click();
+        $("#start-screen").show();
+        $("#share-screen").hide();
+        $("#stop-screen").hide();
+    });
 
     $(".giotay_std").click(function(event){
         if($(this).children().attr('class') == 'fa fa-hand-paper-o'){

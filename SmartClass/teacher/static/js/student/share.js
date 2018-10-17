@@ -3,10 +3,7 @@ $(document).ready(function(){
         'ws://' + window.location.host +
         '/ws/' + teacher_name + 'chatall'+lopht+'/');
 
-    share_connect();
-    $('input[name=broadcaster]').prop('checked',false);
-    $("#room-id").val(window.atob(location.href.split("_")[1]));
-    $("#join-room").click();
+
 
     $('body').on('click', '#giotay', function(){
         chatallSocket.send(JSON.stringify({
@@ -16,6 +13,7 @@ $(document).ready(function(){
         }));
 
     });
+
     chatallSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
@@ -37,6 +35,11 @@ $(document).ready(function(){
                 $('input[name=broadcaster]').prop('checked',false);
                 $("#join-room").click();
             },1000);
+        }else if(time == 'start_screen'){
+            share_connect();
+            $('input[name=broadcaster]').prop('checked',false);
+            $("#room-id").val(window.atob(location.href.split("_")[1]));
+            $("#join-room").click();
         }
     };
 

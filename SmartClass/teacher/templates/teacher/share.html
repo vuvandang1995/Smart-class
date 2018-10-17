@@ -48,12 +48,14 @@
           <div class="x_panel">
             <div class="x_title" style="text-align:center">
                 <input type="checkbox" name="broadcaster" hidden checked>
-                <input  type="hidden" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
+                <input  type="hidden" id="room-id">
                 <input type="hidden" id="giao_vien" value="{{user.position}}">
-                <button  id="open-room" hidden>Open Broadcast</button>
-                <button  id="join-room" hidden>Join Broadcast</button>
-                <button id="share-screen" class="btn btn-primary"><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
-                <div id="room-urls" style="text-align: center;display: none;background: #F1EDED;margin: 15px -10px;border: 1px solid rgb(189, 189, 189);border-left: 0;border-right: 0;"></div>
+                <button  id="open-room" style="display: none;">Open Broadcast</button>
+                <button  id="join-room" style="display: none;">Join Broadcast</button>
+                <button  id="done_video" style="display: none;">Join Broadcast</button>
+                <button id="start-screen" class="btn btn-success"><i class="fa fa fa-play"></i> Bắt đầu</button>
+                <button id="share-screen" class="btn btn-primary" style="display: none;"><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
+                <button  id="stop-screen" class="btn btn-danger" style="display: none;"><i class="fa fa fa-stop"></i> Dừng</button>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
