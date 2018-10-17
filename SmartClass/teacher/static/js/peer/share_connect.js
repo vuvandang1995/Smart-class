@@ -45,6 +45,7 @@ function share_connect(){
             throw error;
         });
     };
+
     connection.socketURL = "https://192.168.100.23:9443/";
     connection.socketMessageEvent = 'audio-video-screen-demo';
     connection.session = {

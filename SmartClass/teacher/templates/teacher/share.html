@@ -126,7 +126,7 @@
 
 {% block javascripts %}
   {{ block.super }}
-    <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script>
+    <script src="{% static 'js/peer/RTCMultiConnection.min.js' %}"></script>
     <script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>
     <script src="{% static 'js/peer/getScreenId.js' %}"></script>
     <script src="{% static 'js/peer/getMediaElement.js' %}"></script>
