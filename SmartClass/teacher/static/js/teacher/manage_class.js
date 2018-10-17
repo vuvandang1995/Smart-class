@@ -298,15 +298,7 @@ $(document).ready(function(){
 
     $('body #btn_audio_all').on('click',function(){
 
-        audio_broad.onEntireSessionClosed = function(event) {
-            audio_broad.attachStreams.forEach(function(stream) {
-                stream.stop();
-            });
-            $('#giotay').hide();
-            // don't display alert for moderator
-            if (audio_broad.userid === event.userid) return;
-                console.log('close');
-        };
+
         $("input[name=broadcaster]").prop('checked', true);
         $('#room-id').val(userName+'_'+class_);
         $('#open-broadcast').click();

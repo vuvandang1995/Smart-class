@@ -8,24 +8,7 @@
     <link rel="stylesheet" href="{% static 'math/katex.css' %}" />
     <link rel="stylesheet" href="{% static 'math/monokai-sublime.min.css' %}" />
     <link rel="stylesheet" href="{% static 'math/quill/quill.snow.css' %}" />
-    <!--<link href="{% static 'css/easy-autocomplete.css' %}" rel="stylesheet">-->
-    <!--<link href="{% static 'css/easy-autocomplete.min.css' %}" rel="stylesheet">-->
-    <!--<link href="{% static 'css/easy-autocomplete.themes.css' %}" rel="stylesheet">-->
-    <!--<link href="{% static 'css/easy-autocomplete.themes.min.css' %}" rel="stylesheet">-->
-    <style>
-      ::placeholder {
-          color: red;
-          opacity: 1; /* Firefox */
-      }
 
-      :-ms-input-placeholder { /* Internet Explorer 10-11 */
-         color: red;
-      }
-
-      ::-ms-input-placeholder { /* Microsoft Edge */
-         color: red;
-      }
-    </style>
  {% endblock stylesheets %}
 {% block content %}
   <div class="right_col" role="main">
@@ -36,6 +19,7 @@
             <div class="x_title">
                 <h2>Danh sách điểm lớp {{lop_ht}}  </h2>
                 <input type="hidden" value="{{lop_ht}}" id="lop_ht">
+                <i class="fa fa-question" style="float:right;"></i>
                 <div class="clearfix"></div>
             </div>
 

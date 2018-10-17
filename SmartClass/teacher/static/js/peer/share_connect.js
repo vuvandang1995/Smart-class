@@ -134,35 +134,35 @@ function share_connect(){
         }
     };
 
-    (function() {
-        var params = {},
-            r = /([^&=]+)=?([^&]*)/g;
-        function d(s) {
-            return decodeURIComponent(s.replace(/\+/g, ' '));
-        }
-        var match, search = window.location.search;
-        while (match = r.exec(search.substring(1)))
-            params[d(match[1])] = d(match[2]);
-        window.params = params;
-    })();
-    var roomid = '';
-    if (localStorage.getItem(connection.socketMessageEvent)) {
-        roomid = localStorage.getItem(connection.socketMessageEvent);
-    } else {
-        roomid = connection.token();
-    }
-    document.getElementById('room-id').value = roomid;
-    document.getElementById('room-id').onkeyup = function() {
-        localStorage.setItem(connection.socketMessageEvent, this.value);
-    };
-    var hashString = location.hash.replace('#', '');
-    if(hashString.length && hashString.indexOf('comment-') == 0) {
-      hashString = '';
-    }
-    var roomid = params.roomid;
-    if(!roomid && hashString.length) {
-        roomid = hashString;
-    }
+//    (function() {
+//        var params = {},
+//            r = /([^&=]+)=?([^&]*)/g;
+//        function d(s) {
+//            return decodeURIComponent(s.replace(/\+/g, ' '));
+//        }
+//        var match, search = window.location.search;
+//        while (match = r.exec(search.substring(1)))
+//            params[d(match[1])] = d(match[2]);
+//        window.params = params;
+//    })();
+//    var roomid = '';
+//    if (localStorage.getItem(connection.socketMessageEvent)) {
+//        roomid = localStorage.getItem(connection.socketMessageEvent);
+//    } else {
+//        roomid = connection.token();
+//    }
+//    document.getElementById('room-id').value = roomid;
+//    document.getElementById('room-id').onkeyup = function() {
+//        localStorage.setItem(connection.socketMessageEvent, this.value);
+//    };
+//    var hashString = location.hash.replace('#', '');
+//    if(hashString.length && hashString.indexOf('comment-') == 0) {
+//      hashString = '';
+//    }
+//    var roomid = params.roomid;
+//    if(!roomid && hashString.length) {
+//        roomid = hashString;
+//    }
     function joinBroadcastLooper(roomid) {
         (function reCheckRoomPresence() {
             connection.checkPresence(roomid, function(isRoomExist) {
@@ -178,11 +178,35 @@ function share_connect(){
             });
         })();
     }
-    if (roomid && roomid.length) {
-        document.getElementById('room-id').value = roomid;
-        localStorage.setItem(connection.socketMessageEvent, roomid);
-        joinBroadcastLooper(roomid);
-    }
+//    if (roomid && roomid.length) {
+//        document.getElementById('room-id').value = roomid;
+//        localStorage.setItem(connection.socketMessageEvent, roomid);
+//        joinBroadcastLooper(roomid);
+//    }
+    connection.onEntireSessionClosed = function(event) {
+        if (connection.isInitiator) {
+            connection.attachStreams.forEach(function(stream) {
+                stream.stop();
+            });
+        } else {
+            $('#giotay').hide();
+            $('#bogiotay').hide();
+        }
+    };
+
+    $('body #done_video').on('click',function(){
+        if (connection.isInitiator) {
+            connection.closeEntireSession(function() {
+                console.log('close');
+            });
+        } else {
+            connection.leave();
+            connection.attachStreams.forEach(function(localStream) {
+                localStream.stop();
+            });
+        }
+        $(this).hide();
+    });
 
     $('body #out_gr').on('click',function(){
         connection.closeEntireSession();
