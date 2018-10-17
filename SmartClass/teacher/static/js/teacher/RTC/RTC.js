@@ -284,10 +284,21 @@ function audio_broad(){
             audio_broad.attachStreams.forEach(function(stream) {
                 stream.stop();
             });
-        } else {
+            console.log(event);
+            console.log(audio_broad.attachStreams);
+        }else {
+            console.log(event);
+            console.log(audio_broad.attachStreams);
+            audio_broad.leave();
+            audio_broad.attachStreams.forEach(function(localStream) {
+                if (audio_broad.attachStreams.type == 'local'){
+                    localStream.stop();
+                }
+            });
             $('#giotay').hide();
             $('#bogiotay').hide();
         }
+            
     };
 
     $('body #done_video').on('click',function(){
@@ -295,7 +306,7 @@ function audio_broad(){
             audio_broad.closeEntireSession(function() {
                 console.log('close');
             });
-        } else {
+        }else{
             audio_broad.leave();
             audio_broad.attachStreams.forEach(function(localStream) {
                 localStream.stop();
@@ -305,7 +316,15 @@ function audio_broad(){
     });
 
     $('body #out_gr').on('click',function(){
-        audio_broad.closeEntireSession();
+        console.log(audio_broad.getRemoteStreams());
+        audio_broad.getRemoteStreams().forEach(function(localStream) {
+            localStream.stop();
+        });
+        audio_broad.attachStreams.forEach(function(localStream) {
+            localStream.stop();
+        });
+        // audio_broad.closeEntireSession();
+        audio_broad.closeSocket();
     });
 
 

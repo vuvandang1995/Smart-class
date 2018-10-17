@@ -1,6 +1,5 @@
 $(document).ready(function(){
-    var _class_ = window.location.pathname.split('/');
-    var class_ =  _class_[_class_.length-1];
+    var class_ =  $('#lopht').text();
     chatallSocket = new WebSocket(
         'ws://' + window.location.host +
         '/ws/' + userName + 'chatall'+class_+'/');
@@ -14,10 +13,10 @@ $(document).ready(function(){
         if (time == 'key'){
             $("#videocall"+who).attr("name", message); 
         }else if (time == 'giotay'){
-            $('#giotay_'+who).show();
+            $('#giotayxxx'+who).show();
         }else if (time == 'bogiotay'){
-            $('#giotay_'+who).hide();
-        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_call') && (time != 'teacher_audio_all') && (time != 'enable_mic')){
+            $('#giotayxxx'+who).hide();
+        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_call') && (time != 'teacher_audio_all') && (time != 'enable_mic') && (time != 'disable_mic')){
             insertChat(who, message, time);
         }
         
@@ -244,7 +243,7 @@ $(document).ready(function(){
         $(this).hide();
         chatallSocket.send(JSON.stringify({
             'message' : 'enable_mic',
-            'who' : $(this).attr('id').split('_')[1],
+            'who' : $(this).attr('id').split('xxx')[1],
             'time' : 'enable_mic'
         }));
         $(this).next().show();
@@ -255,7 +254,7 @@ $(document).ready(function(){
         $(this).hide();
         chatallSocket.send(JSON.stringify({
             'message' : 'disable_mic',
-            'who' : $(this).attr('id').split('_')[1],
+            'who' : $(this).attr('id').split('xxx')[1],
             'time' : 'disable_mic'
         }));
 
@@ -297,8 +296,6 @@ $(document).ready(function(){
     });
 
     $('body #btn_audio_all').on('click',function(){
-
-
         $("input[name=broadcaster]").prop('checked', true);
         $('#room-id').val(userName+'_'+class_);
         $('#open-broadcast').click();
@@ -638,7 +635,8 @@ $(document).ready(function(){
     });
 
 
-    audio_broad();
+
+audio_broad();
 
     
 });

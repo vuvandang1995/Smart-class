@@ -43,7 +43,7 @@
                     <section class="make-center">
                       <label style="cursor: pointer;display:none;"><input type="checkbox" name="broadcaster"> Are You A Broadcaster?</label>
                       <br><br>
-                      <input style="display:none;" type="text" id="room-id" value="abcdef" autocorrect=off autocapitalize=off size=20>
+                      <input style="display:none;" type="text" id="room-id" autocorrect=off autocapitalize=off size=20>
                       <button style="display:none;" id="open-broadcast" disabled>Open Broadcast</button>
                       <button style="display:none;" id="join-broadcast">Join Broadcast</button>
 
@@ -84,10 +84,10 @@
                               <p hidden>{{student.username}}</p>
                               <div class="right">
                                 <h3>{{ student.fullname }}
-                                    <small style="display:none;" id="giotay_{{student.username}}" class="giotay_std">
+                                    <small style="display:none;" id="giotayxxx{{student.username}}" class="giotay_std">
                                       <i class="fa fa-hand-paper-o" style="font-size: 20px;color:red"></i>
                                     </small>
-                                    <small style="display:none;" id="bogiotay_{{student.username}}" class="bogiotay_std">
+                                    <small style="display:none;" id="bogiotayxxx{{student.username}}" class="bogiotay_std">
                                       <i class="fa fa-volume-up" style="font-size: 20px;color:green"></i>
                                     </small>
                                   {%if student.online == True%}
@@ -186,7 +186,7 @@
       </div>
     </div>
   </div>
-
+    <p hidden id="lopht">{{lop_ht.ten}}</p>
     <div class="modal" id="ky_thi" role="dialog">
       <div  class="modal-dialog">
         <!-- Modal content-->
