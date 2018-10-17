@@ -159,7 +159,7 @@ function audio_broad(){
         OfferToReceiveAudio: true,
         OfferToReceiveVideo: false
     };
-    audio_broad.mediaConstraints.video = false;
+    // audio_broad.mediaConstraints.video = false;
     audio_broad.videosContainer = document.getElementById('videos-container111');
     audio_broad.onstream = function(event) {
         var width = parseInt(audio_broad.videosContainer.clientWidth / 2) - 20;
