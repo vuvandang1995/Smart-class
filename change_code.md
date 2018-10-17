@@ -12,3 +12,4 @@
 - main.js (teacher)
 - RTC.js
 - manage_class.js
+-share..js (student and teacher)
