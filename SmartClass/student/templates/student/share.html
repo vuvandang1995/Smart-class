@@ -42,13 +42,13 @@
         <div class="col-md-12">
           <div class="x_panel">
             <div class="x_title" style="text-align:center">
-                <input type="checkbox" name="broadcaster" hidden>
-                <input  type="text" id="room-id"hidden>
+                <input type="checkbox" name="broadcaster" >
+                <input  type="text" id="room-id">
                 <input type="hidden" id="giao_vien" value="{{user.position}}">
-                <button  id="open-room" style="display:none;">Open Broadcast</button>
-                <button  id="join-room" style="display:none;">Join Broadcast</button>
-                <button  id="out_gr" style="display:none;">kết thúc</button>
-                <button id="share-screen" style="display:none;" class="btn btn-primary" ><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
+                <button  id="open-room" >Open Broadcast</button>
+                <button  id="join-room" >Join Broadcast</button>
+                <button  id="out_gr" >kết thúc</button>
+                <button id="share-screen"  class="btn btn-primary" ><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
                 <button id="giotay" class="btn btn-success" ><i class="fa fa-hand-paper-o"></i> Giơ tay</button>
                 <button id="bogiotay" class="btn btn-danger"  style="display:none;"><i class="fa fa-hand-rock-o"></i> Bỏ giơ tay</button>
                 <div class="clearfix"></div>
@@ -65,8 +65,8 @@
 {% endblock %}
 {% block javascripts %}
   {{ block.super }}
-    <script src="{% static 'js/peer/RTCMultiConnection.min.js' %}"></script>
-    <script src="http://192.168.100.22:9002/socket.io/socket.io.js"></script>
+    <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script>
+    <script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>
     <script src="{% static 'js/peer/getScreenId.js' %}"></script>
     <script src="{% static 'js/peer/getMediaElement.js' %}"></script>
     <script src="{% static 'js/teacher/RTC/videocall/FileBufferReader.js' %}"></script>

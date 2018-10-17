@@ -2,7 +2,7 @@ $(document).ready(function(){
     var chatallSocket = new WebSocket(
         'ws://' + window.location.host +
         '/ws/' + teacher_name + 'chatall'+lopht+'/');
-
+    share_connect();
 
 
     $('body').on('click', '#giotay', function(){

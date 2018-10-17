@@ -45,8 +45,7 @@ function share_connect(){
             throw error;
         });
     };
-    connection.socketURL = "http://192.168.100.22:9002/";
-    // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
+    connection.socketURL = "https://192.168.100.23:9443/";
     connection.socketMessageEvent = 'audio-video-screen-demo';
     connection.session = {
         audio: true,
@@ -134,35 +133,6 @@ function share_connect(){
         }
     };
 
-//    (function() {
-//        var params = {},
-//            r = /([^&=]+)=?([^&]*)/g;
-//        function d(s) {
-//            return decodeURIComponent(s.replace(/\+/g, ' '));
-//        }
-//        var match, search = window.location.search;
-//        while (match = r.exec(search.substring(1)))
-//            params[d(match[1])] = d(match[2]);
-//        window.params = params;
-//    })();
-//    var roomid = '';
-//    if (localStorage.getItem(connection.socketMessageEvent)) {
-//        roomid = localStorage.getItem(connection.socketMessageEvent);
-//    } else {
-//        roomid = connection.token();
-//    }
-//    document.getElementById('room-id').value = roomid;
-//    document.getElementById('room-id').onkeyup = function() {
-//        localStorage.setItem(connection.socketMessageEvent, this.value);
-//    };
-//    var hashString = location.hash.replace('#', '');
-//    if(hashString.length && hashString.indexOf('comment-') == 0) {
-//      hashString = '';
-//    }
-//    var roomid = params.roomid;
-//    if(!roomid && hashString.length) {
-//        roomid = hashString;
-//    }
     function joinBroadcastLooper(roomid) {
         (function reCheckRoomPresence() {
             connection.checkPresence(roomid, function(isRoomExist) {
@@ -178,17 +148,19 @@ function share_connect(){
             });
         })();
     }
-//    if (roomid && roomid.length) {
-//        document.getElementById('room-id').value = roomid;
-//        localStorage.setItem(connection.socketMessageEvent, roomid);
-//        joinBroadcastLooper(roomid);
-//    }
+
     connection.onEntireSessionClosed = function(event) {
         if (connection.isInitiator) {
             connection.attachStreams.forEach(function(stream) {
                 stream.stop();
             });
-        } else {
+        }else {
+            console.log(connection.attachStreams);
+            connection.attachStreams.forEach(function(localStream) {
+                if (connection.attachStreams.type == 'local'){
+                    localStream.stop();
+                }
+            });
             $('#giotay').hide();
             $('#bogiotay').hide();
         }
@@ -199,7 +171,7 @@ function share_connect(){
             connection.closeEntireSession(function() {
                 console.log('close');
             });
-        } else {
+        }else{
             connection.leave();
             connection.attachStreams.forEach(function(localStream) {
                 localStream.stop();
@@ -209,6 +181,12 @@ function share_connect(){
     });
 
     $('body #out_gr').on('click',function(){
-        connection.closeEntireSession();
+        connection.getRemoteStreams().forEach(function(localStream) {
+            localStream.stop();
+        });
+        connection.attachStreams.forEach(function(localStream) {
+            localStream.stop();
+        });
+        connection.closeSocket();
     });
 };
