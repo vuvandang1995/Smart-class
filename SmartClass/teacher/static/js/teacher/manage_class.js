@@ -16,7 +16,7 @@ $(document).ready(function(){
             $('#giotayxxx'+who).show();
         }else if (time == 'bogiotay'){
             $('#giotayxxx'+who).hide();
-        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_call') && (time != 'teacher_audio_all') && (time != 'enable_mic') && (time != 'disable_mic')){
+        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_change_group') && (time != 'teacher_call') && (time != 'teacher_audio_all') && (time != 'enable_mic') && (time != 'disable_mic')){
             insertChat(who, message, time);
         }
         
@@ -307,9 +307,7 @@ $(document).ready(function(){
             'time' : 'teacher_audio_all'
         }));
         $('#done_video').show();
-    });
-
-    
+    });   
 
     $('body #btn_manual_group').on('click',function(){
 		$('#group_manual').modal('show');
@@ -345,6 +343,11 @@ $(document).ready(function(){
             data:{'csrfmiddlewaretoken': token, 'number_mem':number_mem},
             success: function(){
                 document.getElementById("close_modal_create").click();
+                chatallSocket.send(JSON.stringify({
+                    'message' : 'teacher_change_group',
+                    'who' : userName,
+                    'time' : 'teacher_change_group'
+                }));
                 reload();
             }
         });

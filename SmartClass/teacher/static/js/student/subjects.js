@@ -97,6 +97,8 @@ $(document).ready(function(){
             });
                 
 
+        }else if (time === 'teacher_change_group'){
+            reload();
         }else if ((time != 'key') && (time != 'giotay') && (time != 'bogiotay')){
                 insertChat(who, message, time);
             }
@@ -201,12 +203,14 @@ $(document).ready(function(){
     }
 
     function reload(){
-        // $('body .list_group_all').html('');
+        $('body .list_group_all').html('');
         $.ajax({
             type:'GET',
             url: "/student/group_data/"+teacher_name,
             success: function(data){
                 $('body .list_group_all').prepend(data);
+                var element = '<div style="display:none;" class="mail_list" id="audiocall"><section class="make-center"><div id="videos-container"></div></section></div><p id="demo"></p>';
+                $('body .list_group_all').append(element);
                 if ($('#group_class').length){
                     var group_chat_name = $('#group_class').children('p').first().text();
                     var chatgroup = new WebSocket(

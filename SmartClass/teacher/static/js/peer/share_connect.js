@@ -46,7 +46,7 @@ function share_connect(){
         });
     };
     connection.socketURL = "http://192.168.100.22:9002/";
-    // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
+    // connection.socketURL = "https://192.168.100.22:443/";
     connection.socketMessageEvent = 'audio-video-screen-demo';
     connection.session = {
         audio: true,
