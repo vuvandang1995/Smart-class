@@ -3,8 +3,6 @@ $(document).ready(function(){
         'ws://' + window.location.host +
         '/ws/' + userName + 'chatall'+lopht+'/');
 
-    share_connect();
-
     chatallSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
@@ -16,12 +14,10 @@ $(document).ready(function(){
     };
 
     $("#start-screen").click(function(){
-        $('input[name=broadcaster]').prop('checked',true);
-        $("#room-id").val(window.atob(location.href.split("_")[1]));
-        $("#open-room").click();
+        openRoom();
         chatallSocket.send(JSON.stringify({
             'message' : 'start_screen',
-            'who' : $(this).parent().parent().parent().find('p').first().text(),
+            'who' : 'start_screen',
             'time' : 'start_screen'
         }));
         $("#start-screen").hide();
@@ -30,13 +26,21 @@ $(document).ready(function(){
     });
 
     $("#stop-screen").click(function(){
-        $("#done_video").click();
+        closeRoom();
+        chatallSocket.send(JSON.stringify({
+            'message' : 'start_screen',
+            'who' : 'start_screen',
+            'time' : 'stop_screen'
+        }));
+        $(".giotay_std").children().attr('class','fa fa-hand-paper-o')
+        $(".giotay_std").hide();
         $("#start-screen").show();
         $("#share-screen").hide();
         $("#stop-screen").hide();
     });
 
     $(".giotay_std").click(function(event){
+        event.stopPropagation();
         if($(this).children().attr('class') == 'fa fa-hand-paper-o'){
             if(confirm("Cho phép "+$(this).parent().parent().parent().data("fullname") + " phát biểu")){
                 chatallSocket.send(JSON.stringify({
@@ -44,20 +48,36 @@ $(document).ready(function(){
                     'who' : $(this).parent().parent().parent().find('p').first().text(),
                     'time' : 'enable_share'
                 }));
-                $(this).children().removeClass("fa fa-hand-paper-o").addClass("fa fa-volume-up");
+                $(this).children().attr('class','fa fa-volume-up');
             }else{
                 $(this).hide();
             };
         }else{
-            if(confirm("Hủy quyền phát biểu của"+$(this).parent().parent().parent().data("fullname"))){
+            if(confirm("Hủy quyền phát biểu của "+$(this).parent().parent().parent().data("fullname"))){
+                var name = $(this).parent().parent().parent().find('p').first().text();
                 chatallSocket.send(JSON.stringify({
                     'message' : 'disable_share',
-                    'who' : $(this).parent().parent().parent().find('p').first().text(),
+                    'who' : name,
                     'time' : 'disable_share'
                 }));
-                $(this).children().removeClass("fa fa-volume-up").addClass("fa fa-hand-paper-o");
+//                stopRemote(name);
+//                $(".media-container[data-user="+name+"]").remove();
+                $(this).children().attr('class','fa fa-hand-paper-o');
                 $(this).hide();
             };
         }
+    });
+
+    $(".mail_list").click(function(){
+        if(confirm("Cho phép "+$(this).data("fullname") + " phát biểu")){
+            name = $(this).find('p').first().text();
+            chatallSocket.send(JSON.stringify({
+                'message' : 'enable_share',
+                'who' : name,
+                'time' : 'enable_share'
+            }));
+            $('#giotay_'+name).children().attr('class','fa fa-volume-up');
+            $('#giotay_'+name).show();
+        };
     });
 });

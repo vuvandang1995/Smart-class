@@ -42,20 +42,14 @@
         <div class="col-md-12">
           <div class="x_panel">
             <div class="x_title" style="text-align:center">
-                <input type="checkbox" name="broadcaster" >
-                <input  type="text" id="room-id">
-                <input type="hidden" id="giao_vien" value="{{user.position}}">
-                <button  id="open-room" >Open Broadcast</button>
-                <button  id="join-room" >Join Broadcast</button>
-                <button  id="out_gr" >kết thúc</button>
-                <button id="share-screen"  class="btn btn-primary" ><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
-                <button id="giotay" class="btn btn-success" ><i class="fa fa-hand-paper-o"></i> Giơ tay</button>
-                <button id="bogiotay" class="btn btn-danger"  style="display:none;"><i class="fa fa-hand-rock-o"></i> Bỏ giơ tay</button>
+                <button id="reconnect" class="btn btn-warning"><i class="fa fa fa-repeat"></i> Kết nối lại</button>
+                <button id="share-screen"  class="btn btn-primary"  style="display: none;"><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
+                <button id="giotay" class="btn btn-success" style="display: none;"><i class="fa fa-hand-paper-o"></i> Giơ tay</button>
+                <button id="bogiotay" class="btn btn-danger"  style="display: none;"><i class="fa fa-hand-rock-o"></i> Bỏ giơ tay</button>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
                 <div id="videos-container" style="width:100%"></div>
-                <div id="audios-container"></div>
             </div>
           </div>
         </div>
@@ -65,7 +59,7 @@
 {% endblock %}
 {% block javascripts %}
   {{ block.super }}
-    <script src="{% static 'js/peer/RTCMultiConnection.min.js' %}"></script>
+    <script src="{% static 'js/teacher/RTC/RTCMultiConnection.min.js' %}"></script>
     <script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>
     <script src="{% static 'js/peer/getScreenId.js' %}"></script>
     <script src="{% static 'js/peer/getMediaElement.js' %}"></script>
