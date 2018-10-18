@@ -1,195 +1,158 @@
-$(document).ready(function(){
-    document.getElementById('share-screen').onclick = function() {
-        connection.addStream({
-            screen: true,
-//            oneway:true
-        });
-
-    };
-    document.getElementById('open-room').onclick = function() {
-        beforeJoiningARoom(function() {
-            connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExist, roomid) {
-                afterConnectingSocket();
-            });
-        });
-    };
-    document.getElementById('join-room').onclick = function() {
-        joinBroadcastLooper(document.getElementById('room-id').value);
-    };
-
-
-    function beforeJoiningARoom(callback) {
-        var checkbox = document.querySelector('input[name=broadcaster]');
-        if (checkbox.checked === false) {
-            connection.extra.broadcaster = false;
-            connection.dontCaptureUserMedia = true;
-//            connection.session.oneway = true;
-        } else {
-            connection.extra.broadcaster = true;
+var audio_broad = new RTCMultiConnection();
+audio_broad.socketURL = 'https://192.168.100.23:9443/';
+audio_broad.getScreenConstraints = function(callback) {
+    getScreenConstraints(function(error, screen_constraints) {
+        if (!error) {
+            screen_constraints = audio_broad.modifyScreenConstraints(screen_constraints);
+            callback(error, screen_constraints);
+            return;
         }
-        callback();
+        throw error;
+    });
+};
+
+audio_broad.socketMessageEvent = 'multi-broadcasters-demo';
+audio_broad.session = {
+    audio: true,
+};
+
+audio_broad.sdpConstraints.mandatory = {
+    OfferToReceiveAudio: true,
+    OfferToReceiveVideo: true
+};
+
+audio_broad.mediaConstraints.video = false;
+audio_broad.videosContainer = document.getElementById('videos-container');
+audio_broad.onstream = function(event) {
+    if(document.getElementById(event.streamid)) {
+        var existing = document.getElementById(event.streamid);
+        existing.parentNode.removeChild(existing);
+//        if(audio_broad.extra.broadcaster === false){
+//            BtoN();
+//        }
+    }
+    var width = parseInt(audio_broad.videosContainer.clientWidth / 2) - 20;
+
+    if(event.stream.isScreen === true) {
+        width = audio_broad.videosContainer.clientWidth - 20;
     }
 
-    var connection = new RTCMultiConnection();
+    var mediaElement = getMediaElement(event.mediaElement, {
+        title: event.userid,
+        buttons: ['full-screen'],
+        width: width,
+        showOnMouseEnter: false
+    });
 
-    connection.getScreenConstraints = function(callback) {
-        getScreenConstraints(function(error, screen_constraints) {
-            if (!error) {
-                screen_constraints = connection.modifyScreenConstraints(screen_constraints);
-                callback(error, screen_constraints);
+    audio_broad.videosContainer.appendChild(mediaElement);
+    setTimeout(function() {
+        mediaElement.media.play();
+    }, 5000);
+
+    mediaElement.id = event.streamid;
+//    console.log(event);
+//    if (event.type === 'remote' && audio_broad.isInitiator) {
+//        var participants = [];
+//        audio_broad.getAllParticipants().forEach(function(pid) {
+//            participants.push({
+//                pid: pid,
+//                broadcaster: audio_broad.peers[pid].extra.broadcaster === true
+//            });
+//        });
+//        audio_broad.socket.emit(audio_broad.socketCustomEvent, {
+//            participants: participants
+//        });
+//    } else if (event.type === 'remote' && audio_broad.extra.broadcaster === false) {
+//        audio_broad.socket.emit(audio_broad.socketCustomEvent, {
+//            giveAllParticipants: true
+//        });
+//    }
+};
+
+audio_broad.onstreamended = function(event) {
+    var mediaElement = document.getElementById(event.streamid);
+    if (mediaElement) {
+        mediaElement.parentNode.removeChild(mediaElement);
+    }
+};
+
+function joinBroadcastLooper(roomid) {
+    (function reCheckRoomPresence() {
+        audio_broad.checkPresence(roomid, function(isRoomExist) {
+            if (isRoomExist) {
+                audio_broad.join(roomid, function() {});
                 return;
             }
-            throw error;
+            setTimeout(reCheckRoomPresence, 5000);
         });
-    };
-    connection.socketURL = "http://192.168.100.22:9002/";
-    // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
-    connection.socketMessageEvent = 'audio-video-screen-demo';
-    connection.session = {
-        audio: true,
-        broadcast: true
-    };
-    connection.sdpConstraints.mandatory = {
-        OfferToReceiveAudio: true,
-        OfferToReceiveVideo: true
-    };
-    connection.mediaConstraints.video = false;
-    connection.videosContainer = document.getElementById('videos-container');
-    connection.onstream = function(event) {
-        if(document.getElementById(event.streamid)) {
-            var existing = document.getElementById(event.streamid);
-            existing.parentNode.removeChild(existing);
-            if(!connection.extra.broadcaster){
-                $("#open-room").click();
-                return false;
-            }
-        }
-
-        var width = parseInt(connection.videosContainer.clientWidth / 2) - 20;
-
-        if(event.stream.isScreen === true) {
-            width = connection.videosContainer.clientWidth - 20;
-        }
-
-        var mediaElement = getMediaElement(event.mediaElement, {
-            title: event.userid,
-            buttons: ['full-screen'],
-            width: width,
-            showOnMouseEnter: false
-        });
-        connection.videosContainer.appendChild(mediaElement);
-        setTimeout(function() {
-            mediaElement.media.play();
-        }, 5000);
-        mediaElement.id = event.streamid;
-        if (event.type === 'remote' && connection.isInitiator) {
-            var participants = [];
-            connection.getAllParticipants().forEach(function(pid) {
-                participants.push({
-                    pid: pid,
-                    broadcaster: connection.peers[pid].extra.broadcaster === true
-                });
-            });
-            connection.socket.emit(connection.socketCustomEvent, {
-                participants: participants
-            });
-        } else if (event.type === 'remote' && connection.extra.broadcaster === false) {
-            connection.socket.emit(connection.socketCustomEvent, {
-                giveAllParticipants: true
-            });
-        }
-    };
-    function afterConnectingSocket() {
-        connection.socket.on(connection.socketCustomEvent, function(message) {
-            if (message.participants && !connection.isInitiator) {
-                message.participants.forEach(function(participant) {
-                    if (participant.pid === connection.userid) return;
-                    if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
-                    if (connection.extra.broadcaster.checked === true && participant.broadcaster === false) return;
-                    connection.join(participant.pid);
-                });
-            }
-            if (message.giveAllParticipants && connection.isInitiator) {
-                var participants = [];
-                connection.getAllParticipants().forEach(function(pid) {
-                    participants.push({
-                        pid: pid,
-                        broadcaster: connection.peers[pid].extra.broadcaster === true
-                    });
-                });
-                connection.socket.emit(connection.socketCustomEvent, {
-                    participants: participants
-                });
-            }
-        });
-    }
-    connection.onstreamended = function(event) {
-        var mediaElement = document.getElementById(event.streamid);
-        if(mediaElement) {
-            mediaElement.parentNode.removeChild(mediaElement);
-        }
-    };
-
-    (function() {
-        var params = {},
-            r = /([^&=]+)=?([^&]*)/g;
-        function d(s) {
-            return decodeURIComponent(s.replace(/\+/g, ' '));
-        }
-        var match, search = window.location.search;
-        while (match = r.exec(search.substring(1)))
-            params[d(match[1])] = d(match[2]);
-        window.params = params;
     })();
-    var roomid = '';
-    if (localStorage.getItem(connection.socketMessageEvent)) {
-        roomid = localStorage.getItem(connection.socketMessageEvent);
-    } else {
-        roomid = connection.token();
-    }
-    document.getElementById('room-id').value = roomid;
-    document.getElementById('room-id').onkeyup = function() {
-        localStorage.setItem(connection.socketMessageEvent, this.value);
-    };
-    var hashString = location.hash.replace('#', '');
-    if(hashString.length && hashString.indexOf('comment-') == 0) {
-      hashString = '';
-    }
-    var roomid = params.roomid;
-    if(!roomid && hashString.length) {
-        roomid = hashString;
-    }
-    function joinBroadcastLooper(roomid) {
-        (function reCheckRoomPresence() {
-            connection.checkPresence(roomid, function(isRoomExist) {
-                if (isRoomExist) {
-                    beforeJoiningARoom(function() {
-                        connection.join(roomid, function() {
-                            afterConnectingSocket();
-                        });
-                    });
-                    return;
-                }
-                setTimeout(reCheckRoomPresence, 5000);
-            });
-        })();
-    }
-    if (roomid && roomid.length) {
-        document.getElementById('room-id').value = roomid;
-        localStorage.setItem(connection.socketMessageEvent, roomid);
-        joinBroadcastLooper(roomid);
-    }
+}
 
-    $("#room-id").val(window.atob(location.href.split("_")[1]));
-    if($("#giao_vien").val() == 1){
-        $("#open-room").click();
-    }else{
-        $("#join-room").click();
-    }
+function NtoB(){
+//    audio_broad.leave();
+//    audio_broad.close();
+    audio_broad.disconnect();
+    audio_broad.extra.broadcaster = true;
+    audio_broad.dontCaptureUserMedia = false;
+    joinBroadcastLooper(window.atob(location.href.split("_")[1]));
+}
 
-    $(".mail_list").click(function(){
-        if(confirm("Cho phép "+$(this).data('fullname') + " chia sẻ màn hình")){
-            alert("send socket");
-        };
-    })
+function BtoN(){
+    audio_broad.attachStreams.forEach(function(localStream) {
+        localStream.stop();
+    });
+//    audio_broad.leave();
+//    audio_broad.close();
+    audio_broad.disconnect();
+    audio_broad.extra.broadcaster = false;
+    audio_broad.dontCaptureUserMedia = true;
+    joinBroadcastLooper(window.atob(location.href.split("_")[1]));
+}
+
+function openRoom(){
+    audio_broad.openOrJoin(window.atob(location.href.split("_")[1]), function(isRoomExist, roomid) {});
+}
+
+$('#share-screen').click(function(){
+    audio_broad.addStream({
+        screen: true,
+    });
 });
+
+$('body #status').on('click',function(){
+    console.log(audio_broad.getRemoteStreams());
+    console.log(audio_broad.attachStreams);
+    console.log(audio_broad.getAllParticipants());
+    console.log(audio_broad);
+    audio_broad.getRemoteStreams().forEach(function(reStream) {
+        console.log(reStream)
+    });
+});
+
+
+function closeRoom(){
+    audio_broad.attachStreams.forEach(function(stream) {
+        stream.stop();
+    });
+    audio_broad.getRemoteStreams().forEach(function(reStream) {
+        reStream.stop();
+    });
+    audio_broad.disconnect();
+    audio_broad.closeSocket();
+}
+
+function closeRemote(){
+    audio_broad.getRemoteStreams().forEach(function(reStream) {
+        reStream.stop();
+    });
+}
+
+function reconnect(){
+    if(audio_broad.extra.broadcaster == true){
+        NtoB();
+    }else{
+        BtoN();
+    }
+}
+
+

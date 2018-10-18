@@ -47,12 +47,7 @@
         <div class="col-md-12">
           <div class="x_panel">
             <div class="x_title" style="text-align:center">
-                <input type="checkbox" name="broadcaster"  checked>
-                <input  type="text" id="room-id">
-                <input type="hidden" id="giao_vien" value="{{user.position}}">
-                <button  id="open-room" >Open Broadcast</button>
-                <button  id="join-room" >Join Broadcast</button>
-                <button  id="done_video" style="display: none;">Join Broadcast</button>
+                <button id="reconnect" style="display: none;"><i class="fa fa fa-repeat"></i> Kết nối lại</button>
                 <button id="start-screen" class="btn btn-success"><i class="fa fa fa-play"></i> Bắt đầu</button>
                 <button id="share-screen" class="btn btn-primary" style="display: none;"><i class="fa fa-video-camera"></i> Chia sẻ màn hình</button>
                 <button  id="stop-screen" class="btn btn-danger" style="display: none;"><i class="fa fa fa-stop"></i> Dừng</button>
@@ -61,41 +56,33 @@
             <div class="x_content">
               <div class="row">
                 <div class="col-sm-3 mail_list_column" style="overflow-y: scroll; height:600px;">
-                          {% for student in ls_student %}
-                          {% comment %} <a href="javascript:register_popup_teacher('{{student.username}}', '{{student.fullname}}');"> {% endcomment %}
-                            <div class="mail_list" data-fullname="{{student.fullname}}">
-                              <!-- <div class="left">
-                              </div> -->
-                              <p hidden>{{student.username}}</p>
-                              <div class="right">
-                                <h3>{{ student.fullname }}
-                                    <small style="display:none;" id="giotay_{{student.username}}" class="giotay_std">
-                                      <i class="fa fa-hand-paper-o" style="font-size: 20px;color:red"></i>
-                                    </small>
-                                  {%if student.online == True%}
-                                    <small style="background: rgb(66, 183, 42);border-radius: 50%;display: inline-block;height: 6px;margin-left: 4px;width: 6px;"></small>
-                                  {% endif %}
-                                  </h3>
-                                {% if student.gioi_tinh == 1%}
-                                  <p><b>Giới tính:</b> Nam</p>
-                                {% else%}
-                                  <p><b>Giới tính:</b> Nữ</p>
-                                {% endif%}
-                                <p><b>Email:</b> {{student.email}}</p>
-                              </div>
-                            </div>
-                          {% comment %} </a> {% endcomment %}
-                          {% endfor %}
-
-                        </div>
+                  {% for student in ls_student %}
+                    <div class="mail_list" data-fullname="{{student.fullname}}">
+                      <p hidden>{{student.username}}</p>
+                      <div class="right">
+                        <h3>{{ student.fullname }}
+                            <small style="display:none;" id="giotay_{{student.username}}" class="giotay_std">
+                              <i class="fa fa-hand-paper-o" style="font-size: 20px;color:red"></i>
+                            </small>
+                          {% if student.online == True %}
+                            <small style="background: rgb(66, 183, 42);border-radius: 50%;display: inline-block;height: 6px;margin-left: 4px;width: 6px;"></small>
+                          {% endif %}
+                          </h3>
+                        {% if student.gioi_tinh == 1 %}
+                          <p><b>Giới tính:</b> Nam</p>
+                        {% else%}
+                          <p><b>Giới tính:</b> Nữ</p>
+                        {% endif%}
+                        <p><b>Email:</b> {{student.email}}</p>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
                 <div class="col-sm-9 mail_view">
                   <div class="inbox-body">
                     <div id="videos-container" style="width:100%"></div>
-                    <div id="audios-container"></div>
                   </div>
-
                 </div>
-
               </div>
             </div>
           </div>
@@ -104,30 +91,30 @@
     </div>
   </div>
 <div class="modal" id="allow" role="dialog">
-      <div  class="modal-dialog modal-lg">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Thay đổi thông tin nhóm</h4>
-            </div>
-            <div class="modal-body" id="allow_body">
-                <!--<div id="videos-container"></div>-->
-                <!--<div id="audios-container"></div>-->
-            </div>
-            <div class="modal-footer">
-               <button type="submit" class="btn btn-primary"  id="save_profile">Lưu</button>
-               <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-            </div>
+  <div  class="modal-dialog modal-lg">
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Thay đổi thông tin nhóm</h4>
         </div>
-      </div>
+        <div class="modal-body" id="allow_body">
+            <!--<div id="videos-container"></div>-->
+            <!--<div id="audios-container"></div>-->
+        </div>
+        <div class="modal-footer">
+           <button type="submit" class="btn btn-primary"  id="save_profile">Lưu</button>
+           <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+        </div>
     </div>
+  </div>
+</div>
 {% endblock content %}
 
 {% block javascripts %}
   {{ block.super }}
     <script src="{% static 'js/peer/RTCMultiConnection.min.js' %}"></script>
-    <script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>
+    <script src="http://192.168.100.22:9002/socket.io/socket.io.js"></script>
     <script src="{% static 'js/peer/getScreenId.js' %}"></script>
     <script src="{% static 'js/peer/getMediaElement.js' %}"></script>
     <script src="{% static 'js/teacher/RTC/videocall/FileBufferReader.js' %}"></script>

@@ -2,8 +2,6 @@ $(document).ready(function(){
     var chatallSocket = new WebSocket(
         'ws://' + window.location.host +
         '/ws/' + teacher_name + 'chatall'+lopht+'/');
-    share_connect();
-
 
     $('body').on('click', '#giotay', function(){
         chatallSocket.send(JSON.stringify({
@@ -11,7 +9,22 @@ $(document).ready(function(){
             'who' : userName,
             'time' : 'giotay'
         }));
+        $("#giotay").hide();
+        setTimeout(function(){$("#bogiotay").hide();},1000);
+    });
 
+    $('body').on('click', '#bogiotay', function(){
+        chatallSocket.send(JSON.stringify({
+            'message' : 'bogiotay',
+            'who' : userName,
+            'time' : 'bogiotay'
+        }));
+        $("#bogiotay").hide();
+        setTimeout(function(){$("#giotay").hide();},1000);
+    });
+
+    $('body').on('click', '#reconnect', function(){
+        reconnect();
     });
 
     chatallSocket.onmessage = function(e) {
@@ -20,28 +33,30 @@ $(document).ready(function(){
         var who = data['who'];
         var time = data['time'];
         if ((time == 'enable_share') && (userName == who)){
-            $('#out_gr').click();
-            share_connect();
-            setTimeout(function(){
-                $("#share-screen").show();
-                $('input[name=broadcaster]').prop('checked',true);
-                $("#join-room").click();
-            },1000);
+            NtoB();
+            $("#giotay").hide();
+            $("#bogiotay").hide();
+            $("#share-screen").show();
         }else if ((time == 'disable_share') && (userName == who)){
-            $('#out_gr').click();
-            share_connect();
-            setTimeout(function(){
-                $("#share-screen").hide();
-                $('input[name=broadcaster]').prop('checked',false);
-                $("#join-room").click();
-            },1000);
+            BtoN();
+            $("#giotay").show();
+            $("#bogiotay").hide();
+            $("#share-screen").hide();
         }else if(time == 'start_screen'){
-            share_connect();
-            $('input[name=broadcaster]').prop('checked',false);
-            $("#room-id").val(window.atob(location.href.split("_")[1]));
-            $("#join-room").click();
+            BtoN();
+            $("#giotay").show();
+            $("#bogiotay").hide();
+            $("#share-screen").hide();
+        }else if(time == 'stop_screen'){
+            closeRoom();
+            $("#giotay").hide();
+            $("#bogiotay").hide();
+            $("#share-screen").hide();
+        }else if ((time == 'tu_choi_giotay') && (userName == who)){
+            $("#giotay").show();
+            $("#bogiotay").hide();
+            $("#share-screen").hide();
         }
     };
-
 
 });
