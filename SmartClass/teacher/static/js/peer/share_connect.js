@@ -1,5 +1,5 @@
 var audio_broad = new RTCMultiConnection();
-audio_broad.socketURL = 'https://192.168.100.23:9443/';
+audio_broad.socketURL = 'http://192.168.100.22:9002/';
 audio_broad.getScreenConstraints = function(callback) {
     getScreenConstraints(function(error, screen_constraints) {
         if (!error) {
