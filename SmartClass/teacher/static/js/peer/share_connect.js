@@ -1,5 +1,5 @@
 var audio_broad = new RTCMultiConnection();
-audio_broad.socketURL = 'http://192.168.100.22:9002/';
+audio_broad.socketURL = 'https://192.168.100.22:443/';
 audio_broad.getScreenConstraints = function(callback) {
     getScreenConstraints(function(error, screen_constraints) {
         if (!error) {
@@ -27,6 +27,9 @@ audio_broad.onstream = function(event) {
     if(document.getElementById(event.streamid)) {
         var existing = document.getElementById(event.streamid);
         existing.parentNode.removeChild(existing);
+        if(audio_broad.extra.broadcaster === false){
+            BtoN();
+        }
     }
     var width = parseInt(audio_broad.videosContainer.clientWidth / 2) - 20;
 
