@@ -28,7 +28,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-        await self.accept()        
+        await self.accept()
+        try:
+            f = r'notification/chat/class/'+self.room_group_name+'.txt'
+            file = open(f,'r')
+            for line in file:
+                message = line.split('^%$^%$&^')[0]
+                who = line.split('^%$^%$&^')[1].strip()
+                time = line.split('^%$^%$&^')[2].strip()
+                await self.send(text_data=json.dumps({
+                        'message': message,
+                        'who': who,
+                        'time' : time
+                    }))
+        except:
+            pass       
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -46,6 +60,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         who = text_data_json['who']
         time = text_data_json['time']
+        if time != 'None' and time != 'call_time' and time != 'teacher_change_group' and time != 'teacher_call' and time != 'key':
+            f = r'notification/chat/class/'+self.room_group_name+'.txt'
+            file = open(f,'a')
+            file.write(message + "^%$^%$&^"+ who +"^%$^%$&^"+ time + "\n") 
+            file.close()  
         print(time)
         await self.channel_layer.group_send(
             self.room_group_name,

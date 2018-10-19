@@ -30,35 +30,7 @@
                   </li>
                   <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Nhóm</a>
                   </li>
-
-                  <li><button class="btn btn-primary" id="btn_audio_all" >Audio Cả Lớp</button>
-                  </li>
-                  <li>
-                      <section class="make-center">
-                        <div style="display:none;" id="videos-container111"></div>
-                      </section>
-                  </li>
-
-                  <li>
-                    <section class="make-center">
-                      <label style="cursor: pointer;display:none;"><input type="checkbox" name="broadcaster"> Are You A Broadcaster?</label>
-                      <br><br>
-                      <input style="display:none;" type="text" id="room-id" autocorrect=off autocapitalize=off size=20>
-                      <button style="display:none;" id="open-broadcast" disabled>Open Broadcast</button>
-                      <button style="display:none;" id="join-broadcast">Join Broadcast</button>
-
-                    </section>
-                  </li>
-
-                  <li id="all_audio">
-                    <section class="make-center">
-                      <div id="videos-container">
-
-                      </div>
-                    </section>
-                  </li>
-                  <li><button style="display:none;" class="btn btn-danger" id="done_video" >Kết thúc</button>
-                  </li>
+                  
                   
                   <li><button style="display:none;" class="btn btn-primary" id="btn_random_group" >Tạo nhóm Random</button>
                   </li>
@@ -91,7 +63,7 @@
                                       <i class="fa fa-volume-up" style="font-size: 20px;color:green"></i>
                                     </small>
                                   {%if student.online == True%}
-                                    <small style="background: rgb(66, 183, 42);border-radius: 50%;display: inline-block;height: 6px;margin-left: 4px;width: 6px;"></small>
+                                    <small id="online" style="background: rgb(66, 183, 42);border-radius: 50%;display: inline-block;height: 6px;margin-left: 4px;width: 6px;"></small>
                                   {% endif %}
                                   </h3>
                                 {% if student.gioi_tinh == 1%}
