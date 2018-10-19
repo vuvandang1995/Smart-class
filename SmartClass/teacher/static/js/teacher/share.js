@@ -23,6 +23,7 @@ $(document).ready(function(){
         $("#start-screen").hide();
         $("#share-screen").show();
         $("#stop-screen").show();
+        $("#back").hide();
     });
 
     $("#stop-screen").click(function(){
@@ -37,6 +38,11 @@ $(document).ready(function(){
         $("#start-screen").show();
         $("#share-screen").hide();
         $("#stop-screen").hide();
+        $("#back").show();
+    });
+
+    $('#back').click(function(){
+        window.history.back();
     });
 
     $(".giotay_std").click(function(event){

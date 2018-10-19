@@ -73,7 +73,8 @@ def user_profile(request):
                 else:
                     messages.warning(request, 'Mật khẩu không đúng')
             return HttpResponseRedirect("profile")
-        content = {'mon': lop_mon(user), 'username': mark_safe(json.dumps(user.username))}
+        content = {'mon': lop_mon(user), 'lop': ChiTietLop.objects.get(myuser_id=user),
+                   'username': mark_safe(json.dumps(user.username))}
         return render(request, 'student/profile.html', content)
     else:
         return redirect("/")

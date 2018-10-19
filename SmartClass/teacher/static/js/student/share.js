@@ -55,6 +55,9 @@ $(document).ready(function(){
             $("#giotay").hide();
             $("#bogiotay").hide();
             $("#share-screen").hide();
+            setTimeout(function(){
+                window.history.back();
+            },2000);
         }else if ((time == 'tu_choi_giotay') && (userName == who)){
             setTimeout(function(){
                 $("#giotay").show();

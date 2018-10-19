@@ -58,15 +58,17 @@ audio_broad.onstream = function(event) {
     }, 5000);
 
     mediaElement.id = event.streamid;
-//    console.log(event.extra.username);
     var audio = mediaElement.getElementsByTagName("audio");
-    var title = mediaElement.getElementsByTagName("h2")[0].innerHTML = event.extra.fullname
     mediaElement.setAttribute('data-username',event.extra.username);
+    mediaElement.getElementsByClassName("media-box")[0].style.textAlign = 'center' ;
     if(audio.length == 1){
+        var title = mediaElement.getElementsByTagName("h2")[0].innerHTML = event.extra.fullname
         mediaElement.getElementsByClassName("media-controls")[0].style.display = 'none' ;
         mediaElement.getElementsByClassName("media-box")[0].style.height = '30px';
-        mediaElement.getElementsByClassName("media-box")[0].style.textAlign = 'center' ;
-    };
+    }else{
+        var title = `<h2 style="color: rgb(160, 160, 160); font-size: 20px; text-shadow: rgb(255, 255, 255) 1px 1px; padding: 0px; margin: 0px;">${event.extra.fullname}</h2>`
+        $("#"+mediaElement.id+" .media-box").first().prepend(title);
+    }
 };
 
 //audio_broad.onspeaking = function (e) {
