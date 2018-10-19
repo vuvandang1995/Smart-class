@@ -1,5 +1,5 @@
 var audio_broad = new RTCMultiConnection();
-audio_broad.socketURL = 'https://192.168.100.23:9443/';
+audio_broad.socketURL = 'https://192.168.100.22:443/';
 audio_broad.getScreenConstraints = function(callback) {
     getScreenConstraints(function(error, screen_constraints) {
         if (!error) {
@@ -27,9 +27,9 @@ audio_broad.onstream = function(event) {
     if(document.getElementById(event.streamid)) {
         var existing = document.getElementById(event.streamid);
         existing.parentNode.removeChild(existing);
-//        if(audio_broad.extra.broadcaster === false){
-//            BtoN();
-//        }
+        if(audio_broad.extra.broadcaster === false){
+            BtoN();
+        }
     }
     var width = parseInt(audio_broad.videosContainer.clientWidth / 2) - 20;
 
@@ -50,23 +50,6 @@ audio_broad.onstream = function(event) {
     }, 5000);
 
     mediaElement.id = event.streamid;
-//    console.log(event);
-//    if (event.type === 'remote' && audio_broad.isInitiator) {
-//        var participants = [];
-//        audio_broad.getAllParticipants().forEach(function(pid) {
-//            participants.push({
-//                pid: pid,
-//                broadcaster: audio_broad.peers[pid].extra.broadcaster === true
-//            });
-//        });
-//        audio_broad.socket.emit(audio_broad.socketCustomEvent, {
-//            participants: participants
-//        });
-//    } else if (event.type === 'remote' && audio_broad.extra.broadcaster === false) {
-//        audio_broad.socket.emit(audio_broad.socketCustomEvent, {
-//            giveAllParticipants: true
-//        });
-//    }
 };
 
 audio_broad.onstreamended = function(event) {
@@ -119,15 +102,15 @@ $('#share-screen').click(function(){
     });
 });
 
-$('body #status').on('click',function(){
-    console.log(audio_broad.getRemoteStreams());
-    console.log(audio_broad.attachStreams);
-    console.log(audio_broad.getAllParticipants());
-    console.log(audio_broad);
-    audio_broad.getRemoteStreams().forEach(function(reStream) {
-        console.log(reStream)
-    });
-});
+//$('body #status').on('click',function(){
+//    console.log(audio_broad.getRemoteStreams());
+//    console.log(audio_broad.attachStreams);
+//    console.log(audio_broad.getAllParticipants());
+//    console.log(audio_broad);
+//    audio_broad.getRemoteStreams().forEach(function(reStream) {
+//        console.log(reStream)
+//    });
+//});
 
 
 function closeRoom(){
@@ -148,11 +131,18 @@ function closeRemote(){
 }
 
 function reconnect(){
-    if(audio_broad.extra.broadcaster == true){
-        NtoB();
-    }else{
-        BtoN();
-    }
+    audio_broad.checkPresence(window.atob(location.href.split("_")[1]), function(isRoomExist){
+        if (isRoomExist){
+            if(audio_broad.extra.broadcaster == true){
+                NtoB();
+            }else{
+                BtoN();
+            };
+            $("#giotay").show();
+            $("#bogiotay").hide();
+            $("#share-screen").hide();
+        };
+    });
 }
 
 

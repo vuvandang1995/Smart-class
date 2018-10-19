@@ -14,14 +14,6 @@
         .answer-container {
             height: 50px;
         }
-        .mytable > td {
-            border: 1px solid rgb(204, 204, 204);
-            border-collapse: collapse;
-            text-align: center;
-            font-size: 14px;
-            line-height: 1.42857143;
-            color: #555;
-        }
     </style>
 {% endblock stylesheets %}
 {% block content %}
@@ -47,7 +39,7 @@
                                 <!--<button class="btn btn-primary" style="float:right">-->
                                     <!--<i class="fa fa-file-excel-o"></i> Nhập bằng excel-->
                                 <!--</button>-->
-                                <button class="btn btn-round btn-xs btn-info" style="float:right;"><i class="fa fa-question-circle"></i></button>
+                                <a href="https://katex.org/docs/supported.html" target="_blank" style="float:right">*Danh sách ký tự đặc biệt</a>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
@@ -278,24 +270,6 @@
         </div>
       </div>
     </div>
-
-<div class="modal" id="hd_dien_tu" role="dialog">
-      <div  class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Hướng dẫn tạo câu hỏi điền từ</h4>
-            </div>
-            <div class="modal-body">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-            </div>
-        </div>
-      </div>
-    </div>
-
 {% endblock content %}
 {% block javascripts %}
     {{ block.super }}

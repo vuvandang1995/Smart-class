@@ -18,7 +18,8 @@
                                 <div class="card-body">
                                     <center class="m-t-30"> <img src="{% static 'image/huong.png' %}" class="rounded-circle" width="150" />
                                         <h4 class="card-title m-t-10">{{ user.fullname}}</h4>
-                                        <h6 class="card-subtitle"> Lớp {{ lop.lop_id.ten }}</h6>
+                                        <h6 class="card-subtitle"> Lớp {{ lop.lop_id.ten }} - {{lop.lop_id.nien_khoa_id.ten_nien_khoa}}</h6>
+                                        <h6 class="card-subtitle">{{ lop.lop_id.khoa_id.ten_khoa }}</h6>
                                         <h6 class="card-subtitle">{{ user.truong_id.ten }}</h6>
                                     </center>
                                 </div>
