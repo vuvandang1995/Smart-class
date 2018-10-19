@@ -10,7 +10,7 @@ $(document).ready(function(){
             'time' : 'giotay'
         }));
         $("#giotay").hide();
-        setTimeout(function(){$("#bogiotay").hide();},1000);
+        setTimeout(function(){$("#bogiotay").show();},2000);
     });
 
     $('body').on('click', '#bogiotay', function(){
@@ -20,7 +20,7 @@ $(document).ready(function(){
             'time' : 'bogiotay'
         }));
         $("#bogiotay").hide();
-        setTimeout(function(){$("#giotay").hide();},1000);
+        setTimeout(function(){$("#giotay").show();},2000);
     });
 
     $('body').on('click', '#reconnect', function(){
@@ -37,11 +37,14 @@ $(document).ready(function(){
             $("#giotay").hide();
             $("#bogiotay").hide();
             $("#share-screen").show();
-        }else if ((time == 'disable_share') && (userName == who)){
-            BtoN();
-            $("#giotay").show();
-            $("#bogiotay").hide();
-            $("#share-screen").hide();
+        }else if (time == 'disable_share'){
+            if(userName == who){
+                BtoN();
+                $("#giotay").show();
+                $("#bogiotay").hide();
+                $("#share-screen").hide();
+            };
+            $(".media-container[data-username="+who+"]").remove();
         }else if(time == 'start_screen'){
             BtoN();
             $("#giotay").show();
@@ -53,9 +56,11 @@ $(document).ready(function(){
             $("#bogiotay").hide();
             $("#share-screen").hide();
         }else if ((time == 'tu_choi_giotay') && (userName == who)){
-            $("#giotay").show();
-            $("#bogiotay").hide();
-            $("#share-screen").hide();
+            setTimeout(function(){
+                $("#giotay").show();
+                $("#bogiotay").hide();
+                $("#share-screen").hide();
+            },2000);
         }
     };
 

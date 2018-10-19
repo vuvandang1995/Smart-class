@@ -28,10 +28,14 @@
         img, input, textarea {
           max-width: 100%
         }
-        @media all and (max-width: 500px) {
-            .fork-left, .fork-right, .github-stargazers {
-                display: none;
-            }
+
+        media-box {
+            height: 30px;
+            text-align: center;
+        }
+
+        media-controls {
+            display:none;
         }
     </style>
 {% endblock %}
@@ -59,16 +63,18 @@
 {% endblock %}
 {% block javascripts %}
   {{ block.super }}
-    <script src="{% static 'js/peer/RTCMultiConnection.min.js' %}"></script>
-    <script src="https://192.168.100.22:443/socket.io/socket.io.js"></script>
-    <script src="{% static 'js/peer/getScreenId.js' %}"></script>
+    <script src="{% static 'js/teacher/RTC/RTCMultiConnection.min.js' %}"></script>
     <script src="{% static 'js/peer/getMediaElement.js' %}"></script>
-    <script src="{% static 'js/teacher/RTC/videocall/FileBufferReader.js' %}"></script>
-    <script src="{% static 'js/peer/share_connect.js' %}"></script>
+    <script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>
+    <script src="{% static 'js/peer/getScreenId.js' %}"></script>
+    <!--<script src="{% static 'js/teacher/RTC/videocall/FileBufferReader.js' %}"></script>-->
     <script>
         var teacher_name = '{{ gvht.username }}';
         var lopht = '{{ lopht }}';
+        var ten_dang_nhap = {{username}};
+        var ho_ten = {{fullname}};
     </script>
+    <script src="{% static 'js/peer/share_connect.js' %}"></script>
     <script src="{% static 'js/student/share.js' %}"></script>
 {% endblock %}
 

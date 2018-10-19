@@ -1,5 +1,10 @@
 var audio_broad = new RTCMultiConnection();
-audio_broad.socketURL = 'https://192.168.100.22:443/';
+var roomName = window.atob(location.href.split("_")[1]);
+audio_broad.socketURL = 'https://192.168.100.23:9443/';
+audio_broad.extra = {
+    username: ten_dang_nhap,
+    fullname: ho_ten,
+};
 audio_broad.getScreenConstraints = function(callback) {
     getScreenConstraints(function(error, screen_constraints) {
         if (!error) {
@@ -16,12 +21,14 @@ audio_broad.session = {
     audio: true,
 };
 
+
 audio_broad.sdpConstraints.mandatory = {
     OfferToReceiveAudio: true,
     OfferToReceiveVideo: true
 };
 
 audio_broad.mediaConstraints.video = false;
+audio_broad.enableLogs = false;
 audio_broad.videosContainer = document.getElementById('videos-container');
 audio_broad.onstream = function(event) {
     if(document.getElementById(event.streamid)) {
@@ -29,6 +36,7 @@ audio_broad.onstream = function(event) {
         existing.parentNode.removeChild(existing);
         if(audio_broad.extra.broadcaster === false){
             BtoN();
+            return false;
         }
     }
     var width = parseInt(audio_broad.videosContainer.clientWidth / 2) - 20;
@@ -50,7 +58,26 @@ audio_broad.onstream = function(event) {
     }, 5000);
 
     mediaElement.id = event.streamid;
+//    console.log(event.extra.username);
+    var audio = mediaElement.getElementsByTagName("audio");
+    var title = mediaElement.getElementsByTagName("h2")[0].innerHTML = event.extra.fullname
+    mediaElement.setAttribute('data-username',event.extra.username);
+    if(audio.length == 1){
+        mediaElement.getElementsByClassName("media-controls")[0].style.display = 'none' ;
+        mediaElement.getElementsByClassName("media-box")[0].style.height = '30px';
+        mediaElement.getElementsByClassName("media-box")[0].style.textAlign = 'center' ;
+    };
 };
+
+//audio_broad.onspeaking = function (e) {
+//    console.log("speak");
+//    e.mediaElement.style.border = '1px solid red';
+//};
+//
+//audio_broad.onsilence = function (e) {
+//    console.log("silence");
+//    e.mediaElement.style.border = '';
+//};
 
 audio_broad.onstreamended = function(event) {
     var mediaElement = document.getElementById(event.streamid);
@@ -58,6 +85,8 @@ audio_broad.onstreamended = function(event) {
         mediaElement.parentNode.removeChild(mediaElement);
     }
 };
+
+
 
 function joinBroadcastLooper(roomid) {
     (function reCheckRoomPresence() {
@@ -77,7 +106,7 @@ function NtoB(){
     audio_broad.disconnect();
     audio_broad.extra.broadcaster = true;
     audio_broad.dontCaptureUserMedia = false;
-    joinBroadcastLooper(window.atob(location.href.split("_")[1]));
+    joinBroadcastLooper(roomName);
 }
 
 function BtoN(){
@@ -89,11 +118,11 @@ function BtoN(){
     audio_broad.disconnect();
     audio_broad.extra.broadcaster = false;
     audio_broad.dontCaptureUserMedia = true;
-    joinBroadcastLooper(window.atob(location.href.split("_")[1]));
+    joinBroadcastLooper(roomName);
 }
 
 function openRoom(){
-    audio_broad.openOrJoin(window.atob(location.href.split("_")[1]), function(isRoomExist, roomid) {});
+    audio_broad.openOrJoin(roomName, function(isRoomExist, roomid) {});
 }
 
 $('#share-screen').click(function(){
@@ -102,15 +131,6 @@ $('#share-screen').click(function(){
     });
 });
 
-//$('body #status').on('click',function(){
-//    console.log(audio_broad.getRemoteStreams());
-//    console.log(audio_broad.attachStreams);
-//    console.log(audio_broad.getAllParticipants());
-//    console.log(audio_broad);
-//    audio_broad.getRemoteStreams().forEach(function(reStream) {
-//        console.log(reStream)
-//    });
-//});
 
 
 function closeRoom(){
@@ -120,6 +140,7 @@ function closeRoom(){
     audio_broad.getRemoteStreams().forEach(function(reStream) {
         reStream.stop();
     });
+    audio_broad.close();
     audio_broad.disconnect();
     audio_broad.closeSocket();
 }
@@ -131,7 +152,7 @@ function closeRemote(){
 }
 
 function reconnect(){
-    audio_broad.checkPresence(window.atob(location.href.split("_")[1]), function(isRoomExist){
+    audio_broad.checkPresence(roomName, function(isRoomExist){
         if (isRoomExist){
             if(audio_broad.extra.broadcaster == true){
                 NtoB();

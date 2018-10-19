@@ -41,27 +41,32 @@ $(document).ready(function(){
 
     $(".giotay_std").click(function(event){
         event.stopPropagation();
+        var name = $(this).parent().parent().parent().find('p').first().text();
         if($(this).children().attr('class') == 'fa fa-hand-paper-o'){
+            name
             if(confirm("Cho phép "+$(this).parent().parent().parent().data("fullname") + " phát biểu")){
                 chatallSocket.send(JSON.stringify({
                     'message' : 'enable_share',
-                    'who' : $(this).parent().parent().parent().find('p').first().text(),
+                    'who' : name,
                     'time' : 'enable_share'
                 }));
                 $(this).children().attr('class','fa fa-volume-up');
             }else{
+                chatallSocket.send(JSON.stringify({
+                    'message' : 'tu_choi_giotay',
+                    'who' : name,
+                    'time' : 'tu_choi_giotay'
+                }));
                 $(this).hide();
             };
         }else{
             if(confirm("Hủy quyền phát biểu của "+$(this).parent().parent().parent().data("fullname"))){
-                var name = $(this).parent().parent().parent().find('p').first().text();
                 chatallSocket.send(JSON.stringify({
                     'message' : 'disable_share',
                     'who' : name,
                     'time' : 'disable_share'
                 }));
-//                stopRemote(name);
-//                $(".media-container[data-user="+name+"]").remove();
+                $(".media-container[data-username="+name+"]").remove();
                 $(this).children().attr('class','fa fa-hand-paper-o');
                 $(this).hide();
             };

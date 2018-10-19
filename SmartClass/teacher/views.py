@@ -1060,9 +1060,9 @@ def share(request, lop):
     if user.is_authenticated:
         ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
-        content = {'username': mark_safe(json.dumps(user.username)),
-                   'list_lop': ChiTietLop.objects.filter(myuser_id=user),
-                   'ls_student': ls_student, 'gvht': MyUser.objects.get(id=gvid), 'lopht': lop}
+        content = {'username': mark_safe(json.dumps(user.username)), 'ls_student': ls_student, 'lopht': lop,
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user), 'gvht': MyUser.objects.get(id=gvid),
+                   'fullname': mark_safe(json.dumps(user.fullname))}
         if user.position == 0:
             return render(request, 'student/share.html', content)
         else:
