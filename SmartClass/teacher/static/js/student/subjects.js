@@ -3,6 +3,9 @@ $(document).ready(function(){
     var chatallSocket = new WebSocket(
         'ws://' + window.location.host +
         '/ws/' + teacher_name + 'chatall'+lop+'/');
+    /*var chatallSocket = new WebSocket(
+        'wss://' + window.location.host +
+        ':8443/ws/' + teacher_name + 'chatall'+lop+'/');*/
 
 
     chatallSocket.onmessage = function(e) {
@@ -41,65 +44,9 @@ $(document).ready(function(){
                     makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                 }, time);
             }
-        }else if ((time === 'enable_mic') && (userName == who)){
-            $('#out_gr').click();
-            audio_broad();
-            setTimeout(function(){
-                $("input[name=broadcaster]").prop('checked', true);
-                $('#room-id').val(teacher_name+'_'+lop);
-                $('#join-broadcast').click();
-                $('#videos-container111').show();
-            }, 1000);
-            $('#bogiotay').hide();
-        }else if ((time === 'disable_mic') && (userName == who)){
-            $('#out_gr').click();
-            audio_broad();
-            setTimeout(function(){
-                $("input[name=broadcaster]").prop('checked', false);
-                $('#room-id').val(teacher_name+'_'+lop);
-                $('#join-broadcast').click();
-                $('#videos-container111').show();
-            }, 1000);
-            $('#giotay').show();
-        }else if (time === 'teacher_audio_all'){
-            $("input[name=broadcaster]").prop('checked', false);
-            $('#room-id').val(teacher_name+'_'+lop);
-            setTimeout(function(){ 
-                $('#join-broadcast').click();
-            }, 2000);
-            $('#videos-container111').show();
-            
-            $('#giotay').show();
-            $('body').on('click', '#giotay', function(){
-                setTimeout(function(){
-                    chatallSocket.send(JSON.stringify({
-                        'message' : 'giotay',
-                        'who' : userName,
-                        'time' : 'giotay'
-                    }));
-                }, 2000);
-                $('#giotay').hide();
-                $('#bogiotay').show();
-                
-            });
-
-            $('body').on('click', '#bogiotay', function(){
-                setTimeout(function(){
-                    chatallSocket.send(JSON.stringify({
-                        'message' : 'bogiotay',
-                        'who' : userName,
-                        'time' : 'bogiotay'
-                    }));
-                }, 2000);
-                $('#giotay').show();
-                $('#bogiotay').hide();
-                
-            });
-                
-
         }else if (time === 'teacher_change_group'){
             reload();
-        }else if ((time != 'key') && (time != 'giotay') && (time != 'bogiotay')){
+        }else if ((time != 'key')){
                 insertChat(who, message, time);
             }
         };
@@ -216,6 +163,9 @@ $(document).ready(function(){
                     var chatgroup = new WebSocket(
                     'ws://' + window.location.host +
                     '/ws/' + group_chat_name + 'chatgroup/');
+                    /*var chatgroup = new WebSocket(
+                        'wss://' + window.location.host +
+                        ':8443/ws/' + group_chat_name + 'chatgroup/');*/
                     var group_name = $('#group_class').children('p').next('p').text();
                     $('#title-chat').html(group_name);
                     $("#chat-group-text").prop('disabled', false);
@@ -312,29 +262,14 @@ $(document).ready(function(){
 
                     $('#audiocall').attr('name', group_name);
                 };
+                if (sessionStorage.getItem('socket_teacher') != null){
+                    $('#mail_list').click();
+                }
 
             }
         });
     }
     reload();
-
-//     else if (time === 'teacher_call'){
-//         if ($('#audiocall').length){
-//             $('#audiocall').show();
-//             $("#demo").show();
-//             var time = 1;
-//             $('#group_class .right').children('p').each(function(index){
-//                 if (userName == $(this).attr("name")){
-//                     time = index*1000;
-//                     return false;
-//                 }
-//             });
-//             // alert(time)
-//             setTimeout(function(){
-//                 makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
-//             }, time);
-//         }    
-// }
 
 
     $('body').on('click', '.xxx', function(){
@@ -360,11 +295,9 @@ $(document).ready(function(){
         $(this).parent().parent().children().children().children('input').val(''); 
     })
 
+    
     var socket_teacher;
-    $('.mail_list').on('click',function(){
-        var std = $(this).children('p').text();
-        //  $("body .noti_chat"+std_username).hide();
-            $('body #'+std).children('.frame_std').show();
+    $('#mail_list').on('click',function(){
         //  if (typeof(Storage) !== "undefined") {
         //     var herf = $(this).attr('href');
         //     var chat = herf.substring(herf.indexOf("(")+1, herf.indexOf(")")) + ',' + std_username;
@@ -375,10 +308,26 @@ $(document).ready(function(){
         // } else {
         //     document.write('Trình duyệt của bạn không hỗ trợ local storage');
         // }
-
-        socket_teacher = new WebSocket(
+        if (($('#'+userName).length == 0) || ($("body .chat"+userName).css('display') == 'none')){
+            var std = $(this).children('p').text();
+            register_popup(userName, $('#teacher_fullname').text());
+            //  $("body .noti_chat"+std_username).hide();
+            $('body #'+std).children('.frame_std').show();
+            $("body .chat"+userName+" > ul").empty();
+            socket_teacher = new WebSocket(
                 'ws://' + window.location.host +
                 '/ws/' + userName +'chat11/');
+            /*socket_teacher = new WebSocket(
+                'wss://' + window.location.host +
+                ':8443/ws/' + userName +'chat11/');*/
+            if (typeof(Storage) !== "undefined") {
+                // Gán dữ liệu
+                sessionStorage.setItem('socket_teacher', socket_teacher);
+                    
+                // Lấy dữ liệu
+            } else {
+                document.write('Trình duyệt của bạn không hỗ trợ local storage');
+            }
 
             var me = {};
             me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
@@ -421,12 +370,13 @@ $(document).ready(function(){
 
             
             socket_teacher.onmessage = function(e) {
-            var data = JSON.parse(e.data);
-            var message = data['message'];
-            var who = data['who'];
-            var time = data['time'];
-            insertChat1(who, message, time);
+                var data = JSON.parse(e.data);
+                var message = data['message'];
+                var who = data['who'];
+                var time = data['time'];
+                insertChat1(who, message, time);
             };
+        }
 
         });
 
@@ -460,13 +410,9 @@ $(document).ready(function(){
     })
 
     $('body').on('click', '.chat-close', function(){
-    var teacher_name = $(this).attr('id');
-    socket_teacher.close();
-    // sessionStorage.removeItem(tk_id);
-    $("body #chat"+teacher_name+" .frame > ul").empty();
+        socket_teacher.close();
+        // sessionStorage.removeItem(tk_id);
+        sessionStorage.removeItem('socket_teacher');
+        $("body .chat"+userName+" > ul").empty();
     })
-
-
-    audio_broad();
-
 });
