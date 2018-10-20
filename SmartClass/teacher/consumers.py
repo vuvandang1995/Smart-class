@@ -32,17 +32,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             f = r'notification/chat/class/'+self.room_group_name+'.txt'
             file = open(f,'r')
-            for line in file:
-                message = line.split('^%$^%$&^')[0]
-                who = line.split('^%$^%$&^')[1].strip()
-                time = line.split('^%$^%$&^')[2].strip()
-                await self.send(text_data=json.dumps({
-                        'message': message,
-                        'who': who,
-                        'time' : time
-                    }))
+            if len(open(f).readlines()) > 15:
+                count = len(open(f).readlines()) - 15
+                for i, line in enumerate(file):
+                    if i > count:
+                        message = line.split('^%$^%$&^')[0]
+                        who = line.split('^%$^%$&^')[1].strip()
+                        time = line.split('^%$^%$&^')[2].strip()
+                        await self.send(text_data=json.dumps({
+                                'message': message,
+                                'who': who,
+                                'time' : time
+                            }))
+            else:
+                for line in file:
+                    message = line.split('^%$^%$&^')[0]
+                    who = line.split('^%$^%$&^')[1].strip()
+                    time = line.split('^%$^%$&^')[2].strip()
+                    await self.send(text_data=json.dumps({
+                            'message': message,
+                            'who': who,
+                            'time' : time
+                        }))
         except:
-            pass       
+            pass
 
     async def disconnect(self, close_code):
         # Leave room group
