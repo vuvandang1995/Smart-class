@@ -327,73 +327,75 @@ $(document).ready(function(){
 	$('.mail_list').on('click',function(){
         var std_username = $(this).children('p').text();
         var std_fullname = $(this).data("fullname");
-        register_popup_teacher(std_username, std_fullname);
-        //  $("body .noti_chat"+std_username).hide();
-         $('body #'+std_username).children('.frame_std').show();
-        //  if (typeof(Storage) !== "undefined") {
-        //     var herf = $(this).attr('href');
-        //     var chat = herf.substring(herf.indexOf("(")+1, herf.indexOf(")")) + ',' + std_username;
-        //     // Gán dữ liệu
-        //     sessionStorage.setItem(std_username, chat);
-             
-        //     // Lấy dữ liệu
-        // } else {
-        //     document.write('Trình duyệt của bạn không hỗ trợ local storage');
-        // }
+        if (($('#'+std_username).length == 0) || ($("body .chat"+std_username).css('display') == 'none')){
+            register_popup_teacher(std_username, std_fullname);
+            //  $("body .noti_chat"+std_username).hide();
+            $('body #'+std_username).children('.frame_std').show();
+            //  if (typeof(Storage) !== "undefined") {
+            //     var herf = $(this).attr('href');
+            //     var chat = herf.substring(herf.indexOf("(")+1, herf.indexOf(")")) + ',' + std_username;
+            //     // Gán dữ liệu
+            //     sessionStorage.setItem(std_username, chat);
+                
+            //     // Lấy dữ liệu
+            // } else {
+            //     document.write('Trình duyệt của bạn không hỗ trợ local storage');
+            // }
 
-         if (dict_ws[std_username] == undefined){
-             dict_ws[std_username] = new WebSocket(
-             'ws://' + window.location.host +
-             '/ws/' + std_username + 'chat11/');
-         }
+            if (dict_ws[std_username] == undefined){
+                dict_ws[std_username] = new WebSocket(
+                'ws://' + window.location.host +
+                '/ws/' + std_username + 'chat11/');
+                $("body .chat"+std_username+" > ul").empty();
+                var me = {};
+                me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
 
-         var me = {};
-         me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
+                var you = {};
+                you.avatar = "https://cdn2.iconfinder.com/data/icons/rcons-users-color/32/support_man-512.png";      
 
-         var you = {};
-         you.avatar = "https://cdn2.iconfinder.com/data/icons/rcons-users-color/32/support_man-512.png";      
+                //-- No use time. It is a javaScript effect.
+                function insertChat1(who, text, time){
+                    if (time === undefined){
+                        time = 0;
+                    }
+                    var control = "";
+                    var date = time;
+                    
+                    if (who == userName){
+                        control = '<li style="padding-top: 15px;margin-left: 5em;width:75%;">' +
+                                    '<div class="msj-rta macro" style="background-color: #BFE9F9;">' +
+                                        '<div class="text text-r">' +
+                                            '<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
+                                            '<p><small style="color: #444950;">'+date+'</small></p>' +
+                                        '</div></div></li>';
+                    }else{
+                        control = '<li style="width:75%">' +
+                            '<h4 style="margin-bottom: -3px;margin-left: 10%;font-size: 12px;">'+who+'</h4>'+
+                            '<div class="avatar" style="padding:5px 0px 0px 10px;width: 20%;margin-left: -12%;margin-top: 5%; !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
+                            '<div class="msj-rta macro">' +
+                                '<div class="text text-r">' +
+                                    '<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
+                                    '<p><small style="color: #444950;">'+date+'</small></p>' +
+                                '</div></div>' +
+                            '</li>';
+                    }
+                    setTimeout(
+                        function(){                        
+                            $(".chat"+std_username).children('ul').append(control).scrollTop($(".chat"+std_username).children('ul').prop('scrollHeight'));
+                        }, time);
+                    
+                }
 
-         //-- No use time. It is a javaScript effect.
-         function insertChat1(who, text, time){
-             if (time === undefined){
-                 time = 0;
-             }
-             var control = "";
-             var date = time;
-             
-             if (who == userName){
-				control = '<li style="padding-top: 15px;margin-left: 5em;width:75%;">' +
-							  '<div class="msj-rta macro" style="background-color: #BFE9F9;">' +
-								  '<div class="text text-r">' +
-									  '<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
-									  '<p><small style="color: #444950;">'+date+'</small></p>' +
-								  '</div></div></li>';
-			  }else{
-				control = '<li style="width:75%">' +
-					'<h4 style="margin-bottom: -3px;margin-left: 10%;font-size: 12px;">'+who+'</h4>'+
-					'<div class="avatar" style="padding:5px 0px 0px 10px;width: 20%;margin-left: -12%;margin-top: 5%; !important"><img class="img-circle" style="width:90%;" src="'+me.avatar+'" /></div>'+
-					'<div class="msj-rta macro">' +
-						'<div class="text text-r">' +
-							'<p style="color: #444950;line-height: 17px;word-break: break-all;">'+text+'</p>' +
-							'<p><small style="color: #444950;">'+date+'</small></p>' +
-						'</div></div>' +
-					'</li>';
-			  }
-             setTimeout(
-                 function(){                        
-                     $(".chat"+std_username).children('ul').append(control).scrollTop($(".chat"+std_username).children('ul').prop('scrollHeight'));
-                 }, time);
-             
-         }
-
-         
-         dict_ws[std_username].onmessage = function(e) {
-             var data = JSON.parse(e.data);
-             var message = data['message'];
-             var who = data['who'];
-			 var time = data['time'];
-             insertChat1(who, message, time);
-         };
+                
+                dict_ws[std_username].onmessage = function(e) {
+                    var data = JSON.parse(e.data);
+                    var message = data['message'];
+                    var who = data['who'];
+                    var time = data['time'];
+                    insertChat1(who, message, time);
+                };
+            }
+        }
 
      });
 
