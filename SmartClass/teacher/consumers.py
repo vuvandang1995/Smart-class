@@ -73,7 +73,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         who = text_data_json['who']
         time = text_data_json['time']
-        if time != 'None' and time != 'call_time' and time != 'teacher_change_group' and time != 'teacher_call' and time != 'key':
+        if time != 'None' and time != 'call_time' and time != 'teacher_change_group' and time != 'teacher_call' and time != 'key' and message != 'new_chat':
             f = r'notification/chat/class/'+self.room_group_name+'.txt'
             file = open(f,'a')
             file.write(message + "^%$^%$&^"+ who +"^%$^%$&^"+ time + "\n") 

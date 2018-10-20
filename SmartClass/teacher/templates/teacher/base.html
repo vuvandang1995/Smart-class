@@ -126,11 +126,11 @@
 
                     <li role="presentation" class="dropdown">
                       <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-envelope-o"></i>
+                        <i class="fa fa-bell-o"></i>
                         <span class="badge bg-green">6</span>
                       </a>
                       <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                        <li>
+                        <li class="noti_noti">
                           <a>
                             <span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span>
                             <span>
@@ -142,14 +142,7 @@
                             </span>
                           </a>
                         </li>
-                        <li>
-                          <div class="text-center">
-                            <a>
-                              <strong>Tấtcả thông báo</strong>
-                              <i class="fa fa-angle-right"></i>
-                            </a>
-                          </div>
-                        </li>
+                        
                       </ul>
                     </li>
                   </ul>
@@ -356,7 +349,11 @@
             'who' : userName,
             'time' : date
             }));
-            
+            chatallSocket.send(JSON.stringify({
+              'message' : `new_chat`,
+              'who' : std_username,
+              'time' : date
+            }));
           }
           $(this).parent().parent().children().children().children('input').val('');
         })

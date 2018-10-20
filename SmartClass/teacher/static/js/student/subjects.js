@@ -46,6 +46,11 @@ $(document).ready(function(){
             }
         }else if (time === 'teacher_change_group'){
             reload();
+        }else if ((message == 'new_chat') && (who == userName)){
+            $('#mail_list').click();
+        }else if (message.includes('Bắt đầu làm bài thi:')){
+            alert('thi')
+            insertChat(who, message, time);
         }else if ((time != 'key')){
                 insertChat(who, message, time);
             }
@@ -262,7 +267,7 @@ $(document).ready(function(){
 
                     $('#audiocall').attr('name', group_name);
                 };
-                if (sessionStorage.getItem('socket_teacher') != null){
+                if (sessionStorage.getItem(teacher_name) != null){
                     $('#mail_list').click();
                 }
 
@@ -316,13 +321,13 @@ $(document).ready(function(){
             $("body .chat"+userName+" > ul").empty();
             socket_teacher = new WebSocket(
                 'ws://' + window.location.host +
-                '/ws/' + userName +'chat11/');
+                '/ws/' + userName +teacher_name+lop+'chat11/');
             /*socket_teacher = new WebSocket(
                 'wss://' + window.location.host +
                 ':8443/ws/' + userName +'chat11/');*/
             if (typeof(Storage) !== "undefined") {
                 // Gán dữ liệu
-                sessionStorage.setItem('socket_teacher', socket_teacher);
+                sessionStorage.setItem(teacher_name, socket_teacher);
                     
                 // Lấy dữ liệu
             } else {
@@ -412,7 +417,7 @@ $(document).ready(function(){
     $('body').on('click', '.chat-close', function(){
         socket_teacher.close();
         // sessionStorage.removeItem(tk_id);
-        sessionStorage.removeItem('socket_teacher');
+        sessionStorage.removeItem(teacher_name);
         $("body .chat"+userName+" > ul").empty();
     })
 });
