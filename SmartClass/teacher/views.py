@@ -77,9 +77,12 @@ def manage_class(request, id):
         except:
             so_lop = int(lop.ten[0])
         gvm = GiaoVienMon.objects.filter(myuser_id=user).values('mon_id')
-        ds_de = De.objects.filter(myuser_id=user, mon_id__in=Mon.objects.filter(id__in=gvm, lop=so_lop))
-        content = {'username': mark_safe(json.dumps(user.username)), 'list_lop': ChiTietLop.objects.filter(myuser_id=user),
-                   'lop_ht': lop, 'ls_student': ls_student, 'ds_de': ds_de}
+        ds_de = De.objects.filter(myuser_id=user, mon_id__in=Mon.objects.filter(id__in=gvm, lop=so_lop), dung_lam='Thi')
+        ds_bai_tap = De.objects.filter(myuser_id=user, mon_id__in=Mon.objects.filter(id__in=gvm, lop=so_lop),
+                                       dung_lam='Bài tập')
+        content = {'username': mark_safe(json.dumps(user.username)),
+                   'list_lop': ChiTietLop.objects.filter(myuser_id=user),
+                   'lop_ht': lop, 'ls_student': ls_student, 'ds_de': ds_de, 'ds_bai_tap': ds_bai_tap}
         list_std = []
         for std in ls_student:
             list_std.append(std)
@@ -192,6 +195,7 @@ def group_data(request, lop):
                             <h3>'''+lsg.ten_nhom+'''<small>
                                 <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
                                 <button type="button" class="btn btn-primary btn-xs join_gr" name="'''+lsg.ten_nhom+'''">Audio</button>
+                                <button type="button" class="btn btn-success btn-xs send_gr" name="'''+lsg.ten_nhom+'''" data-toggle="modal" data-target="#send">Giao bài</button>
                                 <button style="display:none;" type="button" class="btn btn-primary btn-xs done_gr" name="'''+lsg.ten_nhom+'''">Kết thúc</button>
                                 </small></h3>
                 '''

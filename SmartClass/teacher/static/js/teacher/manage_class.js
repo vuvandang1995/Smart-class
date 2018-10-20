@@ -607,4 +607,46 @@ $(document).ready(function(){
             }
         });
     });
+
+    $("#send").on("show.bs.modal", function(event){
+        var btn = $(event.relatedTarget);
+        var group = btn.attr('name');
+        $("#send_title").text("Giao bài tập cho "+group);
+        $("#send input[name=gr_name]").val(group);
+    });
+
+    $("#send_bai_tap").click(function(){
+        if($("#send input[name='bai_tap']").val() == ''){
+            alert("Chưa chọn bài tập");
+            return false;
+        }
+        $("#ds_bai_tap option").each(function(){
+            if($(this).val()== $("input[name=bai_tap]").val()){
+                var id = $(this).data('id');
+                var thoi_gian = $(this).data('thoi_gian');
+                var currentdate = new Date();
+                var now = `${currentdate.getHours()}:${currentdate.getMinutes()}:${currentdate.getSeconds()}`
+                var data = window.btoa(id+"_"+now);
+                var date = formatAMPM(new Date());
+                var href = location.href.split('/')[0]+location.href.split('/')[1]+location.href.split('/')[2]+"/student/exam_"+data
+                var group = $("#send input[name='gr_name']").val();
+                if(group == "tất cả"){
+                    chatallSocket.send(JSON.stringify({
+                        'message' : `<a href="/student/exam_${data}">${href}</a>`,
+                        'who' : userName,
+                        'time' : date
+                    }));
+                }else{
+                    var group_chat_name =  class_ +userName+ group
+                    dict_group_chat[group_chat_name].send(JSON.stringify({
+                        'message' : `<a href="/student/exam_${data}">${href}</a>`,
+                        'who' : userName,
+                        'time' : date
+                    }));
+                }
+
+                return false;
+            }
+        });
+    });
 });

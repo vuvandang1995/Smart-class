@@ -18,6 +18,7 @@
             <div class="x_title">
                 <h2>Lớp {{lop_ht.ten}}</h2>
                 <!--<small> {{lop_ht.khoa_id.ten_khoa}} - {{lop_ht.nien_khoa_id.ten_nien_khoa}} -  {{lop_ht.nien_khoa_id.nam_hoc}}</small>-->
+                <button style="float:right;" class="btn btn-success" id="btn_send" data-toggle="modal" data-target="#send" name="tất cả">Giao bài tập cả lớp <i class="fa fa-send"></i></button>
                 <button class="btn btn-info" style="float:right;" id="tao_ky_thi" data-toggle="modal" data-target="#ky_thi" >Tạo kỳ thi <i class="fa fa-edit"></i> </button>
                 <button class="btn btn-primary" style="float:right;" id="share" >Trình chiếu <i class="fa fa-video-camera"></i> </button>
 
@@ -160,7 +161,7 @@
   </div>
     <p hidden id="lopht">{{lop_ht.ten}}</p>
     <div class="modal" id="ky_thi" role="dialog">
-      <div  class="modal-dialog">
+      <div  class="modal-dialog  modal-sm">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
@@ -289,6 +290,32 @@
             <div class="modal-footer">
                <button type="submit" class="btn btn-primary"  id="save_audiocall">Tạo</button>
                <button type="button" class="btn btn-default" data-dismiss="modal" id="close_modal_audiocall">Đóng</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="send" role="dialog">
+      <div  class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" id="send_title"></h4>
+            </div>
+            <div class="modal-body">
+                <label>Chọn bài tập</label>
+                <input class="form-control" list="ds_bai_tap" name="bai_tap">
+                <datalist id="ds_bai_tap">
+                    {% for de in ds_bai_tap %}
+                        <option data-id="{{de.id}}" data-thoi_gian="{{de.thoi_gian}}">{{de.ten}}: {{de.dung_lam}} - {{ de.thoi_gian}} phút</option>
+                    {% endfor %}
+                </datalist>
+                <input hidden name="gr_name">
+            </div>
+            <div class="modal-footer">
+               <button type="submit" class="btn btn-primary"  id="send_bai_tap">Giao</button>
+               <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
             </div>
         </div>
       </div>

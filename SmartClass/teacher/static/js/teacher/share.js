@@ -1,9 +1,9 @@
 $(document).ready(function(){
-    chatallSocket = new WebSocket(
+    shareAllSocket = new WebSocket(
         'ws://' + window.location.host +
-        '/ws/' + userName + 'chatall'+lopht+'/');
+        '/ws/' + userName + 'shareall'+lopht+'/');
 
-    chatallSocket.onmessage = function(e) {
+    shareAllSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
         var who = data['who'];
@@ -15,7 +15,7 @@ $(document).ready(function(){
 
     $("#start-screen").click(function(){
         openRoom();
-        chatallSocket.send(JSON.stringify({
+        shareAllSocket.send(JSON.stringify({
             'message' : 'start_screen',
             'who' : 'start_screen',
             'time' : 'start_screen'
@@ -28,9 +28,9 @@ $(document).ready(function(){
 
     $("#stop-screen").click(function(){
         closeRoom();
-        chatallSocket.send(JSON.stringify({
-            'message' : 'start_screen',
-            'who' : 'start_screen',
+        shareAllSocket.send(JSON.stringify({
+            'message' : 'stop_screen',
+            'who' : 'stop_screen',
             'time' : 'stop_screen'
         }));
         $(".giotay_std").children().attr('class','fa fa-hand-paper-o')
@@ -51,14 +51,14 @@ $(document).ready(function(){
         if($(this).children().attr('class') == 'fa fa-hand-paper-o'){
             name
             if(confirm("Cho phép "+$(this).parent().parent().parent().data("fullname") + " phát biểu")){
-                chatallSocket.send(JSON.stringify({
+                shareAllSocket.send(JSON.stringify({
                     'message' : 'enable_share',
                     'who' : name,
                     'time' : 'enable_share'
                 }));
                 $(this).children().attr('class','fa fa-volume-up');
             }else{
-                chatallSocket.send(JSON.stringify({
+                shareAllSocket.send(JSON.stringify({
                     'message' : 'tu_choi_giotay',
                     'who' : name,
                     'time' : 'tu_choi_giotay'
@@ -67,7 +67,7 @@ $(document).ready(function(){
             };
         }else{
             if(confirm("Hủy quyền phát biểu của "+$(this).parent().parent().parent().data("fullname"))){
-                chatallSocket.send(JSON.stringify({
+                shareAllSocket.send(JSON.stringify({
                     'message' : 'disable_share',
                     'who' : name,
                     'time' : 'disable_share'
@@ -82,7 +82,7 @@ $(document).ready(function(){
     $(".mail_list").click(function(){
         if(confirm("Cho phép "+$(this).data("fullname") + " phát biểu")){
             name = $(this).find('p').first().text();
-            chatallSocket.send(JSON.stringify({
+            shareAllSocket.send(JSON.stringify({
                 'message' : 'enable_share',
                 'who' : name,
                 'time' : 'enable_share'
