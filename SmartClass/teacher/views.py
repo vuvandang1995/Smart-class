@@ -254,7 +254,7 @@ def manage_point_data(request, lop):
             lop_Ob = Lop.objects.get(ten=lop)
             ChiTietLop.objects.get(myuser_id=user, lop_id=lop_Ob)
         except ObjectDoesNotExist:
-            pass
+            return JsonResponse(json.loads(json.dumps({"data": []})))
         else:
             ls_chi_tiet = ChiTietLop.objects.filter(lop_id=lop_Ob).values('myuser_id')
             ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
@@ -657,40 +657,48 @@ def question_data(request, id_mon, all, dung_lam):
     user = request.user
     if user.is_authenticated and user.position == 1:
         data = []
-        if all == 0:
-            list_ques = CauHoi.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon), don=True)
-            list_ques_da = CauHoiDa.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon))
-        else:
-            list_ques = CauHoi.objects.filter(mon_id=Mon.objects.get(id=id_mon), don=True, dung_lam=dung_lam)
-            list_ques_da = CauHoiDa.objects.filter(mon_id=Mon.objects.get(id=id_mon), dung_lam=dung_lam)
-        for ques in list(chain(list_ques, list_ques_da)):
-            dang_cau_hoi = '<p id="dang_cau_hoi_{}">{}</p>'.format(ques.id, ques.dang_cau_hoi)
-            try:
-                so_cau_hoi = '<p id="so_cau_hoi_{}">{}<p>'.format(ques.id, str(ques.so_cau_hoi))
-            except:
-                chu_de = '<p id="chu_de_{0}" data-don="don">{1}</p>'.format(ques.id, ques.chu_de)
-                so_cau_hoi = '<p id="so_cau_hoi_{}">1<p>'.format(ques.id)
-            else:
-                chu_de = '<p id="chu_de_{0}" data-don="da">{1}</p>'.format(ques.id, ques.chu_de)
-            loai_cau_hoi = '<p>{}</p>'.format(ques.dung_lam)
-            do_kho = '<p id="do_kho_{}">'.format(ques.id)
-            if ques.do_kho == 0:
-                do_kho += 'Dễ</p>'
-            elif ques.do_kho == 1:
-                do_kho += 'Trung bình</p>'
-            else:
-                do_kho += 'Khó</p>'
-            ngay_tao = '<p>{}</p>'.format(str(ques.ngay_tao))
-            noi_dung = '''
-            <div id="tom_tat_{0}" class="row">{1}</div>
-            '''.format(ques.id, ques.noi_dung[:40])
+        try:
             if all == 0:
-                data.append([chu_de, loai_cau_hoi, dang_cau_hoi, so_cau_hoi, do_kho, ngay_tao, noi_dung])
+                list_ques = CauHoi.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon), don=True)
+                list_ques_da = CauHoiDa.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon))
             else:
-                ten = '<p>{}</p>'.format(ques.myuser_id.fullname)
-                data.append([ques.id, chu_de, dang_cau_hoi, so_cau_hoi, do_kho, ten, ngay_tao, noi_dung])
-        json_data = json.loads(json.dumps({"data": data}))
-        return JsonResponse(json_data)
+                if dung_lam != '':
+                    list_ques = CauHoi.objects.filter(mon_id=Mon.objects.get(id=id_mon), don=True, dung_lam=dung_lam)
+                    list_ques_da = CauHoiDa.objects.filter(mon_id=Mon.objects.get(id=id_mon), dung_lam=dung_lam)
+                else:
+                    list_ques = CauHoi.objects.filter(mon_id=Mon.objects.get(id=id_mon), don=True)
+                    list_ques_da = CauHoiDa.objects.filter(mon_id=Mon.objects.get(id=id_mon))
+        except:
+            return JsonResponse(json.loads(json.dumps({"data": []})))
+        else:
+            for ques in list(chain(list_ques, list_ques_da)):
+                dang_cau_hoi = '<p id="dang_cau_hoi_{}">{}</p>'.format(ques.id, ques.dang_cau_hoi)
+                try:
+                    so_cau_hoi = '<p id="so_cau_hoi_{}">{}<p>'.format(ques.id, str(ques.so_cau_hoi))
+                except:
+                    chu_de = '<p id="chu_de_{0}" data-don="don">{1}</p>'.format(ques.id, ques.chu_de)
+                    so_cau_hoi = '<p id="so_cau_hoi_{}">1<p>'.format(ques.id)
+                else:
+                    chu_de = '<p id="chu_de_{0}" data-don="da">{1}</p>'.format(ques.id, ques.chu_de)
+                loai_cau_hoi = '<p>{}</p>'.format(ques.dung_lam)
+                do_kho = '<p id="do_kho_{}">'.format(ques.id)
+                if ques.do_kho == 0:
+                    do_kho += 'Dễ</p>'
+                elif ques.do_kho == 1:
+                    do_kho += 'Trung bình</p>'
+                else:
+                    do_kho += 'Khó</p>'
+                ngay_tao = '<p>{}</p>'.format(str(ques.ngay_tao))
+                noi_dung = '''
+                <div id="tom_tat_{0}" class="row">{1}</div>
+                '''.format(ques.id, ques.noi_dung[:40])
+                if all == 0:
+                    data.append([chu_de, loai_cau_hoi, dang_cau_hoi, so_cau_hoi, do_kho, ngay_tao, noi_dung])
+                else:
+                    ten = '<p>{}</p>'.format(ques.myuser_id.fullname)
+                    data.append([ques.id, chu_de, dang_cau_hoi, so_cau_hoi, do_kho, ten, ngay_tao, noi_dung])
+            json_data = json.loads(json.dumps({"data": data}))
+            return JsonResponse(json_data)
 
 
 def question_data_detail(request, id, bien):

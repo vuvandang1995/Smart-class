@@ -81,17 +81,79 @@ $(document).ready(function(){
         var token = $("#new_class input[name=csrfmiddlewaretoken]").val();
         var ten = $("#new_class input[name=ten]").val();
         var id = $("#new_class input[name=id]").val();
-        var khoa = $("#new_class input[name=khoa]").val();
-        var nien_khoa = $("#new_class input[name=nien_khoa]").val();
+        var khoa = '';
+        $("#ls option").each(function(){
+            if($("#new_class input[name=khoa]").val() == $(this).val()){
+                khoa = $(this).val();
+                return false;
+            }
+        });
+        if(khoa == ''){
+            alert("Khoa không chính xác");
+            return false;
+        }
+        var nien_khoa = '';
+        $("#lss option").each(function(){
+            if($("#new_class input[name=nien_khoa]").val() == $(this).val()){
+                 nien_khoa = $(this).val();
+                return false;
+            }
+        });
+        if(nien_khoa == ''){
+            alert("Khóa không chính xác");
+            return false;
+        }
         $.ajax({
             type:'POST',
             url:location.href,
             data: {'csrfmiddlewaretoken':token, 'kieu':kieu, 'ten': ten, 'id':id , 'khoa':khoa, 'nien_khoa':nien_khoa},
             success: function(){
-                $("#new_class").modal("hide");
                 table_class.ajax.reload(null,false);
+                $("#new_class").modal("hide");
             }
         });
+    });
+
+    var input_dom_element = document.getElementById("file");
+    var result;
+
+    function handle_fr(e) {
+        result = [];
+        var files = e.target.files, f = files[0];
+        var reader = new FileReader();
+        var rABS = !!reader.readAsBinaryString;
+        reader.onload = function(e) {
+            var data = e.target.result;
+            if(!rABS) data = new Uint8Array(data);
+
+            var wb = XLSX.read(data, {type: rABS ? 'binary' : 'array'});
+            var ws = wb.Sheets[wb.SheetNames[0]];
+            result = XLSX.utils.sheet_to_json(ws, {header:1});
+//            wb.SheetNames.forEach(function(sheetName) {
+//                var roa = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {header:1});
+//                if(roa.length) result[sheetName] = roa;
+//            });
+
+        };
+        if(rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+    }
+    var handler = handle_fr;
+    if(input_dom_element.attachEvent) input_dom_element.attachEvent('onchange', handler);
+    else input_dom_element.addEventListener('change', handler, false);
+
+    $('#create_new_class_multi').click(function(){
+        var token = $("input[name=csrfmiddlewaretoken]").val();
+        if (typeof result != 'undefined' ){
+            $.ajax({
+                type:'POST',
+                url:location.href,
+                data: {'csrfmiddlewaretoken':token, 'list_class':JSON.stringify(result)},
+                success: function(){
+                    table_class.ajax.reload(null,false);
+                    $("#new_class_multi").modal("hide");
+                }
+           });
+        }
     });
 
 

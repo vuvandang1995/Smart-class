@@ -3,10 +3,10 @@
 {% block stylesheets %}
     {{ block.super }}
     <link href="{% static 'vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/easy-autocomplete.css' %}" rel="stylesheet">
-    <link href="{% static 'css/easy-autocomplete.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/easy-autocomplete.themes.css' %}" rel="stylesheet">
-    <link href="{% static 'css/easy-autocomplete.themes.min.css' %}" rel="stylesheet">
+    <!--<link href="{% static 'css/easy-autocomplete.css' %}" rel="stylesheet">-->
+    <!--<link href="{% static 'css/easy-autocomplete.min.css' %}" rel="stylesheet">-->
+    <!--<link href="{% static 'css/easy-autocomplete.themes.css' %}" rel="stylesheet">-->
+    <!--<link href="{% static 'css/easy-autocomplete.themes.min.css' %}" rel="stylesheet">-->
 {% endblock stylesheets %}
 {% block content %}
   <div class="right_col" role="main">
@@ -16,7 +16,9 @@
           <div class="x_panel">
             <div class="x_title">
                 <h2>Danh sách lớp  </h2>
-
+                <button class="btn btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_class_multi" data-title="new">
+                    <i class="fa fa-plus"></i> Thêm nhiều lớp
+                </button>
                 <button class="btn btn-round btn-primary"  style="float:right;" data-toggle="modal" data-target="#new_class" data-title="new">
                     <i class="fa fa-plus"></i> Tạo mới lớp
                 </button>
@@ -121,11 +123,11 @@
                 <input type="hidden" name="id">
                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                   <input type="text" class="form-control has-feedback-left" name="ten" required placeholder="Tên lớp">
-                  <span class="fa fa-book form-control-feedback left" aria-hidden="true"></span>
+                  <span class="fa fa-home form-control-feedback left" aria-hidden="true"></span>
                 </div>
                  <div class="col-md-12 col-sm-12 col-xs-12 form-group has-feedback">
                   <input list="ls" type="text" class="form-control has-feedback-left" name="khoa" required placeholder="Tên khoa">
-                  <span class="fa fa-cube form-control-feedback left" aria-hidden="true"></span>
+                  <span class="fa fa-bank form-control-feedback left" aria-hidden="true"></span>
                     <datalist id="ls">
                         {% for k in ds_khoa %}
                         <option data-id="{{k.id}}">{{k.ten_khoa}}</option>
@@ -150,6 +152,29 @@
         </div>
       </div>
     </div>
+<div class="modal" id="new_class_multi" role="dialog">
+  <div  class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Nhập dữ liệu theo mẫu dưới</h4>
+        </div>
+        <div class="modal-body">
+            <img style="border: 1px solid; border-radius: 10px;" src="{% static '/image/class.PNG' %}" width="100%">
+            <br>
+            <br>
+            <input type="file" name="file" id="file" class="form-control">
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="modal-footer">
+           <button type="button" class="btn btn-primary"  id="create_new_class_multi">Upload</button>
+           <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+        </div>
+    </div>
+  </div>
+</div>
 
 {% endblock content %}
 {% block javascripts %}
@@ -158,5 +183,6 @@
     <script src="{% static 'js/jquery.easy-autocomplete.min.js' %}"></script>
     <script src="{% static 'vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/xlsx.full.min.js' %}"></script>
     <script src="{% static 'js/adminsc/manage_class.js' %}"></script>
 {% endblock javascripts %}

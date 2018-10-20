@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    setTimeout(function(){$(".easy-autocomplete.eac-square").css("width","100%");},500);
     var table_teacher = $('#list_teacher').DataTable({
         "ajax": {
             "type": "GET",
@@ -38,11 +39,11 @@ $(document).ready(function(){
 
             var gioi_tinh = $("#gioi_"+ gvid).text();
             if(gioi_tinh === 'Nam'){
-                $('#new_teacher input[name=nam]').prop('checked', true);
-                $('#new_teacher input[name=nu]').prop('checked', false);
+                $('#gioi_tinh option[data-gioi_tinh="1"]').prop('selected', true);
+                $('#gioi_tinh option[data-gioi_tinh="0"]').prop('selected', false);
             }else{
-                $('#new_teacher input[name=nam]').prop('checked', false);
-                $('#new_teacher input[name=nu]').prop('checked', true);
+                $('#gioi_tinh option[data-gioi_tinh="1"]').prop('selected', false);
+                $('#gioi_tinh option[data-gioi_tinh="0"]').prop('selected', true);
             }
 
             var username = $("#user_"+gvid).text();
@@ -67,8 +68,6 @@ $(document).ready(function(){
             $("#new_teacher input[name=search_mon]").val("");
             $("#new_teacher input[name=search_lop]").val("");
             $("#new_teacher input[name=gioi_tinh]").val("");
-            $('#new_teacher input[name=nam]').prop('checked', true);
-            $('#new_teacher input[name=nu]').prop('checked', false);
             $("#new_teacher input[name=username]").val("");
             $("#new_teacher input[name=password]").val("");
             $("#new_teacher input[name=password2]").val("");
@@ -92,11 +91,7 @@ $(document).ready(function(){
         var kieu = $("#new_teacher  input[name=kieu]").val();
         var token = $("#new_teacher input[name=csrfmiddlewaretoken]").val();
         var fullname = $("#new_teacher input[name=fullname]").val();
-        if ($('#new_teacher input[name=nam]').is(':checked')){
-            var gioi_tinh = 1;
-        }else{
-            var gioi_tinh = 0;
-        }
+        var gioi_tinh= $('#gioi_tinh option:selected').data('gioi_tinh');
         var username = $("#new_teacher input[name=username]").val();
         var email = $("#new_teacher input[name=email]").val();
         var password = $("#new_teacher input[name=password]").val();
@@ -121,15 +116,6 @@ $(document).ready(function(){
                     $('#list_teacher').DataTable().ajax.reload(null,false);
                 }
             });
-        }
-    });
-
-    $(".gioi_tinh").change(function() {
-        if(this.checked && this.name === 'nam'){
-            $('#new_teacher input[name=nu]').prop('checked', false);
-        }
-        else if(this.checked && this.name === 'nu'){
-            $('#new_teacher input[name=nam]').prop('checked', false);
         }
     });
 
