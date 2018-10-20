@@ -1,10 +1,10 @@
 $(document).ready(function(){
-    var chatallSocket = new WebSocket(
+    var shareAllSocket = new WebSocket(
         'ws://' + window.location.host +
-        '/ws/' + teacher_name + 'chatall'+lopht+'/');
+        '/ws/' + teacher_name + 'shareAll'+lopht+'/');
 
     $('body').on('click', '#giotay', function(){
-        chatallSocket.send(JSON.stringify({
+        shareAllSocket.send(JSON.stringify({
             'message' : 'giotay',
             'who' : userName,
             'time' : 'giotay'
@@ -14,7 +14,7 @@ $(document).ready(function(){
     });
 
     $('body').on('click', '#bogiotay', function(){
-        chatallSocket.send(JSON.stringify({
+        shareAllSocket.send(JSON.stringify({
             'message' : 'bogiotay',
             'who' : userName,
             'time' : 'bogiotay'
@@ -27,7 +27,7 @@ $(document).ready(function(){
         reconnect();
     });
 
-    chatallSocket.onmessage = function(e) {
+    shareAllSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
         var message = data['message'];
         var who = data['who'];
