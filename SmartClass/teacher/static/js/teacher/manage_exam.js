@@ -425,6 +425,21 @@ $(document).ready(function(){
         });
     });
 
+    $('#delete_exam').click(function(){
+        if(confirm("Bạn có chắc chắn muốn xóa ?")){
+            $.ajax({
+                url: location.href,
+                type: "POST",
+                data: {'id':$('#exam input[name=exam_id]').val(), 'delete':'',
+                'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()},
+                success: function(){
+                    table_exam.ajax.reload(null, false);
+                    $("#exam").modal("hide");
+                }
+            });
+        };
+    });
+
     setTimeout(function(){
         $('#wizard').find('.buttonFinish').first().click(function(){
             if (chon_tn < max_tn){

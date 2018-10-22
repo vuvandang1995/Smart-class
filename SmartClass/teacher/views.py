@@ -334,10 +334,10 @@ def manage_de(request):
     user = request.user
     if user.is_authenticated and user.position == 1:
         if request.method == "POST":
-            mon = Mon.objects.get(id=request.POST['mon'])
-            chi_tiet_so_luong = json.loads(request.POST['chi_tiet_so_luong'])
-            cau_truc = json.loads(request.POST['cau_truc'])
             if 'random' in request.POST:
+                mon = Mon.objects.get(id=request.POST['mon'])
+                chi_tiet_so_luong = json.loads(request.POST['chi_tiet_so_luong'])
+                cau_truc = json.loads(request.POST['cau_truc'])
                 trac_nhiem_de = CauHoi.objects.filter(do_kho=0, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                       dang_cau_hoi__contains="Trắc nhiệm")
                 if chi_tiet_so_luong['r_tn_d'] > len(trac_nhiem_de):
@@ -405,7 +405,12 @@ def manage_de(request):
                 randomCauHoi(tu_luan_de, chi_tiet_so_luong['r_tl_d'], de, diem_tl)
                 randomCauHoi(tu_luan_tb, chi_tiet_so_luong['r_tl_tb'], de, diem_tl)
                 randomCauHoi(tu_luan_kho, chi_tiet_so_luong['r_tl_k'], de, diem_tl)
+            elif 'delete' in request.POST:
+                De.objects.get(id=request.POST['id']).delete()
             else:
+                mon = Mon.objects.get(id=request.POST['mon'])
+                chi_tiet_so_luong = json.loads(request.POST['chi_tiet_so_luong'])
+                cau_truc = json.loads(request.POST['cau_truc'])
                 de = De.objects.create(ten=request.POST['ten_de'], dung_lam=request.POST['loai_de'],
                                        thoi_gian=request.POST['thoi_gian'], cau_truc=request.POST['cau_truc'],
                                        so_luong=request.POST['so_luong'],
@@ -466,7 +471,7 @@ def chi_tiet_de_data(request, id):
     user = request.user
     if user.is_authenticated and user.position == 1:
         list_ques = ChiTietDe.objects.filter(de_id=id)
-        content = ''
+        content = '<input name="exam_id" value="{}" hidden>'.format(id)
         for i, ch in enumerate(list_ques):
             dap_an = ''
             if ch.cau_hoi_da_id is not None:
@@ -1089,7 +1094,6 @@ def call11(request):
         return render(request, 'videocall/home.html')
     else:
         return HttpResponseRedirect('/')
-
 
 
 def handle_uploaded_file(f):

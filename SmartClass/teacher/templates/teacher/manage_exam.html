@@ -441,15 +441,16 @@
     <!-- Modal content-->
     <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title" id="exam_title">Đề</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title" id="exam_title">Đề</h4>
         </div>
         <div class="modal-body" id="khung_exam">
             {% csrf_token %}
 
         </div>
         <div class="modal-footer">
-           <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-danger" id="delete_exam"> <i class="fa fa-trash"></i> Xóa</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
         </div>
     </div>
   </div>

@@ -89,7 +89,7 @@ $(document).ready(function(){
             'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val()},
             success: function(){
                 $('#point').modal('hide');
-                table_student.ajax.reload();
+                table_student.ajax.reload(null, false);
             }
         });
     });
