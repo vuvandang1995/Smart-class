@@ -97,7 +97,7 @@ $(document).ready(function(){
     var table_question = $("#list_question").DataTable({
         "ajax": {
             "type": "GET",
-            "url": "/question_data_" + $("#gv_mon option:selected").val() +"_0_123",
+            "url": "/question_data_" + $("#gv_mon option:selected").val() +"_0_0",
             "contentType": "application/json; charset=utf-8",
             "data": function(result){
                 return JSON.stringify(result);
@@ -109,7 +109,7 @@ $(document).ready(function(){
     });
 
     $("#gv_mon").on('change', function(){
-        table_question.ajax.url("/question_data_" + $("#gv_mon option:selected").val()+"_0").load();
+        table_question.ajax.url("/question_data_" + $("#gv_mon option:selected").val()+"_0_0").load();
     });
 
     $('#list_question tbody').on( 'click', 'tr', function () {

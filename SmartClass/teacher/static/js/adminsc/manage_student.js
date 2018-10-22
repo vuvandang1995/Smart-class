@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    setTimeout(function(){$(".easy-autocomplete.eac-square").css("width","100%");},500);
     var table_student = $('#list_student').DataTable({
 //        "columnDefs": [
 //            { "width": "2%", "targets": 0 },
@@ -41,11 +42,11 @@ $(document).ready(function(){
 
             var gioi_tinh = $("#gioi_"+ hsid).text();
             if(gioi_tinh === 'Nam'){
-                $('#new_student input[name=nam]').prop('checked', true);
-                $('#new_student input[name=nu]').prop('checked', false);
+                $('#gioi_tinh option[data-gioi_tinh="1"]').prop('selected', true);
+                $('#gioi_tinh option[data-gioi_tinh="0"]').prop('selected', false);
             }else{
-                $('#new_student input[name=nam]').prop('checked', false);
-                $('#new_student input[name=nu]').prop('checked', true);
+                $('#gioi_tinh option[data-gioi_tinh="1"]').prop('selected', false);
+                $('#gioi_tinh option[data-gioi_tinh="0"]').prop('selected', true);
             }
 
             var username = $("#user_"+hsid).text();
@@ -70,8 +71,6 @@ $(document).ready(function(){
             $("#new_student input[name=search_mon]").val("");
             $("#new_student input[name=search_lop]").val("");
             $("#new_student input[name=gioi_tinh]").val("");
-            $('#new_student input[name=nam]').prop('checked', true);
-            $('#new_student input[name=nu]').prop('checked', false);
             $("#new_student input[name=username]").val("");
             $("#new_student input[name=password]").val("");
             $("#new_student input[name=password2]").val("");
@@ -93,11 +92,7 @@ $(document).ready(function(){
         var kieu = $("#new_student  input[name=kieu]").val();
         var token = $("#new_student input[name=csrfmiddlewaretoken]").val();
         var fullname = $("#new_student input[name=fullname]").val();
-        if ($('#new_student input[name=nam]').is(':checked')){
-            var gioi_tinh = 1;
-        }else{
-            var gioi_tinh = 0;
-        }
+        var gioi_tinh= $('#gioi_tinh option:selected').data('gioi_tinh');
         var username = $("#new_student input[name=username]").val();
         var email = $("#new_student input[name=email]").val();
         var password = $("#new_student input[name=password]").val();
@@ -118,14 +113,14 @@ $(document).ready(function(){
         }
     });
 
-    $(".gioi_tinh").change(function() {
-        if(this.checked && this.name === 'nam'){
-            $('#new_student input[name=nu]').prop('checked', false);
-        }
-        else if(this.checked && this.name === 'nu'){
-            $('#new_student input[name=nam]').prop('checked', false);
-        }
-    });
+//    $(".gioi_tinh").change(function() {
+//        if(this.checked && this.name === 'nam'){
+//            $('#new_student input[name=nu]').prop('checked', false);
+//        }
+//        else if(this.checked && this.name === 'nu'){
+//            $('#new_student input[name=nam]').prop('checked', false);
+//        }
+//    });
 
     var options_lop = {
         url: "lop_data",
@@ -218,8 +213,15 @@ $(document).ready(function(){
 });
 
 function change() {
-    lop_hs = $('#data_lop').val();
-    if(lop_hs != ''){
+    var lop_hs = '';
+    $("#ls option").each(function(){
+        if($('#data_lop').val() == $(this).val()){
+            lop_hs = $('#data_lop').val();
+        }
+    });
+    if(lop_hs == ''){
+        alert("Lớp không chính xác");
+    }else{
         if(lop_hs === 'Tất cả'){
             lop_hs = 'all'
         }

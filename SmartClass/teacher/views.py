@@ -255,7 +255,7 @@ def manage_point_data(request, lop):
             lop_Ob = Lop.objects.get(ten=lop)
             ChiTietLop.objects.get(myuser_id=user, lop_id=lop_Ob)
         except ObjectDoesNotExist:
-            pass
+            return JsonResponse(json.loads(json.dumps({"data": []})))
         else:
             ls_chi_tiet = ChiTietLop.objects.filter(lop_id=lop_Ob).values('myuser_id')
             ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
@@ -335,10 +335,10 @@ def manage_de(request):
     user = request.user
     if user.is_authenticated and user.position == 1:
         if request.method == "POST":
-            mon = Mon.objects.get(id=request.POST['mon'])
-            chi_tiet_so_luong = json.loads(request.POST['chi_tiet_so_luong'])
-            cau_truc = json.loads(request.POST['cau_truc'])
             if 'random' in request.POST:
+                mon = Mon.objects.get(id=request.POST['mon'])
+                chi_tiet_so_luong = json.loads(request.POST['chi_tiet_so_luong'])
+                cau_truc = json.loads(request.POST['cau_truc'])
                 trac_nhiem_de = CauHoi.objects.filter(do_kho=0, don=True, mon_id=mon, dung_lam=request.POST['loai_de'],
                                                       dang_cau_hoi__contains="Trắc nhiệm")
                 if chi_tiet_so_luong['r_tn_d'] > len(trac_nhiem_de):
@@ -406,7 +406,12 @@ def manage_de(request):
                 randomCauHoi(tu_luan_de, chi_tiet_so_luong['r_tl_d'], de, diem_tl)
                 randomCauHoi(tu_luan_tb, chi_tiet_so_luong['r_tl_tb'], de, diem_tl)
                 randomCauHoi(tu_luan_kho, chi_tiet_so_luong['r_tl_k'], de, diem_tl)
+            elif 'delete' in request.POST:
+                De.objects.get(id=request.POST['id']).delete()
             else:
+                mon = Mon.objects.get(id=request.POST['mon'])
+                chi_tiet_so_luong = json.loads(request.POST['chi_tiet_so_luong'])
+                cau_truc = json.loads(request.POST['cau_truc'])
                 de = De.objects.create(ten=request.POST['ten_de'], dung_lam=request.POST['loai_de'],
                                        thoi_gian=request.POST['thoi_gian'], cau_truc=request.POST['cau_truc'],
                                        so_luong=request.POST['so_luong'],
@@ -467,7 +472,7 @@ def chi_tiet_de_data(request, id):
     user = request.user
     if user.is_authenticated and user.position == 1:
         list_ques = ChiTietDe.objects.filter(de_id=id)
-        content = ''
+        content = '<input name="exam_id" value="{}" hidden>'.format(id)
         for i, ch in enumerate(list_ques):
             dap_an = ''
             if ch.cau_hoi_da_id is not None:
@@ -658,40 +663,48 @@ def question_data(request, id_mon, all, dung_lam):
     user = request.user
     if user.is_authenticated and user.position == 1:
         data = []
-        if all == 0:
-            list_ques = CauHoi.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon), don=True)
-            list_ques_da = CauHoiDa.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon))
-        else:
-            list_ques = CauHoi.objects.filter(mon_id=Mon.objects.get(id=id_mon), don=True, dung_lam=dung_lam)
-            list_ques_da = CauHoiDa.objects.filter(mon_id=Mon.objects.get(id=id_mon), dung_lam=dung_lam)
-        for ques in list(chain(list_ques, list_ques_da)):
-            dang_cau_hoi = '<p id="dang_cau_hoi_{}">{}</p>'.format(ques.id, ques.dang_cau_hoi)
-            try:
-                so_cau_hoi = '<p id="so_cau_hoi_{}">{}<p>'.format(ques.id, str(ques.so_cau_hoi))
-            except:
-                chu_de = '<p id="chu_de_{0}" data-don="don">{1}</p>'.format(ques.id, ques.chu_de)
-                so_cau_hoi = '<p id="so_cau_hoi_{}">1<p>'.format(ques.id)
-            else:
-                chu_de = '<p id="chu_de_{0}" data-don="da">{1}</p>'.format(ques.id, ques.chu_de)
-            loai_cau_hoi = '<p>{}</p>'.format(ques.dung_lam)
-            do_kho = '<p id="do_kho_{}">'.format(ques.id)
-            if ques.do_kho == 0:
-                do_kho += 'Dễ</p>'
-            elif ques.do_kho == 1:
-                do_kho += 'Trung bình</p>'
-            else:
-                do_kho += 'Khó</p>'
-            ngay_tao = '<p>{}</p>'.format(str(ques.ngay_tao))
-            noi_dung = '''
-            <div id="tom_tat_{0}" class="row">{1}</div>
-            '''.format(ques.id, ques.noi_dung[:40])
+        try:
             if all == 0:
-                data.append([chu_de, loai_cau_hoi, dang_cau_hoi, so_cau_hoi, do_kho, ngay_tao, noi_dung])
+                list_ques = CauHoi.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon), don=True)
+                list_ques_da = CauHoiDa.objects.filter(myuser_id=user, mon_id=Mon.objects.get(id=id_mon))
             else:
-                ten = '<p>{}</p>'.format(ques.myuser_id.fullname)
-                data.append([ques.id, chu_de, dang_cau_hoi, so_cau_hoi, do_kho, ten, ngay_tao, noi_dung])
-        json_data = json.loads(json.dumps({"data": data}))
-        return JsonResponse(json_data)
+                if dung_lam != '':
+                    list_ques = CauHoi.objects.filter(mon_id=Mon.objects.get(id=id_mon), don=True, dung_lam=dung_lam)
+                    list_ques_da = CauHoiDa.objects.filter(mon_id=Mon.objects.get(id=id_mon), dung_lam=dung_lam)
+                else:
+                    list_ques = CauHoi.objects.filter(mon_id=Mon.objects.get(id=id_mon), don=True)
+                    list_ques_da = CauHoiDa.objects.filter(mon_id=Mon.objects.get(id=id_mon))
+        except:
+            return JsonResponse(json.loads(json.dumps({"data": []})))
+        else:
+            for ques in list(chain(list_ques, list_ques_da)):
+                dang_cau_hoi = '<p id="dang_cau_hoi_{}">{}</p>'.format(ques.id, ques.dang_cau_hoi)
+                try:
+                    so_cau_hoi = '<p id="so_cau_hoi_{}">{}<p>'.format(ques.id, str(ques.so_cau_hoi))
+                except:
+                    chu_de = '<p id="chu_de_{0}" data-don="don">{1}</p>'.format(ques.id, ques.chu_de)
+                    so_cau_hoi = '<p id="so_cau_hoi_{}">1<p>'.format(ques.id)
+                else:
+                    chu_de = '<p id="chu_de_{0}" data-don="da">{1}</p>'.format(ques.id, ques.chu_de)
+                loai_cau_hoi = '<p>{}</p>'.format(ques.dung_lam)
+                do_kho = '<p id="do_kho_{}">'.format(ques.id)
+                if ques.do_kho == 0:
+                    do_kho += 'Dễ</p>'
+                elif ques.do_kho == 1:
+                    do_kho += 'Trung bình</p>'
+                else:
+                    do_kho += 'Khó</p>'
+                ngay_tao = '<p>{}</p>'.format(str(ques.ngay_tao))
+                noi_dung = '''
+                <div id="tom_tat_{0}" class="row">{1}</div>
+                '''.format(ques.id, ques.noi_dung[:40])
+                if all == 0:
+                    data.append([chu_de, loai_cau_hoi, dang_cau_hoi, so_cau_hoi, do_kho, ngay_tao, noi_dung])
+                else:
+                    ten = '<p>{}</p>'.format(ques.myuser_id.fullname)
+                    data.append([ques.id, chu_de, dang_cau_hoi, so_cau_hoi, do_kho, ten, ngay_tao, noi_dung])
+            json_data = json.loads(json.dumps({"data": data}))
+            return JsonResponse(json_data)
 
 
 def question_data_detail(request, id, bien):
@@ -1082,7 +1095,6 @@ def call11(request):
         return render(request, 'videocall/home.html')
     else:
         return HttpResponseRedirect('/')
-
 
 
 def handle_uploaded_file(f):

@@ -1,7 +1,7 @@
 $(document).ready(function(){
     shareAllSocket = new WebSocket(
         'ws://' + window.location.host +
-        '/ws/' + userName + 'shareall'+lopht+'/');
+        '/ws/' + userName + 'shareAll'+lopht+'/');
 
     shareAllSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);

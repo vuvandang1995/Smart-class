@@ -100,31 +100,36 @@ def manage_teacher(request):
             else:
                 list_teacher = request.POST['list_teacher']
                 list_teacher = json.loads(list_teacher)
-                for tea in list_teacher:
+                for i, tea in enumerate(list_teacher):
                     if len(tea) == 0:
                         continue
                     tem = tea[1].split(" ")
-                    usname = ''
+                    usname = 'gv_'
                     for s in tem:
                         usname += s[0].lower()
-                    usname += '_{}'.format(tea[0])
+                    usname += '_{}_{}'.format(tea[0], i)
                     email = usname + "@gmail.com"
                     if tea[2] == 'Nam':
                         gioi_tinh = 1
                     else:
                         gioi_tinh = 0
-                    gv = MyUser.objects.create_teacher(email=email,
-                                                       fullname=tea[1],
-                                                       username=usname,
-                                                       password=1,
-                                                       gioi_tinh=gioi_tinh)
-                    list_mon = tea[3].split(",")
-                    for mon in list_mon:
-                        ten, lop = mon.split(" - ")
-                        GiaoVienMon.objects.create(myuser_id=gv, mon_id=Mon.objects.get(ten=ten, lop=lop))
-                    list_lop = tea[4].split(",")
-                    for lop in list_lop:
-                        ChiTietLop.objects.create(lop_id=Lop.objects.get(ten=lop), myuser_id=gv)
+                    try:
+                        gv = MyUser.objects.create_teacher(email=email,
+                                                           fullname=tea[1],
+                                                           username=usname,
+                                                           password=1,
+                                                           gioi_tinh=gioi_tinh)
+                        if tea[3] is not None:
+                            for mon in tea[3].split(", "):
+                                ten, lop = mon.split(" - ")
+                                print(mon, ten, lop)
+                                GiaoVienMon.objects.create(myuser_id=gv, mon_id=Mon.objects.get(ten=ten, lop=lop))
+                        if len(tea) > 4:
+                            list_lop = tea[4].split(",")
+                            for lop in list_lop:
+                                ChiTietLop.objects.create(lop_id=Lop.objects.get(ten=lop), myuser_id=gv)
+                    except:
+                        continue
 
         return render(request, 'adminsc/manage_teacher.html', content)
     else:
@@ -290,7 +295,6 @@ def manage_student(request):
                         lop = ChiTietLop.objects.get(myuser_id=hs)
                         lop.lop_id = Lop.objects.get(ten=request.POST['list_lop'])
                         lop.save()
-
                     except:
                         pass
             else:
@@ -318,8 +322,7 @@ def manage_student(request):
                         new_lop = Lop.objects.get(ten=stu[3])
                         ChiTietLop.objects.create(lop_id=new_lop, myuser_id=hs)
                     except:
-                        pass
-
+                        continue
         return render(request, 'adminsc/manage_student.html', content)
     else:
         return HttpResponseRedirect('/')
@@ -331,8 +334,11 @@ def manage_student_data(request, lop):
         if lop == 'all':
             ls_student = MyUser.objects.filter(position=0)
         else:
-            ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
-            ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+            try:
+                ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
+                ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+            except:
+                return JsonResponse(json.loads(json.dumps({'data': []})))
         data = []
         for student in ls_student:
             fullname = '<p id="full_{0}">{1}</p>'.format(student.id, student.fullname)
@@ -382,7 +388,7 @@ def manage_class(request):
         if request.method == 'POST':
             if 'delete' in request.POST:
                 Lop.objects.get(id=request.POST['delete']).delete()
-            else:
+            elif 'ten' in request.POST:
                 nien_khoa, nam = request.POST['nien_khoa'].split(" - ")
                 if request.POST['kieu'] == 'new':
                     try:
@@ -397,6 +403,15 @@ def manage_class(request):
                     l.nien_khoa_id = NienKhoa.objects.get(ten_nien_khoa=nien_khoa, nam_hoc=nam)
                     l.khoa_id = Khoa.objects.get(ten_khoa=request.POST['khoa'])
                     l.save()
+            else:
+                for cls in json.loads(request.POST['list_class']):
+                    try:
+                        khoa = Khoa.objects.get(ten_khoa=cls[1])
+                        ten, nam = cls[2].split(" - ")
+                        nien_khoa = NienKhoa.objects.get(ten_nien_khoa=ten, nam_hoc=nam)
+                        Lop.objects.create(ten=cls[0], khoa_id=khoa, nien_khoa_id=nien_khoa, truong_id=Truong.objects.get(id=1))
+                    except:
+                        continue
         content = {'username': mark_safe(json.dumps(user.username)), 'ds_khoa': Khoa.objects.all(),
                    'ds_nien_khoa': NienKhoa.objects.all()}
         return render(request, 'adminsc/manage_class.html', content)
