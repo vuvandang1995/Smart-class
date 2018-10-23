@@ -1,8 +1,9 @@
 $(document).ready(function(){
     var teacher_name = $('#teacher_name').text();
+    $('#noti').show();
     var chatallSocket = new WebSocket(
         'ws://' + window.location.host +
-        '/ws/' + teacher_name + 'chatall'+lop+'/');
+        '/ws/' + teacher_name + 'chatall'+lop+'*std*'+userName+'/');
     /*var chatallSocket = new WebSocket(
         'wss://' + window.location.host +
         ':8443/ws/' + teacher_name + 'chatall'+lop+'/');*/
@@ -13,6 +14,7 @@ $(document).ready(function(){
         var message = data['message'];
         var who = data['who'];
         var time = data['time'];
+        var noti_noti1 = data['noti_noti'];
         if (time == 'None'){
             if (key == ''){
                 chatallSocket.send(JSON.stringify({
@@ -48,9 +50,24 @@ $(document).ready(function(){
             reload();
         }else if ((message == 'new_chat') && (who == userName)){
             $('#mail_list').click();
+        }else if (time == 'history_noti'){
+            $('.noti_noti').prepend(message);
         }else if (message.includes('Bắt đầu làm bài thi:')){
-            alert('thi')
-            insertChat(who, message, time);
+            $('.noti_noti').prepend(message);
+            try {
+                $('body .num_noti').remove();
+            }
+            catch(err) {
+            }
+            $('body .chat_noti').show();
+        }else if (message.includes('Giao bài tập:')){
+            $('.noti_noti').prepend(message);
+            try {
+                $('body .num_noti').remove();
+            }
+            catch(err) {
+            }
+            $('body .chat_noti').show();
         }else if ((time != 'key')){
                 insertChat(who, message, time);
             }
@@ -280,7 +297,7 @@ $(document).ready(function(){
     $('body').on('click', '.xxx', function(){
         $("body .mytext").trigger({type: 'keydown', which: 13, keyCode: 13});
     })
-    $("body .mytext").focus();
+    // $("body .mytext").focus();
     $('body').on('keyup', '.mytext', function(e){
         if (e.keyCode === 13) {
             $(this).parent().parent().next().children('span').click();

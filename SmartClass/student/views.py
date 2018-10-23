@@ -38,7 +38,7 @@ class EmailThread(threading.Thread):
 def home(request):
     user = request.user
     if user.is_authenticated and user.position == 0:
-        content = {'mon': lop_mon(user), 'username': mark_safe(json.dumps(user.username))}
+        content = {'mon': lop_mon(user), 'username': mark_safe(json.dumps(user.username)), 'noti_noti': mark_safe(json.dumps(user.noti_noti))}
         return render(request, 'student/base.html', content)
     else:
         return HttpResponseRedirect('/')
@@ -74,7 +74,7 @@ def user_profile(request):
                     messages.warning(request, 'Mật khẩu không đúng')
             return HttpResponseRedirect("profile")
         content = {'mon': lop_mon(user), 'lop': ChiTietLop.objects.get(myuser_id=user),
-                   'username': mark_safe(json.dumps(user.username))}
+                   'username': mark_safe(json.dumps(user.username)), 'noti_noti': mark_safe(json.dumps(user.noti_noti))}
         return render(request, 'student/profile.html', content)
     else:
         return redirect("/")
@@ -86,7 +86,7 @@ def score(request):
         lopOb = ChiTietLop.objects.get(myuser_id=user)
         content = {'lop': mark_safe(json.dumps(lopOb.lop_id.ten)),
                    'mon': lop_mon(user),
-                   'username': mark_safe(json.dumps(user.username))}
+                   'username': mark_safe(json.dumps(user.username)), 'noti_noti': mark_safe(json.dumps(user.noti_noti))}
         return render(request, 'student/score.html', content)
     else:
         return redirect("/")
@@ -103,7 +103,11 @@ def mon(request, id):
         teacher_ht = GiaoVienMon.objects.get(myuser_id__in=ls_teacher, mon_id=monOb)
         content = {'lop': mark_safe(json.dumps(lopOb.lop_id.ten)), 'mon': lop_mon(user), 'mon_ht': monOb,
                    'lop_ht': lopOb.lop_id, 'ls_student': ls_student, 'teacher_ht': teacher_ht,
-                   'username': mark_safe(json.dumps(user.username))}
+                   'username': mark_safe(json.dumps(user.username)), 'noti_noti': mark_safe(json.dumps(user.noti_noti))}
+        if request.method == 'POST':
+            if 'noti_noti' in request.POST:
+                user.noti_noti = 0
+                user.save()
         return render(request, 'student/subjects.html', content)
     else:
         return redirect("/")
@@ -417,7 +421,7 @@ def exam(request, data):
         else:
             time_remain = -1
         content = {'time_remain': mark_safe(json.dumps(maHoa(time_remain))), 'de_id': mark_safe(json.dumps(maHoa(de_id))),
-                   'username': mark_safe(json.dumps(user.username))}
+                   'username': mark_safe(json.dumps(user.username)), 'noti_noti': mark_safe(json.dumps(user.noti_noti))}
         return render(request, 'student/exam.html', content)
     else:
         return redirect("/")

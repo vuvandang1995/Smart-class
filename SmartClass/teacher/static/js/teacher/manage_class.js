@@ -18,7 +18,7 @@ $(document).ready(function(){
             $("#videocall"+who).attr("name", message); 
         }else if (time == 'giotay'){
             $('#giotayxxx'+who).show();
-        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_change_group') && (time != 'teacher_call') && (message != 'new_chat')){
+        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_change_group') && (time != 'teacher_call') && (message != 'new_chat') && (message.includes('Bắt đầu làm bài thi:') == false) && (message.includes('Giao bài tập') == false)){
             insertChat(who, message, time);
         }
         
@@ -603,7 +603,7 @@ $(document).ready(function(){
                 var date = formatAMPM(new Date());
                 var href = location.href.split('/')[0]+location.href.split('/')[1]+location.href.split('/')[2]+"/student/exam_"+data
                 chatallSocket.send(JSON.stringify({
-                  'message' : `<a href="/student/exam_${data}">Bắt đầu làm bài thi: ${$(this).val()}</a>`,
+                  'message' : `<li><a href="/student/exam_${data}"><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>`+userName+`</span><span class="time">`+date+`</span></span><span class="message">Bắt đầu làm bài thi: ${$(this).val()}</span></a></li>`,
                   'who' : userName,
                   'time' : date
                 }));
@@ -642,14 +642,14 @@ $(document).ready(function(){
                 var group = $("#send input[name='gr_name']").val();
                 if(group == "tất cả"){
                     chatallSocket.send(JSON.stringify({
-                        'message' : `<a href="/student/exam_${data}">${$(this).val()}</a>`,
+                        'message' : `<li><a href="/student/exam_${data}"><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>`+userName+`</span><span class="time">`+date+`</span></span><span class="message">Giao bài tập: ${$(this).val()}</span></a></li>`,
                         'who' : userName,
                         'time' : date
                     }));
                 }else{
                     var group_chat_name =  class_ +userName+ group
                     dict_group_chat[group_chat_name].send(JSON.stringify({
-                        'message' : `<a href="/student/exam_${data}">${$(this).val()}</a>`,
+                        'message' : `<li><a href="/student/exam_${data}"><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>`+userName+`</span><span class="time">`+date+`</span></span><span class="message">Giao bài tập nhóm: ${$(this).val()}</span></a></li>`,
                         'who' : userName,
                         'time' : date
                     }));

@@ -9,13 +9,18 @@ from channels.auth import login, logout, get_user
 import fileinput
 from datetime import datetime
 from datetime import timedelta
+from teacher.models import *
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         if 'chatall' in self.room_name:
-            self.room_group_name = self.room_name
+            if '*std*' in self.room_name:
+                self.room_group_name = self.room_name.split('*std*')[0]
+                self.std_username = self.room_name.split('*std*')[1]
+            else:
+                self.room_group_name = self.room_name
         elif 'chat11' in self.room_name:
             self.room_group_name = 'chat11_%s' % self.room_name
         elif 'chatgroup' in self.room_name:
@@ -57,6 +62,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except:
             pass
 
+        try:
+            f = r'notification/chat/noti/'+self.room_group_name+'_thongbaothi'+'.txt'
+            file = open(f,'r')
+            if len(open(f).readlines()) > 15:
+                count = len(open(f).readlines()) - 15
+                for i, line in enumerate(file):
+                    if i > count:
+                        message = line
+                        who = 'teacher'
+                        time = 'history_noti'
+                        await self.send(text_data=json.dumps({
+                                'message': message,
+                                'who': who,
+                                'time' : time
+                            }))
+            else:
+                for line in file:
+                    message = line
+                    who = 'teacher'
+                    time = 'history_noti'
+                    await self.send(text_data=json.dumps({
+                            'message': message,
+                            'who': who,
+                            'time' : time
+                        }))
+        except:
+            pass
+
     async def disconnect(self, close_code):
         # Leave room group
         await self.channel_layer.group_discard(
@@ -73,7 +106,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         who = text_data_json['who']
         time = text_data_json['time']
-        if time != 'None' and time != 'call_time' and time != 'teacher_change_group' and time != 'teacher_call' and time != 'key' and message != 'new_chat':
+        if 'Bắt đầu làm bài thi:' in message:
+            f = r'notification/chat/noti/'+self.room_group_name+'_thongbaothi'+'.txt'
+            file = open(f,'a')
+            file.write(message + "\n")
+            file.close()
+            lop = self.room_group_name.split('chatall')[1]
+            ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
+            ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+            for std in ls_student:
+                std.noti_noti = std.noti_noti + 1
+                std.save()
+        elif 'Giao bài tập' in message:
+            f = r'notification/chat/noti/'+self.room_group_name+'_thongbaothi'+'.txt'
+            file = open(f,'a')
+            file.write(message + "\n")
+            file.close()
+            lop = self.room_group_name.split('chatall')[1]
+            ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
+            ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+            for std in ls_student:
+                std.noti_noti = std.noti_noti + 1
+                std.save()
+        elif time != 'None' and time != 'call_time' and time != 'teacher_change_group' and time != 'teacher_call' and time != 'key' and message != 'new_chat':
             f = r'notification/chat/class/'+self.room_group_name+'.txt'
             file = open(f,'a')
             file.write(message + "^%$^%$&^"+ who +"^%$^%$&^"+ time + "\n") 
@@ -85,7 +140,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'who': who,
-                'time' : time
+                'time' : time,
+                'noti_noti': '.'
             }
         )
 
@@ -94,10 +150,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event['message']
         who = event['who']
         time = event['time']
-
+        noti_noti = event['noti_noti']
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'who': who,
-            'time': time
+            'time': time,
+            'noti_noti': noti_noti
         }))
