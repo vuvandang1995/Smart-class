@@ -51,7 +51,7 @@
                         <div class="col-sm-3 mail_list_column" style="overflow-y: scroll; height:600px;">
                           {% for student in ls_student %}
                           {% comment %} <a href="javascript:register_popup_teacher('{{student.username}}', '{{student.fullname}}');"> {% endcomment %}
-                            <div class="mail_list" data-fullname="{{student.fullname}}">
+                            <div class="mail_list chat__{{student.username}}" data-fullname="{{student.fullname}}">
                               <!-- <div class="left">
                               </div> -->
                               <p hidden>{{student.username}}</p>

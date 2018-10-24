@@ -18,6 +18,8 @@ $(document).ready(function(){
             $("#videocall"+who).attr("name", message); 
         }else if (time == 'giotay'){
             $('#giotayxxx'+who).show();
+        }else if ((message == 'new_chat') && (who == userName)){
+            $('.chat__'+time).click();
         }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_change_group') && (time != 'teacher_call') && (message != 'new_chat') && (message.includes('Bắt đầu làm bài thi:') == false) && (message.includes('Giao bài tập') == false)){
             insertChat(who, message, time);
         }
@@ -492,7 +494,19 @@ $(document).ready(function(){
                 var message = data['message'];
                 var who = data['who'];
                 var time = data['time'];
-                insertChat2(who, message, time);
+                if (time == 'history_noti'){
+                    $('.noti_noti').prepend(message);
+                }else if (message.includes('Giao bài tập nhóm')){
+                    $('.noti_noti').prepend(message);
+                    try {
+                        $('body .num_noti').remove();
+                    }
+                    catch(err) {
+                    }
+                    $('body .chat_noti').show();
+                }else{
+                    insertChat2(who, message, time);
+                }
             };
 
             $('body').on('click', '.zzz', function(){
@@ -509,7 +523,7 @@ $(document).ready(function(){
 
         $('body').on('click', '.zzz', function(){
             var message = $(this).parent().parent().children().children().children('input').val();
-            var group_chat_name =  class_+userName+ $('#title-chat').text();
+            var group_chat_name =  class_+'gr_'+userName+'gr_'+ $('#title-chat').text();
             message = escapeHtml(message);
             var date = formatAMPM(new Date());
             if (message != ''){
@@ -647,7 +661,7 @@ $(document).ready(function(){
                         'time' : date
                     }));
                 }else{
-                    var group_chat_name =  class_ +userName+ group
+                    var group_chat_name =  class_ +'gr_'+userName+'gr_'+group
                     dict_group_chat[group_chat_name].send(JSON.stringify({
                         'message' : `<li><a href="/student/exam_${data}"><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>`+userName+`</span><span class="time">`+date+`</span></span><span class="message">Giao bài tập nhóm: ${$(this).val()}</span></a></li>`,
                         'who' : userName,

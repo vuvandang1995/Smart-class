@@ -190,7 +190,7 @@ def group_data(request, lop):
             for lsg in ls_nhom:
                 html += '''
                         <div class="mail_list group_class">
-                        <p hidden>'''+lop+user.username+lsg.ten_nhom+'''</p>
+                        <p hidden>'''+lop+'gr_'+user.username+'gr_'+lsg.ten_nhom+'''</p>
                         <p hidden>'''+lsg.ten_nhom+'''</p>
                         <div class="right">
                             <h3>'''+lsg.ten_nhom+'''<small>

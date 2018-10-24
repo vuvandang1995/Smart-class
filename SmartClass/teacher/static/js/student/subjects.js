@@ -253,6 +253,16 @@ $(document).ready(function(){
                                     makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                                 }, time);
                             }    
+                        }else if (time == 'history_noti'){
+                            $('.noti_noti').prepend(message);
+                        }else if (message.includes('Giao bài tập nhóm')){
+                            $('.noti_noti').prepend(message);
+                            try {
+                                $('body .num_noti').remove();
+                            }
+                            catch(err) {
+                            }
+                            $('body .chat_noti').show();
                         }else if (time != 'teacher_call'){
                             insertChat2(who, message, time);
                         }
@@ -426,6 +436,11 @@ $(document).ready(function(){
         'message' : message,
         'who' : userName,
         'time' : date
+        }));
+        chatallSocket.send(JSON.stringify({
+            'message' : `new_chat`,
+            'who' : teacher_name,
+            'time' : userName
         }));
     }
     $(this).parent().parent().children().children().children('input').val('');

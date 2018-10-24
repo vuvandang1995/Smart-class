@@ -37,8 +37,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             f = r'notification/chat/class/'+self.room_group_name+'.txt'
             file = open(f,'r')
-            if len(open(f).readlines()) > 15:
-                count = len(open(f).readlines()) - 15
+            if len(open(f).readlines()) > 40:
+                count = len(open(f).readlines()) - 40
                 for i, line in enumerate(file):
                     if i > count:
                         message = line.split('^%$^%$&^')[0]
@@ -49,6 +49,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 'who': who,
                                 'time' : time
                             }))
+                    else:
+                        
             else:
                 for line in file:
                     message = line.split('^%$^%$&^')[0]
@@ -65,8 +67,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             f = r'notification/chat/noti/'+self.room_group_name+'_thongbaothi'+'.txt'
             file = open(f,'r')
-            if len(open(f).readlines()) > 15:
-                count = len(open(f).readlines()) - 15
+            if len(open(f).readlines()) > 40:
+                count = len(open(f).readlines()) - 40
                 for i, line in enumerate(file):
                     if i > count:
                         message = line
@@ -117,6 +119,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
             for std in ls_student:
                 std.noti_noti = std.noti_noti + 1
                 std.save()
+        elif 'Giao bài tập nhóm' in message:
+            f = r'notification/chat/noti/'+self.room_group_name+'_thongbaothi'+'.txt'
+            file = open(f,'a')
+            file.write(message + "\n")
+            file.close()
+            lop = self.room_group_name.split('gr_')[0].split('_')[1]
+            teacher_name = self.room_group_name.split('gr_')[1]
+            group_name = self.room_group_name.split('gr_')[2].split('chatgroup')[0]
+            nhom = Nhom.objects.get(myuser_id=MyUser.objects.get(username=teacher_name), lop_id=Lop.objects.get(ten=lop), ten_nhom=group_name)
+            for std in ChiTietNhom.objects.filter(nhom_id=nhom):
+                std.myuser_id.noti_noti = std.myuser_id.noti_noti + 1
+                std.myuser_id.save()
         elif 'Giao bài tập' in message:
             f = r'notification/chat/noti/'+self.room_group_name+'_thongbaothi'+'.txt'
             file = open(f,'a')

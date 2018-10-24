@@ -1,2 +1,0 @@
-<li><a href="/student/exam_MzZfMTg6NDY6MzY="><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>gva</span><span class="time">6:46 PM 23/10/2018</span></span><span class="message">Bắt đầu làm bài thi: test 01: Thi - 15 phút</span></a></li>
-<li><a href="/student/exam_NjFfMTg6NDY6NDQ="><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>gva</span><span class="time">6:46 PM 23/10/2018</span></span><span class="message">Giao bài tập: Bài tập 02: Bài tập - 15 phút</span></a></li>

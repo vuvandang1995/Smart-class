@@ -123,7 +123,7 @@ def group_data(request, teacher):
             nhom = Nhom.objects.filter(myuser_id=MyUser.objects.get(username=teacher), id__in=ls_nhom)
             html += '''
                 <div class="mail_list" id="group_class">
-                <p hidden>'''+lopOb.lop_id.ten+teacher+nhom[0].ten_nhom+'''</p>
+                <p hidden>'''+lopOb.lop_id.ten+'gr_'+teacher+'gr_'+nhom[0].ten_nhom+'''</p>
                 <p hidden>'''+nhom[0].ten_nhom+'''</p>
                 <div class="right">
                     <h3>'''+nhom[0].ten_nhom+'''</h3>

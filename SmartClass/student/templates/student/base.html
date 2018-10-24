@@ -237,11 +237,19 @@
                     $('body .num_noti').remove();
                 }
             });
-        }
-        try {
-          $('body .chat_noti').hide();
-        }
-        catch(err) {
+        }else if($('body .chat_noti').css('display') == 'block'){
+          var token = $("input[name=csrfmiddlewaretoken]").val();
+          $.ajax({
+              type:'POST',
+              url:location.href,
+              data: {'noti_noti': 0, 'csrfmiddlewaretoken':token},
+              success: function(){
+                try {
+                  $('body .chat_noti').hide();
+                }catch(err) {
+                }
+              }
+          });
         }
       }
 
