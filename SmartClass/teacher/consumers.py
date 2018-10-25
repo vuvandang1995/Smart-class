@@ -45,6 +45,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        print(self.room_group_name)
         try:
             f = r'notification/chat/class/'+self.room_group_name+'.txt'
             file = open(f,'r')
@@ -71,6 +72,33 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'message': message,
                         'who': who,
                         'time' : time
+                    }))
+        except:
+            pass
+
+        try:
+            f = r'notification/chat/noti/'+self.room_group_name+'.txt'
+            file = open(f,'r')
+            # if len(open(f).readlines()) > 40:
+            #     count = len(open(f).readlines()) - 40
+            #     for i, line in enumerate(file):
+            #         if i > count:
+            #             message = line.split('^%$^%$&^')[0]
+            #             who = line.split('^%$^%$&^')[1].strip()
+            #             time = line.split('^%$^%$&^')[2].strip()
+            #             await self.send(text_data=json.dumps({
+            #                     'message': message,
+            #                     'who': who,
+            #                     'time' : time
+            #                 }))
+            #         # else:
+                        
+            # else:
+            for line in file:
+                await self.send(text_data=json.dumps({
+                        'message': line,
+                        'who': line,
+                        'time' : line
                     }))
         except:
             pass
@@ -119,7 +147,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         who = text_data_json['who']
         time = text_data_json['time']
-        if 'Bắt đầu làm bài thi:' in message:
+        if message == 'seen':
+            f = r'notification/chat/noti/'+self.room_group_name+'.txt'
+            with open(f, "r") as infile:
+                lines = infile.readlines()
+
+            with open(f, "w") as outfile:
+                for line in enumerate(lines):
+                    if who not in line:
+                        outfile.write(line)
+        elif 'Bắt đầu làm bài thi:' in message:
             f = r'notification/chat/noti/'+self.room_group_name+'_thongbaothi'+'.txt'
             removeLines(path=f,number=40)
             file = open(f,'a')
@@ -156,10 +193,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             for std in ls_student:
                 std.noti_noti = std.noti_noti + 1
                 std.save()
+        elif message == 'new_chat_for_teaccher':
+            f = r'notification/chat/noti/'+who+'07112016_teacher'+'.txt'
+            removeLines(path=f,number=40)
+            file = open(f,'a')
+            if time not in open(f).read():
+                file.write(time + "\n")
+                file.close()
+                # teacher = MyUser.objects.get(username=who)
+                # teacher.noti_noti = teacher.noti_noti + 1
+                # teacher.save()
         elif time != 'None' and time != 'call_time' and time != 'teacher_change_group' and time != 'teacher_call' and time != 'key' and message != 'new_chat':
             f = r'notification/chat/class/'+self.room_group_name+'.txt'
             removeLines(path=f,number=40)
-
             file = open(f,'a')
             file.write(message + "^%$^%$&^"+ who +"^%$^%$&^"+ time + "\n") 
             file.close()  

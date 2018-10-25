@@ -8,6 +8,17 @@ $(document).ready(function(){
         'wss://' + window.location.host +
         ':8443/ws/' + userName + 'chatall'+class_+'/');*/
 
+
+    $(".inboxx").click(function(event){
+        event.stopPropagation();
+        std_username = $(this).attr('id').split('inbox')[1];
+        userSocket.send(JSON.stringify({
+            'message' : 'seen',
+            'who' : std_username,
+            'time' : ''
+        }));
+        $(this).hide();
+    });
     
     chatallSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
@@ -18,8 +29,9 @@ $(document).ready(function(){
             $("#videocall"+who).attr("name", message); 
         }else if (time == 'giotay'){
             $('#giotayxxx'+who).show();
-        }else if ((message == 'new_chat') && (who == userName)){
-            $('.chat__'+time).click();
+        }else if ((message == 'new_chat_for_teaccher') && (who == userName)){
+            // $('.chat__'+time).click();
+            $('#inbox'+time).show();
         }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_change_group') && (time != 'teacher_call') && (message != 'new_chat') && (message.includes('Bắt đầu làm bài thi:') == false) && (message.includes('Giao bài tập') == false)){
             insertChat(who, message, time);
         }
@@ -327,6 +339,14 @@ $(document).ready(function(){
 	$('.mail_list').on('click',function(){
         var std_username = $(this).children('p').text();
         var std_fullname = $(this).data("fullname");
+        if ($('#inbox'+std_username).css('display') == 'block'){
+            userSocket.send(JSON.stringify({
+                'message' : 'seen',
+                'who' : std_username,
+                'time' : ''
+            }));
+            $('#inbox'+std_username).hide();
+        }
         if (($('#'+std_username).length == 0) || ($("body .chat"+std_username).css('display') == 'none')){
             register_popup_teacher(std_username, std_fullname);
             //  $("body .noti_chat"+std_username).hide();

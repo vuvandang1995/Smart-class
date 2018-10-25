@@ -68,7 +68,7 @@ $(document).ready(function(){
             catch(err) {
             }
             $('body .chat_noti').show();
-        }else if ((time != 'key')){
+        }else if ((time != 'key') && (message != 'new_chat_for_teaccher')){
                 insertChat(who, message, time);
             }
         };
@@ -438,7 +438,7 @@ $(document).ready(function(){
         'time' : date
         }));
         chatallSocket.send(JSON.stringify({
-            'message' : `new_chat`,
+            'message' : `new_chat_for_teaccher`,
             'who' : teacher_name,
             'time' : userName
         }));
