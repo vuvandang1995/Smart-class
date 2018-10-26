@@ -4,31 +4,23 @@
 ```
 sudo apt-get update
 sudo apt-get -y upgrade
-sudo apt-get install -y npm stunnel4 python-setuptools unzip
-sudo npm install -g socket.io
-sudo easy_install supervisor
+sudo apt-get install -y npm stunnel4 supervisor
 wget -qO- https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y nodejs
-```
-
-### Cài đặt peerjs
-```
-wget https://github.com/peers/peerjs-server/archive/master.zip
-unzip master.zip
-cd peerjs-server-master/
-npm install
-cd /usr/local/lib/
-sudo npm install peer
-sudo npm install peer -g
 ```
 
 ### Tải các gói cần thiết
 ```
 git clone https://github.com/dung1101/RTC-server.git
+cd /home/smdb/RTC-server/peerjs/
+npm install
 cd /home/smdb/RTC-server/RTC_call
 npm install --production
 cd /home/smdb/RTC-server/RTC_share
 npm install --production
+cd /usr/local/lib/
+sudo npm install peer
+sudo npm install peer -g
 ```
 
 ### Tạo chứng chỉ
@@ -37,48 +29,57 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
 ```
 
 ### Cấu hình Stunnel
-tạo file 'sudo nano /etc/stunnel/stunnel.conf'
-copy nội dung bên dưới:
+- tạo chứng chỉ: 
+    ```
+    openssl genrsa -out key.pem 2048
+    openssl req -new -x509 -key key.pem -out cert.pem -days 1095
+    cat key.pem cert.pem >> /etc/stunnel/stunnel.pem
+    ```
+- tạo file: 'sudo nano /etc/stunnel/stunnel.conf'
 
-```
-pid=
-
-cert = /etc/stunnel/stunnel.pem
-sslVersion = TLSv1.2
-foreground = yes
-output = stunnel.log
-
-[https]
-accept=8444
-connect=9003
-TIMEOUTclose=1
-```
+    copy nội dung bên dưới:
+    ```
+    pid=
+    
+    cert = /etc/stunnel/stunnel.pem
+    sslVersion = TLSv1.2
+    foreground = yes
+    output = stunnel.log
+    
+    [https]
+    accept=8444
+    connect=9003
+    TIMEOUTclose=1
+    ```
 
 ### Cấu hình supervisor
-sửa cấu hình `sudo nano /etc/supervisor/conf.d/supervisord.conf`
-copy nội dung bên dưới:
+- sửa cấu hình `sudo nano /etc/supervisor/conf.d/supervisord.conf`
 
-```
-nodaemon=true
+    copy nội dung bên dưới:
 
-[program:stunnel]
-directory = /etc/stunnel/
-command= stunnel4 stunnel.conf
+    ```
+    [supervisord]
+    nodaemon=true
 
-[program:https]
-command= HTTPS="1"
+    [program:stunnel]
+    directory = /etc/stunnel/
+    command= stunnel4 stunnel.conf
 
-[program:https1]
-command= /usr/local/bin/peerjs --port 9003
+    [program:https1]
+    command= peerjs --port 9003
 
-[program:sockethttps]
-directory = /home/smdb/RTC-server/RTC_call
-command= nodejs server.js
+    [program:sockethttps]
+    directory = /home/smdb/RTC-server/RTC_call
+    command= nodejs server.js
 
-[program:screen_https]
-directory = /home/smdb/RTC-server/RTC_share
-command= nodejs server.js
-```
+    [program:screen_https]
+    directory = /home/smdb/RTC-server/RTC_share
+    command= nodejs server.js
+
+    startretries=5
+
+    ```
+
 ### Cấu hình MySQL server
 - cài đặt `sudo apt-get install -y mysql-server`
 - đăng nhập vào mysql: `mysql -u root -p` (nhập mật khẩu đã tạo lúc dài đặt)
@@ -87,6 +88,8 @@ command= nodejs server.js
 - phân quyền: `GRANT ALL PRIVILEGES ON smart_class . * TO 'smart'@'%';`
 - cập nhật: `FLUSH PRIVILEGES;`
 - thoát: `exit;`
+- thay 127.0.0.1 bằng IP của SQL server vào file `nano /etc/mysql/mysql.conf.d/mysqld.cnf`
+- restart `/etc/init.d/mysql restart`
 
 ### Chạy server RTC
 ```
@@ -101,7 +104,7 @@ sudo systemctl enable supervisor
 sudo apt-get update
 sudo apt-get -y upgrade
 sudo apt-get install -y python3-pip 
-sudo apt-get install -y python3.6-dev libmysqlclient-dev  memcached  python-setuptools
+sudo apt-get install -y python3.5-dev libmysqlclient-dev  memcached libffi-dev libssl-dev
 sudo apt-get install -y git nginx
 sudo curl -sSL https://get.docker.com/ | sudo sh
 sudo usermod -aG docker ticket
@@ -115,6 +118,7 @@ cd Smart-class
 export LC_ALL="en_US.UTF-8"
 export LC_CTYPE="en_US.UTF-8"
 sudo pip3 install -r requirement.txt
+sudo pip3 install -U Twisted[tls,http2]
 ```
 
 ### Tạo chứng chỉ SSL
