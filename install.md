@@ -248,7 +248,7 @@ WantedBy=multi-user.target
 `cd /home/ticket/Smart-class/SmartClass/`
 - `nano SmartClass/settings.py`
 sửa dòng 112:`'HOST': '192.168.100.22',`
-- `nano student/templates/student/objects.html`
+- `nano student/templates/student/subjects.html`
 sửa dòng 185: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano student/templates/student/share.html`
 sửa dòng 68: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
