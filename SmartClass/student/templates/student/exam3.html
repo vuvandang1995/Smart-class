@@ -123,13 +123,21 @@
     <script src="{% static 'js/student/exam.js' %}"></script>
     <script>
       var userName = {{ username }};
-      var userSocket = new WebSocket(
+      /*var userSocket = new WebSocket(
           'ws://' + window.location.host +
-          '/ws/' + userName + '/');
+          '/ws/' + userName + '/');*/
+
+      var userSocket = new WebSocket(
+          'wss://' + window.location.host +
+          ':8443/ws/' + userName + '/');
+
+      /*var chatallSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/' + userName + 'chatall/');*/
 
       var chatallSocket = new WebSocket(
-        'ws://' + window.location.host +
-        '/ws/' + userName + 'chatall/');
+        'wss://' + window.location.host +
+        ':8443/ws/' + userName + 'chatall/');
 
 
       function escapeHtml(text) {

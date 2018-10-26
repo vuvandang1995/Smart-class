@@ -13,7 +13,7 @@ $(document).ready(function(){
         video.play();
     }
 
-    const peer = new Peer({ host: '192.168.100.22', port: 9001, debug: 3});
+    const peer = new Peer({ host: '192.168.100.22', port: 8444, debug: 3});
 
     peer.on('open', id => {
         key = id;

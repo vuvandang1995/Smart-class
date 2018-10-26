@@ -1,11 +1,11 @@
 $(document).ready(function(){
     var teacher_name = $('#teacher_name').text();
+//    var chatallSocket = new WebSocket(
+//        'ws://' + window.location.host +
+//        '/ws/' + teacher_name + 'chatall'+lop+'/');
     var chatallSocket = new WebSocket(
-        'ws://' + window.location.host +
-        '/ws/' + teacher_name + 'chatall'+lop+'/');
-    /*var chatallSocket = new WebSocket(
         'wss://' + window.location.host +
-        ':8443/ws/' + teacher_name + 'chatall'+lop+'/');*/
+        ':8443/ws/' + teacher_name + 'chatall'+lop+'/');
 
 
     chatallSocket.onmessage = function(e) {
@@ -160,12 +160,12 @@ $(document).ready(function(){
                 $('body .list_group_all').append(element);
                 if ($('#group_class').length){
                     var group_chat_name = $('#group_class').children('p').first().text();
+//                    var chatgroup = new WebSocket(
+//                    'ws://' + window.location.host +
+//                    '/ws/' + group_chat_name + 'chatgroup/');
                     var chatgroup = new WebSocket(
-                    'ws://' + window.location.host +
-                    '/ws/' + group_chat_name + 'chatgroup/');
-                    /*var chatgroup = new WebSocket(
                         'wss://' + window.location.host +
-                        ':8443/ws/' + group_chat_name + 'chatgroup/');*/
+                        ':8443/ws/' + group_chat_name + 'chatgroup/');
                     var group_name = $('#group_class').children('p').next('p').text();
                     $('#title-chat').html(group_name);
                     $("#chat-group-text").prop('disabled', false);
@@ -314,12 +314,12 @@ $(document).ready(function(){
             //  $("body .noti_chat"+std_username).hide();
             $('body #'+std).children('.frame_std').show();
             $("body .chat"+userName+" > ul").empty();
+//            socket_teacher = new WebSocket(
+//                'ws://' + window.location.host +
+//                '/ws/' + userName +'chat11/');
             socket_teacher = new WebSocket(
-                'ws://' + window.location.host +
-                '/ws/' + userName +'chat11/');
-            /*socket_teacher = new WebSocket(
                 'wss://' + window.location.host +
-                ':8443/ws/' + userName +'chat11/');*/
+                ':8443/ws/' + userName +'chat11/');
             if (typeof(Storage) !== "undefined") {
                 // Gán dữ liệu
                 sessionStorage.setItem('socket_teacher', socket_teacher);

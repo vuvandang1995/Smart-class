@@ -1,7 +1,11 @@
 $(document).ready(function(){
+//    var shareAllSocket = new WebSocket(
+//        'ws://' + window.location.host +
+//        '/ws/' + teacher_name + 'shareAll'+lopht+'/');
+
     var shareAllSocket = new WebSocket(
-        'ws://' + window.location.host +
-        '/ws/' + teacher_name + 'shareAll'+lopht+'/');
+        'wss://' + window.location.host +
+        ':8443/ws/' + teacher_name + 'shareAll'+lopht+'/');
 
     $('body').on('click', '#giotay', function(){
         shareAllSocket.send(JSON.stringify({
