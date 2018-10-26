@@ -104,7 +104,7 @@ sudo systemctl enable supervisor
 sudo apt-get update
 sudo apt-get -y upgrade
 sudo apt-get install -y python3-pip 
-sudo apt-get install -y python3.6-dev libmysqlclient-dev  memcached  python-setuptools
+sudo apt-get install -y python3.5-dev libmysqlclient-dev  memcached libffi-dev libssl-dev
 sudo apt-get install -y git nginx
 sudo curl -sSL https://get.docker.com/ | sudo sh
 sudo usermod -aG docker ticket
