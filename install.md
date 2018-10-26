@@ -247,21 +247,21 @@ WantedBy=multi-user.target
 **thay tất cả địa chỉ I xuất hiện bên dưới bằng địa chỉ của mysql server cho phù hợp port giữ nguyên**
 `cd /home/ticket/Smart-class/SmartClass/`
 - `nano SmartClass/settings.py`
-sửa dòng 112:`'HOST': '192.168.100.22',`
+    - sửa dòng 112:`'HOST': '192.168.100.22',`
 - `nano student/templates/student/subjects.html`
-sửa dòng 185: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
+    - sửa dòng 185: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano student/templates/student/share.html`
-sửa dòng 68: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
+    - sửa dòng 68: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano teacher/templates/teacher/share.html`
-sửa dòng 114: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
+    - sửa dòng 114: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano teacher/templates/teacher/manage_class.html`
-sửa dòng 331: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
+    - sửa dòng 331: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano teacher/static/js/peer/share_connect.js`
-sửa dòng 3: `audio_broad.socketURL = 'https://192.168.100.23:9443/';`
+    - sửa dòng 3: `audio_broad.socketURL = 'https://192.168.100.23:9443/';`
 - `nano teacher/static/js/teacher/RTC/RTC.js`
-sửa dòng 4: `connection.socketURL = "https://192.168.100.23:9443/";`
+    - sửa dòng 4: `connection.socketURL = "https://192.168.100.23:9443/";`
 - `nano teacher/static/js/teacher/peerjs/main.js`
-sửa dòng 16: `const peer = new Peer({ host: '192.168.100.22', port: 9003, debug: 3});`
+    - sửa dòng 16: `const peer = new Peer({ host: '192.168.100.22', port: 9003, debug: 3});`
 
 ### Migrate database
 ```
