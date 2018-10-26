@@ -101,8 +101,8 @@ sudo systemctl enable supervisor
 sudo apt-get update
 sudo apt-get -y upgrade
 sudo apt-get install -y python3-pip 
-sudo apt-get install python3.6-dev libmysqlclient-dev  memcached  python-setuptools
-sudo apt-get install git nginx
+sudo apt-get install -y python3.6-dev libmysqlclient-dev  memcached  python-setuptools
+sudo apt-get install -y git nginx
 sudo curl -sSL https://get.docker.com/ | sudo sh
 sudo usermod -aG docker ticket
 pip3 install pyOpenSSL --upgrade
@@ -111,10 +111,10 @@ pip3 install pyOpenSSL --upgrade
 ### Tải source code và cài các gói cần thiết để chạy code 
 ```
 git clone https://github.com/vuvandang1995/Smart-class.git
-cd ~/Smart-Class
+cd Smart-class
 export LC_ALL="en_US.UTF-8"
 export LC_CTYPE="en_US.UTF-8"
-sudo pip3 install -r requirements.txt
+sudo pip3 install -r requirement.txt
 ```
 
 ### Tạo chứng chỉ SSL
@@ -136,12 +136,12 @@ sudo pip3 install -r requirements.txt
     ```
     sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
     ```
-- tạo file `sudo nano /etc/nginx/snippets/self-signed.conf`:
+- tạo file:  `sudo nano /etc/nginx/snippets/self-signed.conf`
     ```
     ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
     ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
     ```
-- tạo file `sudo nano /etc/nginx/snippets/ssl-params.conf`
+- tạo file:  `sudo nano /etc/nginx/snippets/ssl-params.conf`
     ```
     # from https://cipherli.st/
     # and https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
@@ -172,35 +172,36 @@ copy nội dung bên dưới vào:
 
 ```
 server {
-	# SSL configuration
-	listen 443 ssl default_server;
-	listen [::]:443 ssl default_server;
-	ssl on;
-	include snippets/self-signed.conf;
- 	include snippets/ssl-params.conf;
-	
-	location = /favicon.ico { access_log off; log_not_found off; }
-	
-	location /static/ {
-		root /home/ticket/Smart-class/SmartClass/teacher;
-	}
-	
-	location /media/ {
-		root /home/ticket/Smart-class/SmartClass;
-   	}
+        # SSL configuration
+        listen 443 ssl default_server;
+        listen [::]:443 ssl default_server;
+        ssl on;
+        include snippets/self-signed.conf;
+        include snippets/ssl-params.conf;
 
-	location / {
+        location = /favicon.ico { access_log off; log_not_found off; }
+
+        location /static/ {
+                root /home/ticket/Smart-class/SmartClass/teacher;
+        }
+
+        location /media/ {
+                root /home/ticket/Smart-class/SmartClass;
+        }
+
+        location / {
                 include proxy_params;
                 proxy_pass https://0.0.0.0:8000;
         }
-		
-	location /wss/ {
-		proxy_pass https://0.0.0.0:8443;
-		proxy_http_version 1.1;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection "upgrade";
-	}
+
+        location /wss/ {
+                proxy_pass https://0.0.0.0:8443;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+        }
 }
+
 ```
 ### Tạo Gunicorn systemd Service File
 `sudo nano /etc/systemd/system/gunicorn.service`
@@ -283,4 +284,3 @@ insert into my_user values(password='pbkdf2_sha256$120000$g5frmDlYSxY1$mTT33TGmt
 exit;
 ```
 ### Truy cập vào tài khoản admin với password là 1 và thay đổi lại password
-
