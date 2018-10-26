@@ -82,7 +82,7 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
     ```
 
 ### Cấu hình MySQL server
-- cài đặt `sudo apt-get install -y mysql-server`
+- cài đặt `sudo apt-get install -y mysql-server` (điền mật khẩu cho tài khoản root)
 - đăng nhập vào mysql: `mysql -u root -p` (nhập mật khẩu đã tạo lúc dài đặt)
 - tạo database: `CREATE DATABASE smart_class CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 - tạo tài khoản: `CREATE USER 'smart'@'%' IDENTIFIED BY '123456';`
