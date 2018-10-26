@@ -148,12 +148,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         who = text_data_json['who']
         time = text_data_json['time']
         if message == 'seen':
+            # Xóa 1 dòng trong file theo string hoặc chỉ số dòng
             f = r'notification/chat/noti/'+self.room_group_name+'.txt'
             with open(f, "r") as infile:
                 lines = infile.readlines()
 
             with open(f, "w") as outfile:
-                for line in enumerate(lines):
+                for i, line in enumerate(lines):
                     if who not in line:
                         outfile.write(line)
         elif 'Bắt đầu làm bài thi:' in message:

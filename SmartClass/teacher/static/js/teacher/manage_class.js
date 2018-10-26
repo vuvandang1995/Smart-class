@@ -7,18 +7,6 @@ $(document).ready(function(){
     /*chatallSocket = new WebSocket(
         'wss://' + window.location.host +
         ':8443/ws/' + userName + 'chatall'+class_+'/');*/
-
-
-    $(".inboxx").click(function(event){
-        event.stopPropagation();
-        std_username = $(this).attr('id').split('inbox')[1];
-        userSocket.send(JSON.stringify({
-            'message' : 'seen',
-            'who' : std_username,
-            'time' : ''
-        }));
-        $(this).hide();
-    });
     
     chatallSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
