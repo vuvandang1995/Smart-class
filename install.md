@@ -114,7 +114,7 @@ sudo apt-get install docker.io
 
 ### Tải source code và cài các gói cần thiết để chạy code 
 ```
-git clone https://github.com/vuvandang1995/Smart-class.git
+git clone https://github.com/dung1101/Smart-class.git
 cd Smart-class
 export LC_ALL="en_US.UTF-8"
 export LC_CTYPE="en_US.UTF-8"
