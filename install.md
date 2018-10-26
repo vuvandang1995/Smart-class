@@ -288,4 +288,17 @@ insert into truong (ten, mo_ta) values ('Học viện An Ninh', 'Học viện An
 insert into my_user (password, email, fullname, username, is_active, position, truong_id, gioi_tinh, noti_chat, noti_noti) values('pbkdf2_sha256$120000$g5frmDlYSxY1$mTT33TGmtMKw2AAQtluVO6T8uTvJowv7SCy2OZZZQ4Q=', 'admin@gmail.com','admin','admin',1,2,1,1,0,0);
 exit;
 ```
+**Chuyển sang server web ở phần 2 restart lại dịch vụ**
+```
+sudo systemctl restart gunicorn.service
+sudo systemctl restart nginx.services
+```
 ### Truy cập vào tài khoản admin với password là 1 và thay đổi lại password
+
+### Vào trình duyệt cài đặt extendtion chrome
+`https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk`
+### Vào trình duyệt chạy các link sau:
+`https://dia_chi_mysql_server:8444`
+`https://dia_chi_mysql_server:9443`
+`https://dia_chi_mysql_server:443`
+
