@@ -10,6 +10,8 @@ sudo apt-get install -y nodejs
 ```
 
 ### Tải các gói cần thiết
+*thay đổi smdb 
+
 ```
 git clone https://github.com/dung1101/RTC-server.git
 cd /home/smdb/RTC-server/peerjs/
@@ -55,8 +57,8 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
 
 ### Cấu hình supervisor
 - sửa cấu hình `sudo nano /etc/supervisor/conf.d/supervisord.conf`
-
-    copy nội dung bên dưới:
+    
+    copy nội dung bên dưới:*thay đổi smdb 
 
     ```
     [supervisord]
@@ -89,8 +91,8 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
 - phân quyền: `GRANT ALL PRIVILEGES ON smart_class . * TO 'smart'@'%';`
 - cập nhật: `FLUSH PRIVILEGES;`
 - thoát: `exit;`
-- thay 127.0.0.1 bằng IP của SQL server vào file `nano /etc/mysql/mysql.conf.d/mysqld.cnf`
-- restart `/etc/init.d/mysql restart`
+- thay 127.0.0.1 bằng IP của SQL server vào file `sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf`
+- restart `sudo /etc/init.d/mysql restart`
 
 ### Chạy server RTC
 ```
@@ -171,7 +173,7 @@ sudo pip3 install -U Twisted[tls,http2]
 ### Cấu hình Nginx:
 `sudo nano /etc/nginx/sites-available/default`
 
-copy nội dung bên dưới vào:
+copy nội dung bên dưới vào:*thay đổi ticket
 
 ```
 server {
@@ -209,7 +211,7 @@ server {
 ### Tạo Gunicorn systemd Service File
 `sudo nano /etc/systemd/system/gunicorn.service`
 
-copy nội dung bên dưới: 
+copy nội dung bên dưới: *thay đổi ticket
 
 ```
 [Unit]
@@ -228,7 +230,7 @@ WantedBy=multi-user.target
 
 ### Tạo Daphne systemd Service File
 `nano /etc/systemd/system/daphne.service`
-
+*thay đổi ticket
 ```
 [Unit]
 Description=My Daphne Service
