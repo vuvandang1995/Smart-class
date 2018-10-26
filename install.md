@@ -12,7 +12,7 @@ sudo apt-get install -y nodejs
 ### Tải các gói cần thiết
 ```
 git clone https://github.com/dung1101/RTC-server.git
-cd /homw/smdb/RTC-server/peerjs/
+cd /home/smdb/RTC-server/peerjs/
 npm install
 cd /home/smdb/RTC-server/RTC_call
 npm install --production
@@ -53,29 +53,32 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
     ```
 
 ### Cấu hình supervisor
-sửa cấu hình `sudo nano /etc/supervisor/conf.d/supervisord.conf`
+- sửa cấu hình `sudo nano /etc/supervisor/conf.d/supervisord.conf`
 
-copy nội dung bên dưới:
+    copy nội dung bên dưới:
 
-```
-[supervisord]
-nodaemon=true
+    ```
+    [supervisord]
+    nodaemon=true
 
-[program:stunnel]
-directory = /etc/stunnel/
-command= stunnel4 stunnel.conf
+    [program:stunnel]
+    directory = /etc/stunnel/
+    command= stunnel4 stunnel.conf
 
-[program:https1]
-command= peerjs --port 9003
+    [program:https1]
+    command= peerjs --port 9003
 
-[program:sockethttps]
-directory = /home/smdb/RTC-server/RTC_call
-command= nodejs server.js
+    [program:sockethttps]
+    directory = /home/smdb/RTC-server/RTC_call
+    command= nodejs server.js
 
-[program:screen_https]
-directory = /home/smdb/RTC-server/RTC_share
-command= nodejs server.js
-```
+    [program:screen_https]
+    directory = /home/smdb/RTC-server/RTC_share
+    command= nodejs server.js
+
+    startretries=5
+
+    ```
 
 ### Cấu hình MySQL server
 - cài đặt `sudo apt-get install -y mysql-server`
@@ -85,6 +88,8 @@ command= nodejs server.js
 - phân quyền: `GRANT ALL PRIVILEGES ON smart_class . * TO 'smart'@'%';`
 - cập nhật: `FLUSH PRIVILEGES;`
 - thoát: `exit;`
+- thay 127.0.0.1 bằng IP của SQL server vào file `nano /etc/mysql/mysql.conf.d/mysqld.cnf`
+- restart `/etc/init.d/mysql restart`
 
 ### Chạy server RTC
 ```
