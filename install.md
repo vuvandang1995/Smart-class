@@ -31,8 +31,9 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
 ### Cấu hình Stunnel
 - tạo chứng chỉ: 
     ```
-    openssl genrsa -out key.pem 2048
-    openssl req -new -x509 -key key.pem -out cert.pem -days 1095
+    sudo openssl genrsa -out key.pem 2048
+    sudo openssl req -new -x509 -key key.pem -out cert.pem -days 1095
+    su
     cat key.pem cert.pem >> /etc/stunnel/stunnel.pem
     ```
 - tạo file: 'sudo nano /etc/stunnel/stunnel.conf'
@@ -106,9 +107,7 @@ sudo apt-get -y upgrade
 sudo apt-get install -y python3-pip 
 sudo apt-get install -y python3.5-dev libmysqlclient-dev  memcached libffi-dev libssl-dev
 sudo apt-get install -y git nginx
-sudo curl -sSL https://get.docker.com/ | sudo sh
-sudo usermod -aG docker ticket
-pip3 install pyOpenSSL --upgrade
+sudo apt-get install docker.io
 ```
 
 ### Tải source code và cài các gói cần thiết để chạy code 
@@ -247,23 +246,23 @@ WantedBy=multi-user.target
 ```
 ### Chỉnh sửa code
 **thay tất cả địa chỉ I xuất hiện bên dưới bằng địa chỉ của mysql server cho phù hợp port giữ nguyên**
-`cd /home/ticket/Smart-Class/SmartClass/`
-- `nano SmartClass/setting.py`
-sửa dòng 112:`'HOST': '192.168.100.22',`
-- `nano student/templates/student/objects.html`
-sửa dòng 185: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
+`cd /home/ticket/Smart-class/SmartClass/`
+- `nano SmartClass/settings.py`
+    - sửa dòng 112:`'HOST': '192.168.100.22',`
+- `nano student/templates/student/subjects.html`
+    - sửa dòng 185: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano student/templates/student/share.html`
-sửa dòng 68: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
+    - sửa dòng 68: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano teacher/templates/teacher/share.html`
-sửa dòng 114: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
+    - sửa dòng 114: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano teacher/templates/teacher/manage_class.html`
-sửa dòng 331: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
+    - sửa dòng 331: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
 - `nano teacher/static/js/peer/share_connect.js`
-sửa dòng 3: `audio_broad.socketURL = 'https://192.168.100.23:9443/';`
+    - sửa dòng 3: `audio_broad.socketURL = 'https://192.168.100.23:9443/';`
 - `nano teacher/static/js/teacher/RTC/RTC.js`
-sửa dòng 4: `connection.socketURL = "https://192.168.100.23:9443/";`
+    - sửa dòng 4: `connection.socketURL = "https://192.168.100.23:9443/";`
 - `nano teacher/static/js/teacher/peerjs/main.js`
-sửa dòng 16: `const peer = new Peer({ host: '192.168.100.22', port: 9003, debug: 3});`
+    - sửa dòng 16: `const peer = new Peer({ host: '192.168.100.22', port: 9003, debug: 3});`
 
 ### Migrate database
 ```
