@@ -245,8 +245,8 @@ WantedBy=multi-user.target
 ```
 ### Chỉnh sửa code
 **thay tất cả địa chỉ I xuất hiện bên dưới bằng địa chỉ của mysql server cho phù hợp port giữ nguyên**
-`cd /home/ticket/Smart-Class/SmartClass/`
-- `nano SmartClass/setting.py`
+`cd /home/ticket/Smart-class/SmartClass/`
+- `nano SmartClass/settings.py`
 sửa dòng 112:`'HOST': '192.168.100.22',`
 - `nano student/templates/student/objects.html`
 sửa dòng 185: `<script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>`
