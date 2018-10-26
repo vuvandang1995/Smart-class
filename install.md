@@ -31,8 +31,9 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
 ### Cấu hình Stunnel
 - tạo chứng chỉ: 
     ```
-    openssl genrsa -out key.pem 2048
-    openssl req -new -x509 -key key.pem -out cert.pem -days 1095
+    sudo openssl genrsa -out key.pem 2048
+    sudo openssl req -new -x509 -key key.pem -out cert.pem -days 1095
+    su
     cat key.pem cert.pem >> /etc/stunnel/stunnel.pem
     ```
 - tạo file: 'sudo nano /etc/stunnel/stunnel.conf'
