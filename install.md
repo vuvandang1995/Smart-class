@@ -284,7 +284,8 @@ sudo systemctl start nginx
 ```
 mysql -u root -p
 use smart_class;
-insert into my_user values(password='pbkdf2_sha256$120000$g5frmDlYSxY1$mTT33TGmtMKw2AAQtluVO6T8uTvJowv7SCy2OZZZQ4Q=', email='admin@gmail.com', fullname='admin', username='admin', is_active=1, position=2, truong_id=1, gioi_tinh=1);
+insert into truong (ten, mo_ta) values ('Học viện An Ninh', 'Học viện An Ninh');
+insert into my_user (password, email, fullname, username, is_active, position, truong_id, gioi_tinh) values('pbkdf2_sha256$120000$g5frmDlYSxY1$mTT33TGmtMKw2AAQtluVO6T8uTvJowv7SCy2OZZZQ4Q=', 'admin@gmail.com','admin','admin',1,2,1,1);
 exit;
 ```
 ### Truy cập vào tài khoản admin với password là 1 và thay đổi lại password
