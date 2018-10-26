@@ -4,13 +4,38 @@
 ```
 sudo apt-get update
 sudo apt-get -y upgrade
-sudo apt-get install -y nodejs npm stunnel4 python-setuptools
+sudo apt-get install -y npm stunnel4 python-setuptools unzip
+sudo npm install -g socket.io
 sudo easy_install supervisor
+wget -qO- https://deb.nodesource.com/setup_10.x | sudo -E bash -
+sudo apt-get install -y nodejs
 ```
+
+### Cài đặt peerjs
+```
+wget https://github.com/peers/peerjs-server/archive/master.zip
+unzip master.zip
+cd peerjs-server-master/
+npm install
+cd /usr/local/lib/
+sudo npm install peer
+sudo npm install peer -g
+```
+
 ### Tải các gói cần thiết
 ```
 git clone https://github.com/dung1101/RTC-server.git
+cd /home/smdb/RTC-server/RTC_call
+npm install --production
+cd /home/smdb/RTC-server/RTC_share
+npm install --production
 ```
+
+### Tạo chứng chỉ
+```
+sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+```
+
 ### Cấu hình Stunnel
 tạo file 'sudo nano /etc/stunnel/stunnel.conf'
 copy nội dung bên dưới:
@@ -61,7 +86,7 @@ command= nodejs server.js
 - tạo tài khoản: `CREATE USER 'smart'@'%' IDENTIFIED BY '123456';`
 - phân quyền: `GRANT ALL PRIVILEGES ON smart_class . * TO 'smart'@'%';`
 - cập nhật: `FLUSH PRIVILEGES;`
-- thoát: nhấp phím 'Ctrl + D'
+- thoát: `exit;`
 
 ### Chạy server RTC
 ```
@@ -90,7 +115,8 @@ cd ~/Smart-Class
 export LC_ALL="en_US.UTF-8"
 export LC_CTYPE="en_US.UTF-8"
 sudo pip3 install -r requirements.txt
-```nano
+```
+
 ### Tạo chứng chỉ SSL
 - chạy câu lệnh:
     ```
