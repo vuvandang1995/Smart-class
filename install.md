@@ -291,14 +291,18 @@ exit;
 **Chuyển sang server web ở phần 2 restart lại dịch vụ**
 ```
 sudo systemctl restart gunicorn.service
-sudo systemctl restart nginx.services
+sudo systemctl restart nginx.service
 ```
 ### Truy cập vào tài khoản admin với password là 1 và thay đổi lại password
+## vào trình duyệt dán link
+- `https://dia_chi_web_server`
 
 ### Vào trình duyệt cài đặt extendtion chrome
 `https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk`
 ### Vào trình duyệt chạy các link sau:
-`https://dia_chi_mysql_server:8444`
-`https://dia_chi_mysql_server:9443`
-`https://dia_chi_mysql_server:443`
+- `https://dia_chi_mysql_server:8444`
+- `https://dia_chi_mysql_server:9443`
+- `https://dia_chi_mysql_server:443`
+
+và đồng ý truy cập cho lần đầu tiên
 
