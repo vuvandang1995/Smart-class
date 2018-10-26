@@ -1,7 +1,7 @@
 window.enableAdapter = true;
 
 var connection = new RTCMultiConnection();
-connection.socketURL = "https://192.168.100.23:9443/";
+connection.socketURL = "https://192.168.100.22:443/";
 connection.session = {
     audio: true,
     video: false,

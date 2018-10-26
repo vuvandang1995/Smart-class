@@ -7,7 +7,6 @@ $(document).ready(function(){
     /*chatallSocket = new WebSocket(
         'wss://' + window.location.host +
         ':8443/ws/' + userName + 'chatall'+class_+'/');*/
-
     
     chatallSocket.onmessage = function(e) {
         var data = JSON.parse(e.data);
@@ -18,9 +17,10 @@ $(document).ready(function(){
             $("#videocall"+who).attr("name", message); 
         }else if (time == 'giotay'){
             $('#giotayxxx'+who).show();
-        }else if (time == 'bogiotay'){
-            $('#giotayxxx'+who).hide();
-        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_change_group') && (time != 'teacher_call')){
+        }else if ((message == 'new_chat_for_teaccher') && (who == userName)){
+            // $('.chat__'+time).click();
+            $('#inbox'+time).show();
+        }else if ((time != 'None') && (time != 'call_time') && (time != 'teacher_change_group') && (time != 'teacher_call') && (message != 'new_chat') && (message.includes('Bắt đầu làm bài thi:') == false) && (message.includes('Giao bài tập') == false)){
             insertChat(who, message, time);
         }
         
@@ -327,6 +327,14 @@ $(document).ready(function(){
 	$('.mail_list').on('click',function(){
         var std_username = $(this).children('p').text();
         var std_fullname = $(this).data("fullname");
+        if ($('#inbox'+std_username).css('display') == 'block'){
+            userSocket.send(JSON.stringify({
+                'message' : 'seen',
+                'who' : std_username,
+                'time' : ''
+            }));
+            $('#inbox'+std_username).hide();
+        }
         if (($('#'+std_username).length == 0) || ($("body .chat"+std_username).css('display') == 'none')){
             register_popup_teacher(std_username, std_fullname);
             //  $("body .noti_chat"+std_username).hide();
@@ -345,7 +353,7 @@ $(document).ready(function(){
             if (dict_ws[std_username] == undefined){
                 dict_ws[std_username] = new WebSocket(
                 'ws://' + window.location.host +
-                '/ws/' + std_username + 'chat11/');
+                '/ws/' + std_username + userName +class_+'chat11/');
                 $("body .chat"+std_username+" > ul").empty();
                 var me = {};
                 me.avatar = "https://cdn2.iconfinder.com/data/icons/perfect-flat-icons-2/512/User_man_male_profile_account_person_people.png";
@@ -494,7 +502,19 @@ $(document).ready(function(){
                 var message = data['message'];
                 var who = data['who'];
                 var time = data['time'];
-                insertChat2(who, message, time);
+                if (time == 'history_noti'){
+                    $('.noti_noti').prepend(message);
+                }else if (message.includes('Giao bài tập nhóm')){
+                    $('.noti_noti').prepend(message);
+                    try {
+                        $('body .num_noti').remove();
+                    }
+                    catch(err) {
+                    }
+                    $('body .chat_noti').show();
+                }else{
+                    insertChat2(who, message, time);
+                }
             };
 
             $('body').on('click', '.zzz', function(){
@@ -511,7 +531,7 @@ $(document).ready(function(){
 
         $('body').on('click', '.zzz', function(){
             var message = $(this).parent().parent().children().children().children('input').val();
-            var group_chat_name =  class_+userName+ $('#title-chat').text();
+            var group_chat_name =  class_+'gr_'+userName+'gr_'+ $('#title-chat').text();
             message = escapeHtml(message);
             var date = formatAMPM(new Date());
             if (message != ''){
@@ -529,7 +549,7 @@ $(document).ready(function(){
     
     function search_std(){
         var options_std = {
-            url: "/std/"+class_,
+            url: "/std/"+class_+'/'+userName,
             getValue: function(element){
                 return element.fullname;
              },
@@ -591,6 +611,10 @@ $(document).ready(function(){
     });
 
     $("#phat_de").click(function(){
+        if($("#ky_thi input[name='de_thi']").val() == ''){
+            alert("Chưa chọn đề thi");
+            return false;
+        }
         $("#de_thi option").each(function(){
             if($(this).val()== $("input[name=de_thi]").val()){
                 var id = $(this).data('id');
@@ -601,10 +625,11 @@ $(document).ready(function(){
                 var date = formatAMPM(new Date());
                 var href = location.href.split('/')[0]+location.href.split('/')[1]+location.href.split('/')[2]+"/student/exam_"+data
                 chatallSocket.send(JSON.stringify({
-                  'message' : `<a href="/student/exam_${data}">${href}</a>`,
+                  'message' : `<li><a href="/student/exam_${data}"><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>`+userName+`</span><span class="time">`+date+`</span></span><span class="message">Bắt đầu làm bài thi: ${$(this).val()}</span></a></li>`,
                   'who' : userName,
                   'time' : date
                 }));
+                $('#ky_thi').modal("hide");
                 return false;
             }
         });
@@ -615,6 +640,11 @@ $(document).ready(function(){
         var group = btn.attr('name');
         $("#send_title").text("Giao bài tập cho "+group);
         $("#send input[name=gr_name]").val(group);
+        $("#send input[name='bai_tap']").val("");
+    });
+
+    $("#ky_thi").on("show.bs.modal", function(event){
+        $("#ky_thi input[name='de_thi']").val("");
     });
 
     $("#send_bai_tap").click(function(){
@@ -634,19 +664,19 @@ $(document).ready(function(){
                 var group = $("#send input[name='gr_name']").val();
                 if(group == "tất cả"){
                     chatallSocket.send(JSON.stringify({
-                        'message' : `<a href="/student/exam_${data}">${href}</a>`,
+                        'message' : `<li><a href="/student/exam_${data}"><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>`+userName+`</span><span class="time">`+date+`</span></span><span class="message">Giao bài tập: ${$(this).val()}</span></a></li>`,
                         'who' : userName,
                         'time' : date
                     }));
                 }else{
-                    var group_chat_name =  class_ +userName+ group
+                    var group_chat_name =  class_ +'gr_'+userName+'gr_'+group
                     dict_group_chat[group_chat_name].send(JSON.stringify({
-                        'message' : `<a href="/student/exam_${data}">${href}</a>`,
+                        'message' : `<li><a href="/student/exam_${data}"><span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span><span><span>`+userName+`</span><span class="time">`+date+`</span></span><span class="message">Giao bài tập nhóm: ${$(this).val()}</span></a></li>`,
                         'who' : userName,
                         'time' : date
                     }));
                 }
-
+                $('#send').modal("hide");
                 return false;
             }
         });

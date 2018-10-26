@@ -458,7 +458,7 @@ body .container.body .right_col {
     color: #fff
 }
 .bg-red {
-    background: #E74C3C !important;
+    background: rgb(255, 255, 254) !important;
     border: 1px solid #E74C3C !important;
     color: #fff
 }
@@ -1544,7 +1544,9 @@ ul.msg_list li a .message {
     width: 220px
 }
 .navbar-nav .open .dropdown-menu.msg_list {
-    width: 300px
+    width: 300px;
+    max-height: 269px;
+    overflow: auto;
 }
 .info-number .badge {
     font-size: 10px;
@@ -4205,6 +4207,63 @@ ul.notifications {
     min-height: 300px;
     border: 1px solid #e5e5e5
 }
+
+
+.notify {
+    position: relative;
+    top: -22px;
+    right: -9px;
+  }
+  .notify .heartbit {
+    position: absolute;
+    top: -20px;
+    right: -4px;
+    height: 25px;
+    width: 25px;
+    z-index: 10;
+    border: 5px solid #ef5350;
+    border-radius: 70px;
+    -moz-animation: heartbit 1s ease-out;
+    -moz-animation-iteration-count: infinite;
+    -o-animation: heartbit 1s ease-out;
+    -o-animation-iteration-count: infinite;
+    -webkit-animation: heartbit 1s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+  }
+  .notify .point {
+    width: 6px;
+    height: 6px;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
+    background-color: #ef5350;
+    position: absolute;
+    right: 6px;
+    top: -10px;
+  }
+  @-webkit-keyframes heartbit {
+    0% {
+      -webkit-transform: scale(0);
+      opacity: 0.0;
+    }
+    25% {
+      -webkit-transform: scale(0.1);
+      opacity: 0.1;
+    }
+    50% {
+      -webkit-transform: scale(0.5);
+      opacity: 0.3;
+    }
+    75% {
+      -webkit-transform: scale(0.8);
+      opacity: 0.5;
+    }
+    to {
+      -webkit-transform: scale(1);
+      opacity: 0.0;
+    }
+  }
 
 /*
 .x_content {

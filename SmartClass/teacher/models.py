@@ -81,6 +81,8 @@ class MyUser(AbstractBaseUser):
     fullname = models.CharField(max_length=100)
     username = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
+    noti_noti = models.IntegerField(default=0)
+    noti_chat = models.IntegerField(default=0)
     position = models.IntegerField(default=0)
     # 0 : student
     # 1 : teacher
