@@ -229,7 +229,7 @@ WantedBy=multi-user.target
 ```
 
 ### Tạo Daphne systemd Service File
-`nano /etc/systemd/system/daphne.service`
+`sudo nano /etc/systemd/system/daphne.service`
 *thay đổi ticket
 ```
 [Unit]
