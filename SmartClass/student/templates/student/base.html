@@ -109,32 +109,17 @@
                       </ul>
                     </li>
 
-                    <li role="presentation" class="dropdown">
-                      <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-envelope-o"></i>
-                        <span class="badge bg-green">6</span>
+                    <li role="presentation" class="dropdown" id="noti" style="display:none;">
+                      <a class="dropdown-toggle info-number noti_fy" data-toggle="dropdown" onclick="notiFunction()">
+                        <i class="fa fa-bell"></i>
+                        <div class="notify chat_noti" style="display:none;">
+                          <span class="heartbit"></span> 
+                          <span class="point"></span> 
+                        </div>
                       </a>
-                      <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                        <li>
-                          <a>
-                            <span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span>
-                            <span>
-                              <span>John Doe</span>
-                              <span class="time">3 mins ago</span>
-                            </span>
-                            <span class="message">
-                              Film festivals used to be do-or-die moments for movie makers. They were where...
-                            </span>
-                          </a>
-                        </li>
-                        <li>
-                          <div class="text-center">
-                            <a>
-                              <strong>Tấtcả thông báo</strong>
-                              <i class="fa fa-angle-right"></i>
-                            </a>
-                          </div>
-                        </li>
+                      <ul id="menu1" class="dropdown-menu list-unstyled msg_list noti_noti" role="menu">
+                      
+                        
                       </ul>
                     </li>
                   </ul>
@@ -240,6 +225,39 @@
 
 
     <script>
+      var noti_noti = {{noti_noti}};
+      function notiFunction() {
+        if ($('body .num_noti').length){
+            var token = $("input[name=csrfmiddlewaretoken]").val();
+            $.ajax({
+                type:'POST',
+                url:location.href,
+                data: {'noti_noti': 0, 'csrfmiddlewaretoken':token},
+                success: function(){
+                    $('body .num_noti').remove();
+                }
+            });
+        }else if($('body .chat_noti').css('display') == 'block'){
+          var token = $("input[name=csrfmiddlewaretoken]").val();
+          $.ajax({
+              type:'POST',
+              url:location.href,
+              data: {'noti_noti': 0, 'csrfmiddlewaretoken':token},
+              success: function(){
+                try {
+                  $('body .chat_noti').hide();
+                }catch(err) {
+                }
+              }
+          });
+        }
+      }
+
+      if (noti_noti != 0){
+          $('body .num_noti').remove();
+          var noti1 = '<span class="badge bg-green num_noti">'+noti_noti+'</span>';
+          $('body .noti_fy').append(noti1);
+      }
       var userName = {{ username }};
       
       /*var userSocket = new WebSocket(

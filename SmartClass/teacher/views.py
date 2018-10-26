@@ -120,15 +120,16 @@ def manage_class(request, id):
         return HttpResponseRedirect('/')
 
 
-def fullname_std_data(request, lop):
+def fullname_std_data(request, lop, teacher_name):
     user = request.user
     if user.is_authenticated and user.position == 1:
         ls_chi_tiet = ChiTietLop.objects.filter(lop_id=Lop.objects.get(ten=lop)).values('myuser_id')
         ls_student = MyUser.objects.filter(id__in=ls_chi_tiet, position=0)
+        ls_nhom = Nhom.objects.filter(myuser_id=MyUser.objects.get(username=teacher_name))
         list_std = []
         for std in ls_student:
             try:
-                ChiTietNhom.objects.get(myuser_id=std)
+                ChiTietNhom.objects.get(myuser_id=std,nhom_id__in=ls_nhom)
             except:
                 list_std.append({"username": std.username, "fullname": std.fullname})
         return JsonResponse(list_std, safe=False)
@@ -189,14 +190,14 @@ def group_data(request, lop):
             for lsg in ls_nhom:
                 html += '''
                         <div class="mail_list group_class">
-                        <p hidden>'''+lop+user.username+lsg.ten_nhom+'''</p>
+                        <p hidden>'''+lop+'gr_'+user.username+'gr_'+lsg.ten_nhom+'''</p>
                         <p hidden>'''+lsg.ten_nhom+'''</p>
                         <div class="right">
                             <h3>'''+lsg.ten_nhom+'''<small>
                                 <button type="button" class="btn btn-danger btn-xs delete_gr" name="'''+str(lsg.id)+'''">Xóa</button>
                                 <button type="button" class="btn btn-primary btn-xs join_gr" name="'''+lsg.ten_nhom+'''">Audio</button>
-                                <button type="button" class="btn btn-success btn-xs send_gr" name="'''+lsg.ten_nhom+'''" data-toggle="modal" data-target="#send">Giao bài</button>
                                 <button style="display:none;" type="button" class="btn btn-primary btn-xs done_gr" name="'''+lsg.ten_nhom+'''">Kết thúc</button>
+                                <button type="button" class="btn btn-success btn-xs send_gr" name="'''+lsg.ten_nhom+'''" data-toggle="modal" data-target="#send">Giao bài</button>
                                 </small></h3>
                 '''
                 for std in ChiTietNhom.objects.filter(nhom_id=lsg):

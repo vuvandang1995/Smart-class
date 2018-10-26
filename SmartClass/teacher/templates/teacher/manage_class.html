@@ -51,12 +51,15 @@
                         <div class="col-sm-3 mail_list_column" style="overflow-y: scroll; height:600px;">
                           {% for student in ls_student %}
                           {% comment %} <a href="javascript:register_popup_teacher('{{student.username}}', '{{student.fullname}}');"> {% endcomment %}
-                            <div class="mail_list" data-fullname="{{student.fullname}}">
+                            <div class="mail_list chat__{{student.username}}" data-fullname="{{student.fullname}}">
                               <!-- <div class="left">
                               </div> -->
                               <p hidden>{{student.username}}</p>
                               <div class="right">
                                 <h3>{{ student.fullname }}
+                                    <small style="display:none;" id="inbox{{student.username}}" class="giotay_std inboxx">
+                                      <i class="fa fa-envelope" style="font-size: 20px;color:red"></i>
+                                    </small>
                                     <small style="display:none;" id="giotayxxx{{student.username}}" class="giotay_std">
                                       <i class="fa fa-hand-paper-o" style="font-size: 20px;color:red"></i>
                                     </small>
@@ -325,10 +328,10 @@
 
     <!-- For RTC-->
     <script src="{% static 'js/teacher/RTC/videocall/menu.js' %}"></script>
-    <script src="{% static 'js/teacher/RTC/RTCMultiConnection.min.js' %}"></script>
+    <script src="{% static 'js/peer/RTCMultiConnection.min.js' %}"></script>
     <script src="{% static 'js/teacher/RTC/videocall/adapter.js' %}"></script>
-    {% comment %} <script src="https://192.168.100.22:443/socket.io/socket.io.js"></script> {% endcomment %}
-    <script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script>
+    <script src="https://192.168.100.22:443/socket.io/socket.io.js"></script>
+    {% comment %} <script src="https://192.168.100.23:9443/socket.io/socket.io.js"></script> {% endcomment %}
     <link rel="stylesheet" href="{% static 'js/teacher/RTC/videocall/getHTMLMediaElement.css' %}">
     <script src="{% static 'js/teacher/RTC/videocall/getHTMLMediaElement.js' %}"></script>
     <script src="{% static 'js/teacher/RTC/videocall/FileBufferReader.js' %}"></script>

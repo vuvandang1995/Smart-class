@@ -1,11 +1,12 @@
 $(document).ready(function(){
     var teacher_name = $('#teacher_name').text();
+    $('#noti').show();
 //    var chatallSocket = new WebSocket(
 //        'ws://' + window.location.host +
-//        '/ws/' + teacher_name + 'chatall'+lop+'/');
+//        '/ws/' + teacher_name + 'chatall'+lop+'*std*'+userName+'/');
     var chatallSocket = new WebSocket(
         'wss://' + window.location.host +
-        ':8443/ws/' + teacher_name + 'chatall'+lop+'/');
+        ':8443/ws/' + teacher_name + 'chatall'+lop+'*std*'+userName+'/');
 
 
     chatallSocket.onmessage = function(e) {
@@ -13,6 +14,7 @@ $(document).ready(function(){
         var message = data['message'];
         var who = data['who'];
         var time = data['time'];
+        var noti_noti1 = data['noti_noti'];
         if (time == 'None'){
             if (key == ''){
                 chatallSocket.send(JSON.stringify({
@@ -46,7 +48,27 @@ $(document).ready(function(){
             }
         }else if (time === 'teacher_change_group'){
             reload();
-        }else if ((time != 'key')){
+        }else if ((message == 'new_chat') && (who == userName)){
+            $('#mail_list').click();
+        }else if (time == 'history_noti'){
+            $('.noti_noti').prepend(message);
+        }else if (message.includes('Bắt đầu làm bài thi:')){
+            $('.noti_noti').prepend(message);
+            try {
+                $('body .num_noti').remove();
+            }
+            catch(err) {
+            }
+            $('body .chat_noti').show();
+        }else if (message.includes('Giao bài tập:')){
+            $('.noti_noti').prepend(message);
+            try {
+                $('body .num_noti').remove();
+            }
+            catch(err) {
+            }
+            $('body .chat_noti').show();
+        }else if ((time != 'key') && (message != 'new_chat_for_teaccher')){
                 insertChat(who, message, time);
             }
         };
@@ -231,6 +253,16 @@ $(document).ready(function(){
                                     makeOrJoinRoom($('#audiocall').attr("name")+'_'+lop+'_'+teacher_name);
                                 }, time);
                             }    
+                        }else if (time == 'history_noti'){
+                            $('.noti_noti').prepend(message);
+                        }else if (message.includes('Giao bài tập nhóm')){
+                            $('.noti_noti').prepend(message);
+                            try {
+                                $('body .num_noti').remove();
+                            }
+                            catch(err) {
+                            }
+                            $('body .chat_noti').show();
                         }else if (time != 'teacher_call'){
                             insertChat2(who, message, time);
                         }
@@ -262,7 +294,7 @@ $(document).ready(function(){
 
                     $('#audiocall').attr('name', group_name);
                 };
-                if (sessionStorage.getItem('socket_teacher') != null){
+                if (sessionStorage.getItem(teacher_name) != null){
                     $('#mail_list').click();
                 }
 
@@ -275,7 +307,7 @@ $(document).ready(function(){
     $('body').on('click', '.xxx', function(){
         $("body .mytext").trigger({type: 'keydown', which: 13, keyCode: 13});
     })
-    $("body .mytext").focus();
+    // $("body .mytext").focus();
     $('body').on('keyup', '.mytext', function(e){
         if (e.keyCode === 13) {
             $(this).parent().parent().next().children('span').click();
@@ -322,7 +354,7 @@ $(document).ready(function(){
                 ':8443/ws/' + userName +'chat11/');
             if (typeof(Storage) !== "undefined") {
                 // Gán dữ liệu
-                sessionStorage.setItem('socket_teacher', socket_teacher);
+                sessionStorage.setItem(teacher_name, socket_teacher);
                     
                 // Lấy dữ liệu
             } else {
@@ -405,6 +437,11 @@ $(document).ready(function(){
         'who' : userName,
         'time' : date
         }));
+        chatallSocket.send(JSON.stringify({
+            'message' : `new_chat_for_teaccher`,
+            'who' : teacher_name,
+            'time' : userName
+        }));
     }
     $(this).parent().parent().children().children().children('input').val('');
     })
@@ -412,7 +449,7 @@ $(document).ready(function(){
     $('body').on('click', '.chat-close', function(){
         socket_teacher.close();
         // sessionStorage.removeItem(tk_id);
-        sessionStorage.removeItem('socket_teacher');
+        sessionStorage.removeItem(teacher_name);
         $("body .chat"+userName+" > ul").empty();
     })
 });
