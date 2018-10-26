@@ -118,6 +118,7 @@ cd Smart-class
 export LC_ALL="en_US.UTF-8"
 export LC_CTYPE="en_US.UTF-8"
 sudo pip3 install -r requirement.txt
+sudo pip3 install -U Twisted[tls,http2]
 ```
 
 ### Tạo chứng chỉ SSL
