@@ -243,14 +243,13 @@
 
     <script>
       var userName = {{ username }};
-      /*var userSocket = new WebSocket(
+      var userSocket = new WebSocket(
           'wss://' + window.location.host +
-          ':8443/ws/' + userName + '/');*/
+          ':8443/ws/' + userName + '07112016_teacher/');
 
-      
-          var userSocket = new WebSocket(
+      /* var userSocket = new WebSocket(
             'ws://' + window.location.host +
-            '/ws/' + userName + '07112016_teacher/');
+            '/ws/' + userName + '07112016_teacher/');*/
 
             userSocket.onmessage = function(e) {
               var data = JSON.parse(e.data);

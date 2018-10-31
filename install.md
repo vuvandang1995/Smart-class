@@ -10,6 +10,8 @@ sudo apt-get install -y nodejs
 ```
 
 ### Tải các gói cần thiết
+*thay đổi smdb 
+
 ```
 git clone https://github.com/dung1101/RTC-server.git
 cd /home/smdb/RTC-server/peerjs/
@@ -55,8 +57,8 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
 
 ### Cấu hình supervisor
 - sửa cấu hình `sudo nano /etc/supervisor/conf.d/supervisord.conf`
-
-    copy nội dung bên dưới:
+    
+    copy nội dung bên dưới:*thay đổi smdb 
 
     ```
     [supervisord]
@@ -82,15 +84,15 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/priva
     ```
 
 ### Cấu hình MySQL server
-- cài đặt `sudo apt-get install -y mysql-server`
+- cài đặt `sudo apt-get install -y mysql-server` (điền mật khẩu cho tài khoản root)
 - đăng nhập vào mysql: `mysql -u root -p` (nhập mật khẩu đã tạo lúc dài đặt)
 - tạo database: `CREATE DATABASE smart_class CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 - tạo tài khoản: `CREATE USER 'smart'@'%' IDENTIFIED BY '123456';`
 - phân quyền: `GRANT ALL PRIVILEGES ON smart_class . * TO 'smart'@'%';`
 - cập nhật: `FLUSH PRIVILEGES;`
 - thoát: `exit;`
-- thay 127.0.0.1 bằng IP của SQL server vào file `nano /etc/mysql/mysql.conf.d/mysqld.cnf`
-- restart `/etc/init.d/mysql restart`
+- thay 127.0.0.1 bằng IP của SQL server vào file `sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf`
+- restart `sudo /etc/init.d/mysql restart`
 
 ### Chạy server RTC
 ```
@@ -112,7 +114,7 @@ sudo apt-get install docker.io
 
 ### Tải source code và cài các gói cần thiết để chạy code 
 ```
-git clone https://github.com/vuvandang1995/Smart-class.git
+git clone https://github.com/dung1101/Smart-class.git
 cd Smart-class
 export LC_ALL="en_US.UTF-8"
 export LC_CTYPE="en_US.UTF-8"
@@ -171,7 +173,7 @@ sudo pip3 install -U Twisted[tls,http2]
 ### Cấu hình Nginx:
 `sudo nano /etc/nginx/sites-available/default`
 
-copy nội dung bên dưới vào:
+copy nội dung bên dưới vào:*thay đổi ticket
 
 ```
 server {
@@ -209,7 +211,7 @@ server {
 ### Tạo Gunicorn systemd Service File
 `sudo nano /etc/systemd/system/gunicorn.service`
 
-copy nội dung bên dưới: 
+copy nội dung bên dưới: *thay đổi ticket
 
 ```
 [Unit]
@@ -227,8 +229,8 @@ WantedBy=multi-user.target
 ```
 
 ### Tạo Daphne systemd Service File
-`nano /etc/systemd/system/daphne.service`
-
+`sudo nano /etc/systemd/system/daphne.service`
+*thay đổi ticket
 ```
 [Unit]
 Description=My Daphne Service
@@ -266,24 +268,41 @@ WantedBy=multi-user.target
 
 ### Migrate database
 ```
-cd /home/ticket/Smart-Class/SmartClass/
-python3 manage.py makemigrations
+cd /home/ticket/Smart-class/SmartClass/
 python3 manage.py migrate
 ```
 ### Chạy web server
 ```
-docker run -p 6379:6379 -d redis:2.8
+sudo docker run -p 6379:6379 -d redis:2.8
 sudo systemctl daemon-reload
 sudo systemctl start gunicorn
 sudo systemctl start daphne
 sudo systemctl start nginx
 ```
 ### Tạo tài khoản Admin
-truy cập vào mySQL server 
+**Chuyển sang server database ở phần 1 truy cập vào mySQL server**
 ```
 mysql -u root -p
 use smart_class;
-insert into my_user values(password='pbkdf2_sha256$120000$g5frmDlYSxY1$mTT33TGmtMKw2AAQtluVO6T8uTvJowv7SCy2OZZZQ4Q=', email='admin@gmail.com', fullname='admin', username='admin', is_active=1, position=2, truong_id=1);
+insert into truong (ten, mo_ta) values ('Học viện An Ninh', 'Học viện An Ninh');
+insert into my_user (password, email, fullname, username, is_active, position, truong_id, gioi_tinh, noti_chat, noti_noti) values('pbkdf2_sha256$120000$g5frmDlYSxY1$mTT33TGmtMKw2AAQtluVO6T8uTvJowv7SCy2OZZZQ4Q=', 'admin@gmail.com','admin','admin',1,2,1,1,0,0);
 exit;
 ```
+**Chuyển sang server web ở phần 2 restart lại dịch vụ**
+```
+sudo systemctl restart gunicorn.service
+sudo systemctl restart nginx.service
+```
 ### Truy cập vào tài khoản admin với password là 1 và thay đổi lại password
+## vào trình duyệt dán link
+- `https://dia_chi_web_server`
+
+### Vào trình duyệt cài đặt extendtion chrome
+`https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk`
+### Vào trình duyệt chạy các link sau:
+- `https://dia_chi_mysql_server:8444`
+- `https://dia_chi_mysql_server:9443`
+- `https://dia_chi_mysql_server:443`
+
+và đồng ý truy cập cho lần đầu tiên
+
