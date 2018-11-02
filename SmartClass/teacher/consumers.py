@@ -204,7 +204,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # teacher = MyUser.objects.get(username=who)
                 # teacher.noti_noti = teacher.noti_noti + 1
                 # teacher.save()
-        elif time != 'None' and time != 'call_time' and time != 'teacher_change_group' and time != 'teacher_call' and time != 'key' and message != 'new_chat' and 'shareall' not in self.room_group_name:
+        elif time != 'None' and time != 'call_time' and time != 'teacher_change_group' and time != 'teacher_call' and time != 'key' and message != 'new_chat' and 'shareall' not in self.room_group_name and message != 'giotay' and message != 'bogiotay' and time != 'enable_share' and time != 'disable_share' and time != 'start_screen' and time != 'stop_screen' and time != 'tu_choi_giotay':
             f = r'notification/chat/class/'+self.room_group_name+'.txt'
             removeLines(path=f,number=40)
             file = open(f,'a')
